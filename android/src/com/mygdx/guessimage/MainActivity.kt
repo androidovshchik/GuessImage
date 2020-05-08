@@ -1,6 +1,7 @@
 package com.mygdx.guessimage
 
 import android.os.Bundle
+import androidx.recyclerview.widget.GridLayoutManager
 import com.afollestad.recyclical.datasource.dataSourceTypedOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
@@ -22,7 +23,9 @@ class MainActivity : BaseActivity() {
         )
         setContentView(frameLayout {
             recyclerView {
+
                 setup {
+                    withLayoutManager(GridLayoutManager(context, 2))
                     withDataSource(dataSource)
                     withItem<PuzzleEntity, PersonViewHolder>(R.layout.person_item_layout) {
                         onBind(::PersonViewHolder) { index, item ->
@@ -32,6 +35,12 @@ class MainActivity : BaseActivity() {
                         }
                         onClick { index ->
 
+                        }
+                    }
+                    withItem<Person, PersonViewHolder>(R.layout.person_item_layout) {
+                        onBind(::PersonViewHolder) { index, item ->
+                            name.text = item.name
+                            age.text = "${item.age}"
                         }
                     }
                 }

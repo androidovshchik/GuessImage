@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey
 class PuzzleEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "p_id")
-    var id: Long? = null,
+    var id: Long = 0L,
     @ColumnInfo(name = "p_path")
     var path: String
 )
