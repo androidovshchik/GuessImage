@@ -54,6 +54,7 @@ project(":android") {
     dependencies {
         implementation "org.kodein.di:kodein-di-generic-jvm:6.5.5"
         implementation "org.kodein.di:kodein-di-framework-android-core:6.5.5"
+        implementation "androidx.constraintlayout:constraintlayout:2.0.0-beta5"
         implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha03'
         implementation "androidx.room:room-runtime:2.2.5"
         kapt "androidx.room:room-compiler:2.2.5"
