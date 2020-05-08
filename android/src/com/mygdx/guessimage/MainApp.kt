@@ -36,6 +36,9 @@ class MainApp : Application(), KodeinAware {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+            Class.forName("com.facebook.stetho.Stetho")
+                .getDeclaredMethod("initializeWithDefaults", Context::class.java)
+                .invoke(null, applicationContext)
         }
     }
 }
