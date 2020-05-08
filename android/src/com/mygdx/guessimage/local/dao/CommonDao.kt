@@ -1,4 +1,4 @@
-package com.example.tourreservationapp2.db.dao
+package com.mygdx.guessimage.local.dao
 
 import androidx.room.Dao
 import androidx.room.RawQuery
