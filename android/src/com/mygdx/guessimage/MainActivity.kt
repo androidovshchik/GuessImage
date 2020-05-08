@@ -10,7 +10,7 @@ import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.local.Database
-import com.mygdx.guessimage.local.entities.PuzzleCount
+import com.mygdx.guessimage.local.entities.PuzzleEntity
 import kotlinx.android.synthetic.main.item_puzzle.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
@@ -18,7 +18,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.di.generic.instance
 import splitties.views.dsl.core.frameLayout
+import splitties.views.dsl.core.lParams
+import splitties.views.dsl.core.matchParent
 import splitties.views.dsl.recyclerview.recyclerView
+
+class DummyHolder(itemView: View) : ViewHolder(itemView)
 
 class PuzzleViewHolder(itemView: View) : ViewHolder(itemView) {
     val pictogram: ImageView = itemView.iv_pictogram
@@ -29,11 +33,14 @@ class MainActivity : BaseActivity() {
 
     private val db by instance<Database>()
 
+    private val dataSource = dataSourceOf("")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val dataSource = dataSourceOf("")
         setContentView(frameLayout {
-            recyclerView {
+            lParams(matchParent, matchParent)
+            addView(recyclerView {
+                lParams(matchParent, matchParent)
                 setup {
                     withLayoutManager(
                         GridLayoutManager(
@@ -42,19 +49,21 @@ class MainActivity : BaseActivity() {
                         )
                     )
                     withDataSource(dataSource)
-                    withItem<String, ViewHolder>(R.layout.item_new) {
+                    withItem<String, DummyHolder>(R.layout.item_new) {
+                        onBind(::DummyHolder) { index, item ->
+                        }
                         onClick { index ->
                         }
                     }
-                    withItem<PuzzleCount, PuzzleViewHolder>(R.layout.item_puzzle) {
+                    withItem<PuzzleEntity, PuzzleViewHolder>(R.layout.item_puzzle) {
                         onBind(::PuzzleViewHolder) { index, item ->
-
+                            count.text = "10"
                         }
                         onClick { index ->
                         }
                     }
                 }
-            }
+            })
         })
     }
 
@@ -62,8 +71,14 @@ class MainActivity : BaseActivity() {
         super.onStart()
         job.cancelChildren()
         launch {
-            withContext(Dispatchers.IO) {
+            val items = withContext(Dispatchers.IO) {
                 db.puzzleDao().getAll()
+            }
+            dataSource.apply {
+                clear()
+                add("")
+                addAll(items)
+                invalidateAll()
             }
         }
     }
