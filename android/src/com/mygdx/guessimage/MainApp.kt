@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.mygdx.guessimage.local.Database
+import com.mygdx.guessimage.local.DatabaseCallback
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
@@ -26,6 +27,7 @@ class MainApp : Application(), KodeinAware {
             Room.databaseBuilder(instance(), Database::class.java, "app.db")
                 .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
                 .fallbackToDestructiveMigration()
+                .addCallback(DatabaseCallback(instance()))
                 .build()
         }
     }

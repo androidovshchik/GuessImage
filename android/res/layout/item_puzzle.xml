@@ -1,56 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="9dp"
-    tools:background="#804D4A5B"
-    tools:ignore="MissingPrefix">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:foreground="?android:attr/selectableItemBackground">
 
-    <ru.iqsolution.tkoonline.screens.common.EllipsizingTextView
-        android:id="@+id/container_address"
-        fontPath="fonts/Roboto-Regular.ttf"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="11dp"
-        android:layout_weight="1"
-        android:ellipsize="start"
-        android:lineSpacingExtra="3sp"
-        android:maxLines="2"
-        android:singleLine="false"
-        android:textColor="@color/colorTextGrayDark"
-        android:textSize="15sp"
-        tools:text="г. Тула Марфинский район Школа №7" />
-
-    <TextView
-        android:id="@+id/container_range"
-        fontPath="fonts/Roboto-Regular.ttf"
+    <ImageView
+        android:id="@+id/iv_pictogram"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:lineSpacingExtra="3sp"
-        android:maxLines="2"
-        android:singleLine="false"
-        android:textColor="@color/colorTextGrayDark"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/tv_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="15sp"
-        tools:text="с   07:00\nдо 23:00" />
+        android:text="Загадайте\nпредметы" />
 
-    <FrameLayout
-        android:layout_width="30dp"
-        android:layout_height="30dp">
-
-        <View
-            android:id="@+id/container_oval"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            tools:background="@drawable/oval_red"
-            tools:layout_height="17dp"
-            tools:layout_width="17dp" />
-
-    </FrameLayout>
-
-</LinearLayout>
+</FrameLayout>
