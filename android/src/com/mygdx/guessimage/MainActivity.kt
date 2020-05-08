@@ -6,7 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import com.afollestad.recyclical.ViewHolder
-import com.afollestad.recyclical.datasource.dataSourceTypedOf
+import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.local.Database
@@ -31,17 +31,18 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val dataSource = dataSourceTypedOf(
-            Person("Aidan", 24),
-            Person("Nina", 24)
-        )
+        val dataSource = dataSourceOf("")
         setContentView(frameLayout {
             recyclerView {
-
                 setup {
-                    withLayoutManager(GridLayoutManager(context, 2))
+                    withLayoutManager(
+                        GridLayoutManager(
+                            context,
+                            resources.getInteger(R.integer.columns)
+                        )
+                    )
                     withDataSource(dataSource)
-                    withItem<Any, ViewHolder>(R.layout.item_new) {
+                    withItem<String, ViewHolder>(R.layout.item_new) {
                         onClick { index ->
                         }
                     }

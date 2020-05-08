@@ -27,7 +27,7 @@ class MainApp : Application(), KodeinAware {
             Room.databaseBuilder(instance(), Database::class.java, "app.db")
                 .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
                 .fallbackToDestructiveMigration()
-                .addCallback(DatabaseCallback(instance()))
+                .addCallback(DatabaseCallback())
                 .build()
         }
     }
