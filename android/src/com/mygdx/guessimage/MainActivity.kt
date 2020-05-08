@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
+import coil.api.load
 import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
@@ -50,13 +51,14 @@ class MainActivity : BaseActivity() {
                     )
                     withDataSource(dataSource)
                     withItem<String, DummyHolder>(R.layout.item_new) {
-                        onBind(::DummyHolder) { index, item ->
+                        onBind(::DummyHolder) { _, _ ->
                         }
                         onClick { index ->
                         }
                     }
                     withItem<PuzzleEntity, PuzzleViewHolder>(R.layout.item_puzzle) {
                         onBind(::PuzzleViewHolder) { index, item ->
+                            pictogram.load(item.path)
                             count.text = "10"
                         }
                         onClick { index ->

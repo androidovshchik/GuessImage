@@ -4,8 +4,11 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import coil.Coil
+import coil.ImageLoader
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.DatabaseCallback
+import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
@@ -40,5 +43,16 @@ class MainApp : Application(), KodeinAware {
                 .getDeclaredMethod("initializeWithDefaults", Context::class.java)
                 .invoke(null, applicationContext)
         }
+        Coil.setImageLoader(
+            ImageLoader.Builder(applicationContext)
+                .availableMemoryPercentage(0.5)
+                .bitmapPoolPercentage(0.5)
+                .okHttpClient {
+                    OkHttpClient.Builder()
+                        .cache(null)
+                        .build()
+                }
+                .build()
+        )
     }
 }
