@@ -59,6 +59,7 @@ project(":android") {
         implementation "androidx.room:room-runtime:2.2.5"
         kapt "androidx.room:room-compiler:2.2.5"
         implementation 'io.coil-kt:coil:0.10.1'
+        implementation "com.louiscad.splitties:splitties-activities:$splitties_version"
         implementation "com.louiscad.splitties:splitties-views-dsl:$splitties_version"
         implementation "com.louiscad.splitties:splitties-views-dsl-recyclerview:$splitties_version"
         implementation 'com.afollestad:recyclical:1.1.1'
