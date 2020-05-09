@@ -9,9 +9,8 @@ import android.view.ViewGroup
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.screen.base.BaseFragment
+import org.jetbrains.anko.*
 import org.kodein.di.generic.instance
-import splitties.views.dsl.core.*
-import splitties.views.onClick
 
 class ObjectFragment : BaseFragment() {
 
@@ -21,24 +20,22 @@ class ObjectFragment : BaseFragment() {
 
     @Suppress("DEPRECATION")
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
-        return with(activity) {
+        return UI {
             frameLayout {
-                lParams(matchParent, matchParent)
                 imageView {
-                    lParams(matchParent, matchParent)
                     //background = Color.BLUE
-                }
-                addView(button {
+                }.lparams(matchParent, matchParent)
+                button {
                     text = "Выберите приложение"
-                    onClick {
+                    setOnClickListener {
                         startActivityForResult(Intent.createChooser(Intent().apply {
                             action = Intent.ACTION_GET_CONTENT
                             type = "image/*"
                         }, "Выберите приложение"), 100)
                     }
-                })
+                }.lparams(matchParent, matchParent)
             }
-        }
+        }.view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
