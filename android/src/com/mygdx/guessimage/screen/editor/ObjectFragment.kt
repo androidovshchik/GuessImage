@@ -6,23 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import coil.api.load
 import com.afollestad.recyclical.datasource.dataSourceOf
-import com.afollestad.recyclical.setup
-import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.local.Database
-import com.mygdx.guessimage.local.entities.PuzzleEntity
-import com.mygdx.guessimage.screen.DummyHolder
-import com.mygdx.guessimage.screen.PuzzleViewHolder
 import com.mygdx.guessimage.screen.base.BaseFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.kodein.di.generic.instance
-import splitties.views.dsl.core.R
-import splitties.views.dsl.core.matchParent
-import splitties.views.dsl.recyclerview.recyclerView
+import splitties.views.dsl.core.*
+import splitties.views.onClick
 
 class ObjectFragment : BaseFragment() {
 
@@ -30,29 +19,24 @@ class ObjectFragment : BaseFragment() {
 
     private val dataSource = dataSourceOf("")
 
+    @Suppress("DEPRECATION")
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
         return with(activity) {
-            recyclerView {
-                layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-                setHasFixedSize(true)
-                setup {
-                    withLayoutManager(LinearLayoutManager(context))
-                    withDataSource(dataSource)
-                    withItem<String, DummyHolder>(R.layout.item_new) {
-                        onBind(::DummyHolder) { _, _ ->
-                        }
-                        onClick { index ->
-                        }
-                    }
-                    withItem<PuzzleEntity, PuzzleViewHolder>(R.layout.item_puzzle) {
-                        onBind(::PuzzleViewHolder) { index, item ->
-                            pictogram.load(item.path)
-                            count.text = "10"
-                        }
-                        onClick { index ->
-                        }
-                    }
+            frameLayout {
+                lParams(matchParent, matchParent)
+                imageView {
+                    lParams(matchParent, matchParent)
+                    //background = Color.BLUE
                 }
+                addView(button {
+                    text = "Выберите приложение"
+                    onClick {
+                        startActivityForResult(Intent.createChooser(Intent().apply {
+                            action = Intent.ACTION_GET_CONTENT
+                            type = "image/*"
+                        }, "Выберите приложение"), 100)
+                    }
+                })
             }
         }
     }
@@ -64,11 +48,11 @@ class ObjectFragment : BaseFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                100 -> launch {
+                /*100 -> launch {
                     withContext(Dispatchers.IO) {
                         presenter.getGalleryPath(applicationContext, data?.data ?: return)
                     }
-                }
+                }*/
             }
         }
     }
