@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GuessImage</string>
+    <string name="guess">Загадайте предметы</string>
+    <string name="btn_close">Закрыть</string>
+    <string name="btn_save">Сохранить</string>
 </resources>
