@@ -14,14 +14,18 @@ import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
+import com.mygdx.guessimage.R
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.PuzzleEntity
+import com.mygdx.guessimage.screen.base.BaseActivity
+import com.mygdx.guessimage.screen.editor.EditorActivity
 import kotlinx.android.synthetic.main.item_puzzle.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.di.generic.instance
+import splitties.activities.start
 import splitties.dimensions.dip
 import splitties.views.dsl.core.frameLayout
 import splitties.views.dsl.core.lParams
@@ -57,7 +61,8 @@ class MainActivity : BaseActivity() {
                     withItem<String, DummyHolder>(R.layout.item_new) {
                         onBind(::DummyHolder) { _, _ ->
                         }
-                        onClick { index ->
+                        onClick {
+                            start<EditorActivity>()
                         }
                     }
                     withItem<PuzzleEntity, PuzzleViewHolder>(R.layout.item_puzzle) {

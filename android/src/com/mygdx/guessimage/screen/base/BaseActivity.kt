@@ -1,4 +1,4 @@
-package com.mygdx.guessimage.screen
+package com.mygdx.guessimage.screen.base
 
 import android.app.Activity
 import android.view.MenuItem
