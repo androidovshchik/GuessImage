@@ -1,41 +1,26 @@
-package com.mygdx.guessimage
+package com.mygdx.guessimage.screen
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Rect
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.api.load
-import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.PuzzleEntity
-import kotlinx.android.synthetic.main.item_puzzle.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.di.generic.instance
-import splitties.dimensions.dip
-import splitties.views.dsl.core.frameLayout
-import splitties.views.dsl.core.lParams
-import splitties.views.dsl.core.matchParent
+import splitties.views.dsl.core.*
 import splitties.views.dsl.recyclerview.recyclerView
+import splitties.views.onClick
 
-class DummyHolder(itemView: View) : ViewHolder(itemView)
-
-class PuzzleViewHolder(itemView: View) : ViewHolder(itemView) {
-    val pictogram: ImageView = itemView.iv_pictogram
-    val count: TextView = itemView.tv_count
-}
-
-class MainActivity : BaseActivity() {
+class EditorActivity : BaseActivity() {
 
     private val db by instance<Database>()
 
@@ -44,14 +29,26 @@ class MainActivity : BaseActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(frameLayout {
+        setContentView(horizontalLayout {
             lParams(matchParent, matchParent)
+            addView(imageView {
+                lParams(0, matchParent, weight = 3f)
+                background = Color.BLUE
+            })
+            button {
+                onClick {
+                    val requestCode = if (which == 0) REQUEST_CAMERA else REQUEST_GALLERY
+                    startActivityForResult(Intent.createChooser(Intent().apply {
+                        action = Intent.ACTION_GET_CONTENT
+                        type = "image/*"
+                    }, "Выберите приложение"), requestCode)
+                }
+            }
             addView(recyclerView {
-                lParams(matchParent, matchParent)
-                val columns = resources.getInteger(R.integer.columns)
-                addItemDecoration(PuzzleDecoration(applicationContext, columns))
+                lParams(0, matchParent, weight = 1f)
+                setHasFixedSize(true)
                 setup {
-                    withLayoutManager(GridLayoutManager(context, columns))
+                    withLayoutManager(LinearLayoutManager(context))
                     withDataSource(dataSource)
                     withItem<String, DummyHolder>(R.layout.item_new) {
                         onBind(::DummyHolder) { _, _ ->
@@ -87,26 +84,15 @@ class MainActivity : BaseActivity() {
             }
         }
     }
-}
 
-class PuzzleDecoration(context: Context, private val columns: Int) : RecyclerView.ItemDecoration() {
-
-    private val minSpace = context.dip(3)
-
-    private val maxSpace = minSpace * 2
-
-    override fun getItemOffsets(
-        outRect: Rect,
-        view: View,
-        parent: RecyclerView,
-        state: RecyclerView.State
-    ) {
-        val position = parent.getChildAdapterPosition(view)
-        outRect.apply {
-            top = if (position / columns == 0) maxSpace else minSpace
-            left = if (position % columns == 0) maxSpace else minSpace
-            right = if ((position + 1) % columns == 0) maxSpace else minSpace
-            bottom = if (position / columns == state.itemCount / columns) maxSpace else minSpace
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                REQUEST_CAMERA ->
+                    onPhotoPath(PathCompat.getPhotoFile(applicationContext)?.path)
+                REQUEST_GALLERY ->
+                    presenter.getGalleryPath(applicationContext, data?.data ?: return)
+            }
         }
     }
 }
