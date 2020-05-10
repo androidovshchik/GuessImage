@@ -5,8 +5,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import com.mygdx.guessimage.extension.transact
-import com.mygdx.guessimage.local.entities.ObjectEntity
+import com.mygdx.guessimage.local.entities.PuzzleEntity
 import com.mygdx.guessimage.screen.base.BaseActivity
 import org.jetbrains.anko.UI
 import org.jetbrains.anko.frameLayout
@@ -16,11 +17,15 @@ import org.jetbrains.anko.matchParent
 @Suppress("DEPRECATION")
 class EditorActivity : BaseActivity() {
 
-    private val idObject = View.generateViewId()
-    private val idObjects = View.generateViewId()
+    private lateinit var puzzleModel: PuzzleModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val puzzle = intent.getSerializableExtra("puzzle") as PuzzleEntity
+        puzzleModel = ViewModelProvider(this, PuzzleModel.Factory(puzzle))
+            .get(PuzzleModel::class.java)
+        val idObject = View.generateViewId()
+        val idObjects = View.generateViewId()
         setContentView(UI {
             linearLayout {
                 layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
@@ -34,13 +39,8 @@ class EditorActivity : BaseActivity() {
             }
         }.view)
         supportFragmentManager.transact {
+            add(idObject, ObjectFragment.newInstance(), ObjectFragment.TAG)
             add(idObjects, ObjectsFragment.newInstance(), ObjectsFragment.TAG)
-        }
-    }
-
-    fun editObject(obj: ObjectEntity) {
-        supportFragmentManager.transact {
-            replace(idObject, ObjectFragment.newInstance(obj), ObjectFragment.TAG)
         }
     }
 
