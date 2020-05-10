@@ -33,21 +33,22 @@ class EditorActivity : BaseActivity() {
                 }.lparams(0, matchParent, 1f)
             }
         }.view)
-        fragmentManager.transact {
+        supportFragmentManager.transact {
             add(idObjects, ObjectsFragment.newInstance(), ObjectsFragment.TAG)
         }
     }
 
     fun editObject(obj: ObjectEntity) {
-        fragmentManager.transact {
+        supportFragmentManager.transact {
             replace(idObject, ObjectFragment.newInstance(obj), ObjectFragment.TAG)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        fragmentManager.findFragmentByTag(ObjectFragment.TAG)
+        super.onActivityResult(requestCode, resultCode, data)
+        /*supportFragmentManager.findFragmentByTag(ObjectFragment.TAG)
             ?.onActivityResult(requestCode, resultCode, data)
-        fragmentManager.findFragmentByTag(ObjectsFragment.TAG)
-            ?.onActivityResult(requestCode, resultCode, data)
+        supportFragmentManager.findFragmentByTag(ObjectsFragment.TAG)
+            ?.onActivityResult(requestCode, resultCode, data)*/
     }
 }

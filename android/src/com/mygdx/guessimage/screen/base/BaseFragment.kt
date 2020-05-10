@@ -1,13 +1,11 @@
-@file:Suppress("DEPRECATION")
-
 package com.mygdx.guessimage.screen.base
 
-import android.app.Fragment
 import android.content.Context
+import androidx.fragment.app.Fragment
 import com.mygdx.guessimage.extension.isMarshmallowPlus
 import kotlinx.coroutines.*
 import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
+import org.kodein.di.android.x.closestKodein
 import timber.log.Timber
 
 @Suppress("MemberVisibilityCanBePrivate")

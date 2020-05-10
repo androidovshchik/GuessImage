@@ -1,14 +1,14 @@
 package com.mygdx.guessimage.screen.base
 
-import android.app.Activity
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import timber.log.Timber
 
 @Suppress("MemberVisibilityCanBePrivate")
-abstract class BaseActivity : Activity(), KodeinAware, CoroutineScope {
+abstract class BaseActivity : AppCompatActivity(), KodeinAware, CoroutineScope {
 
     override val kodein by closestKodein()
 

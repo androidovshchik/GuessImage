@@ -2,9 +2,9 @@
 
 package com.mygdx.guessimage.extension
 
-import android.app.Fragment
-import android.app.FragmentManager
-import android.app.FragmentTransaction
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 
 val FragmentManager.topFragment: Fragment?
     get() = findFragmentByTag((backStackEntryCount - 1).toString())
