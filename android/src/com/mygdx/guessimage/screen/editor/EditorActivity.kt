@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.mygdx.guessimage.PathCompat
 import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.entities.PuzzleEntity
@@ -18,7 +19,7 @@ import org.jetbrains.anko.frameLayout
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
 
-class EditorActivity : BaseActivity() {
+class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
 
     private lateinit var puzzleModel: PuzzleModel
 
@@ -62,4 +63,6 @@ class EditorActivity : BaseActivity() {
             }
         }
     }
+
+    override fun exit() {}
 }

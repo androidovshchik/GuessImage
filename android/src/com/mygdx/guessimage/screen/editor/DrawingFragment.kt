@@ -12,9 +12,13 @@ class DrawingFragment : AndroidFragmentApplication() {
 
     lateinit var guessImage: GuessImage
 
-    override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         guessImage = GuessImage(BuildConfig.DEBUG, object : GuessImage.Listener {
         })
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
         return initializeForView(guessImage)
     }
 
