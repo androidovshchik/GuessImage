@@ -1,6 +1,5 @@
 package com.mygdx.guessimage.screen.editor
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -9,28 +8,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.mygdx.guessimage.PathCompat
 import com.mygdx.guessimage.R
-import com.mygdx.guessimage.local.Database
+import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
-import org.kodein.di.generic.instance
 
+@Suppress("DEPRECATION")
 class ObjectFragment : BaseFragment() {
 
-    private val db by instance<Database>()
+    private lateinit var obj: ObjectEntity
 
-    @Suppress("DEPRECATION")
+    private lateinit var image: ImageView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        obj = arguments.getSerializable("object") as ObjectEntity
+    }
+
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
+        val uri = obj.uri
         return UI {
             frameLayout {
                 layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-                setBackgroundColor(Color.parseColor("#E1BEE7"))
-                imageView {
+                setBackgroundColor(Color.parseColor("#E0E0E0"))
+                image = imageView {
                     scaleType = ImageView.ScaleType.FIT_CENTER
+                    if () {
+
+                    }
                 }.lparams(matchParent, matchParent)
                 button {
                     text = getString(R.string.upload)
@@ -43,26 +48,6 @@ class ObjectFragment : BaseFragment() {
                 }.lparams(wrapContent, wrapContent, Gravity.CENTER)
             }
         }.view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        launch {
-
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_IMAGE -> {
-                    launch {
-                        withContext(Dispatchers.IO) {
-                            PathCompat.getFilePath(, data?.data ?: return)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     companion object {

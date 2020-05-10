@@ -19,9 +19,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".screen.EditorActivity"
+            android:name=".screen.editor.EditorActivity"
             android:screenOrientation="sensorLandscape"
-            tools:ignore="LockedOrientationActivity"></activity>
+            tools:ignore="LockedOrientationActivity" />
     </application>
 
 </manifest>
