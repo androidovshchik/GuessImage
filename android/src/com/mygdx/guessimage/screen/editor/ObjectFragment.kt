@@ -31,8 +31,8 @@ class ObjectFragment : BaseFragment() {
 
     private var obj: ObjectEntity? = null
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
     }
 
@@ -42,6 +42,7 @@ class ObjectFragment : BaseFragment() {
                 layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
                 button = button {
                     text = getString(R.string.upload)
+                    isVisible = false
                     setOnClickListener {
                         val activity = activity ?: return@setOnClickListener
                         if (activity.areGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -66,18 +67,20 @@ class ObjectFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
             obj = it
-            notifyPath(it.uri)
+            notifyObject()
         })
         puzzleModel.galleryUri.observe(viewLifecycleOwner, Observer {
-            notifyPath(it)
+            obj?.uri = it
+            notifyObject()
         })
     }
 
-    private fun notifyPath(path: String?) {
-        button.isVisible = path == null
+    private fun notifyObject() {
+        val uri = obj?.uri
+        button.isVisible = uri == null
         image.apply {
-            isVisible = path != null
-            load(path)
+            isVisible = uri != null
+            load(uri)
         }
     }
 

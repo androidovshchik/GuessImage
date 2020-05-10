@@ -47,7 +47,6 @@ class MainActivity : BaseActivity() {
             frameLayout {
                 layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
                 recyclerView {
-                    setHasFixedSize(true)
                     val columns = resources.getInteger(R.integer.columns)
                     addItemDecoration(LayoutMarginDecoration(columns, dip(6)).also {
                         it.setPadding(this, dip(6))
@@ -59,7 +58,9 @@ class MainActivity : BaseActivity() {
                             onBind(::DummyHolder) { _, _ ->
                             }
                             onClick {
-                                startActivity<EditorActivity>()
+                                startActivity<EditorActivity>(
+                                    "puzzle" to PuzzleEntity()
+                                )
                             }
                         }
                         withItem<PuzzleEntity, PuzzleViewHolder>(R.layout.item_puzzle) {
@@ -68,7 +69,7 @@ class MainActivity : BaseActivity() {
                                 count.text = "10"
                             }
                             onClick { index ->
-                                startActivity<EditorActivity>()
+
                             }
                         }
                     }
@@ -85,10 +86,10 @@ class MainActivity : BaseActivity() {
                 db.puzzleDao().getAll()
             }
             dataSource.apply {
-                /*clear()
+                clear()
                 add("")
                 addAll(items)
-                invalidateAll()*/
+                invalidateAll()
             }
         }
     }

@@ -40,8 +40,8 @@ class ObjectsFragment : BaseFragment() {
 
     private val dataSource = dataSourceOf()
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
     }
 
@@ -74,9 +74,7 @@ class ObjectsFragment : BaseFragment() {
                         button {
                             text = getString(R.string.btn_add)
                             setOnClickListener {
-                                appContext?.activityCallback<EditorActivity> {
-                                    editObject(ObjectEntity())
-                                }
+                                puzzleModel.currentObj.value = ObjectEntity()
                             }
                         }.lparams(matchParent, wrapContent)
                     }
