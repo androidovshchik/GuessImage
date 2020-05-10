@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.recyclical.ViewHolder
@@ -15,6 +14,7 @@ import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.PathCompat
 import com.mygdx.guessimage.R
+import com.mygdx.guessimage.extension.activityCallback
 import com.mygdx.guessimage.extension.nestedScrollView
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
@@ -49,22 +49,31 @@ class ObjectsFragment : BaseFragment() {
                     }
                 }.lparams(matchParent, wrapContent)
                 nestedScrollView {
-                    layoutParams = LinearLayout.LayoutParams(matchParent, 0, 1f)
-                    recyclerView {
+                    verticalLayout {
                         layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
-                        setHasFixedSize(true)
-                        setup {
-                            withLayoutManager(LinearLayoutManager(context))
-                            withDataSource(dataSource)
-                            withItem<ObjectEntity, ObjectViewHolder>(R.layout.item_object) {
-                                onBind(::ObjectViewHolder) { index, item ->
-                                }
-                                onClick { index ->
+                        recyclerView {
+                            isNestedScrollingEnabled = false
+                            setup {
+                                withLayoutManager(LinearLayoutManager(context))
+                                withDataSource(dataSource)
+                                withItem<ObjectEntity, ObjectViewHolder>(R.layout.item_object) {
+                                    onBind(::ObjectViewHolder) { index, item ->
+                                    }
+                                    onClick { index ->
+                                    }
                                 }
                             }
-                        }
+                        }.lparams(matchParent, wrapContent)
+                        button {
+                            text = getString(R.string.btn_add)
+                            setOnClickListener {
+                                appContext?.activityCallback<EditorActivity> {
+
+                                }
+                            }
+                        }.lparams(matchParent, wrapContent)
                     }
-                }
+                }.lparams(matchParent, 0, 1f)
                 button {
                     text = getString(R.string.btn_save)
                     setOnClickListener {
