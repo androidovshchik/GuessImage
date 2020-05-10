@@ -35,6 +35,7 @@ class MainApp : Application(), KodeinAware {
 
     override fun onCreate() {
         super.onCreate()
+        GdxLog.DEBUG = BuildConfig.DEBUG
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
             Class.forName("com.facebook.stetho.Stetho")

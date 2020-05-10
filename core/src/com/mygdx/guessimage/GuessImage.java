@@ -10,32 +10,34 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.mygdx.guessimage.model.Background;
 
 public class GuessImage extends BaseAdapter {
 
     private static final String TAG = GuessImage.class.getSimpleName();
 
+    private OrthographicCamera camera;
+
+    private FitViewport viewport;
+
     private ShapeRenderer shapeRenderer;
     private SpriteBatch spriteBatch;
+
+    Texture textureCenter;
 
     private Listener listener;
 
     private int rendersCount = 0;
 
-    public GuessImage(boolean debug, Listener listener) {
-        GdxLog.DEBUG = debug;
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
+    public GuessImage(Listener listener) {
         this.listener = listener;
-        setPhotoBackground("image.png", 0);
     }
 
     @Override
     public void create() {
+        textureCenter = new Texture("image.png");
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, worldWidth, worldHeight);
-        viewport = new FitViewport(worldWidth, worldHeight, camera);
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
@@ -56,7 +58,7 @@ public class GuessImage extends BaseAdapter {
         spriteBatch.setProjectionMatrix(camera.combined);
 
         spriteBatch.begin();
-
+        spriteBatch.draw(textureCenter, 0, 0);
         spriteBatch.end();
 
         if (rendersCount >= 2) {
@@ -90,22 +92,13 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        viewport.update(width, height, false);
     }
 
     @Override
     public void dispose() {
         spriteBatch.dispose();
         shapeRenderer.dispose();
-    }
-
-    @SuppressWarnings("unused")
-    public void setPhotoBackground(String photoPath, Integer rotation) {
-        clearBackground();
-        Texture textureCenter = new Texture(Gdx.files.local(photoPath));
-        Background backgroundCenter = new Background(textureCenter, Player.TYPE_PHOTO, photoPath);
-        backgroundCenter.center(worldWidth, worldHeight, rotation);
-        backgroundStage.addActor(backgroundCenter);
     }
 
     public interface Listener {
