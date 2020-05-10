@@ -114,6 +114,8 @@ class ObjectsFragment : BaseFragment() {
 
     companion object {
 
+        val TAG = ObjectsFragment::class.java.simpleName
+
         fun newInstance(): ObjectsFragment {
             return ObjectsFragment().apply {
                 arguments = Bundle().apply {

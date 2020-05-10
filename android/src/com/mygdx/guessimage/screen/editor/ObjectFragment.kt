@@ -86,6 +86,8 @@ class ObjectFragment : BaseFragment() {
 
         const val REQUEST_IMAGE = 100
 
+        val TAG = ObjectFragment::class.java.simpleName
+
         fun newInstance(obj: ObjectEntity): ObjectFragment {
             return ObjectFragment().apply {
                 arguments = Bundle().apply {

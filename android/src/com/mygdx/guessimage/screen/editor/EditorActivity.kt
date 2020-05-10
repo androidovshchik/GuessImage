@@ -1,5 +1,6 @@
 package com.mygdx.guessimage.screen.editor
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -33,14 +34,20 @@ class EditorActivity : BaseActivity() {
             }
         }.view)
         fragmentManager.transact {
-            //add(idObject, ObjectFragment(), ObjectFragment::class.java.simpleName)
-            add(idObjects, ObjectsFragment.newInstance(), ObjectsFragment::class.java.simpleName)
+            add(idObjects, ObjectsFragment.newInstance(), ObjectsFragment.TAG)
         }
     }
 
     fun editObject(obj: ObjectEntity) {
         fragmentManager.transact {
-            add(idObject, ObjectFragment.newInstance(obj), ObjectFragment::class.java.simpleName)
+            add(idObject, ObjectFragment.newInstance(obj), ObjectFragment.TAG)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        fragmentManager.findFragmentByTag(ObjectFragment.TAG)
+            ?.onActivityResult(requestCode, resultCode, data)
+        fragmentManager.findFragmentByTag(ObjectsFragment.TAG)
+            ?.onActivityResult(requestCode, resultCode, data)
     }
 }
