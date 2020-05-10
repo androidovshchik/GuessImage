@@ -9,9 +9,7 @@ class PuzzleModel : ViewModel() {
 
     lateinit var puzzle: PuzzleEntity
 
-    val objects = mutableListOf<ObjectEntity>()
-
     val currentObj = MutableLiveData<ObjectEntity>()
 
-    val galleryPath = MutableLiveData<String>()
+    val galleryUri = MutableLiveData<String>()
 }

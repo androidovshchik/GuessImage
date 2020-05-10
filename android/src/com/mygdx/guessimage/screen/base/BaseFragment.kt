@@ -1,8 +1,6 @@
 package com.mygdx.guessimage.screen.base
 
-import android.content.Context
 import androidx.fragment.app.Fragment
-import com.mygdx.guessimage.extension.isMarshmallowPlus
 import kotlinx.coroutines.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -14,9 +12,6 @@ abstract class BaseFragment : Fragment(), KodeinAware, CoroutineScope {
     override val kodein by closestKodein()
 
     protected val job = SupervisorJob()
-
-    protected val appContext: Context?
-        get() = if (isMarshmallowPlus()) context else activity?.applicationContext
 
     override fun onDestroyView() {
         job.cancelChildren()
