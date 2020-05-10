@@ -25,6 +25,10 @@ class MainApp : Application(), KodeinAware {
             applicationContext
         }
 
+        bind<FileManager>() with provider {
+            FileManager(instance())
+        }
+
         bind<Database>() with singleton {
             Room.databaseBuilder(instance(), Database::class.java, "app.db")
                 .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
