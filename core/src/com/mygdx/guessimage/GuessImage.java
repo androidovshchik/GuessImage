@@ -9,20 +9,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.guessimage.model.Background;
 
 public class GuessImage extends BaseAdapter {
 
     private static final String TAG = GuessImage.class.getSimpleName();
 
     private OrthographicCamera camera;
-
     private FitViewport viewport;
-
     private ShapeRenderer shapeRenderer;
     private SpriteBatch spriteBatch;
-
-    Texture textureCenter;
+    private Stage stage;
 
     private Listener listener;
 
@@ -34,13 +33,16 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void create() {
-        textureCenter = new Texture("image.png");
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
+
+        stage = new Stage(viewport);
+        Background background = new Background(new Texture("image.png"));
+        stage.addActor(background);
 
         GestureDetector gestureDetector = new GestureDetector(this);
         InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -51,14 +53,15 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(224f / 255, 224f / 255, 224f / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         shapeRenderer.setProjectionMatrix(camera.combined);
         spriteBatch.setProjectionMatrix(camera.combined);
 
         spriteBatch.begin();
-        spriteBatch.draw(textureCenter, 0, 0);
+        stage.act();
+        stage.getRoot().draw(spriteBatch, 1);
         spriteBatch.end();
 
         if (rendersCount >= 2) {
@@ -92,13 +95,14 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, false);
+        // todo
     }
 
     @Override
     public void dispose() {
-        spriteBatch.dispose();
         shapeRenderer.dispose();
+        spriteBatch.dispose();
+        stage.dispose();
     }
 
     public interface Listener {
