@@ -4,9 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.lang.reflect.Method;
 
@@ -15,16 +13,17 @@ public abstract class BaseAdapter extends InputAdapter
 
     private static final String TAG = BaseAdapter.class.getSimpleName();
 
-    protected OrthographicCamera camera;
-
-    protected FitViewport viewport;
-
     @Override
     public void resume() {
     }
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean longPress(float x, float y) {
         return false;
     }
 
@@ -56,7 +55,7 @@ public abstract class BaseAdapter extends InputAdapter
                 classes[i] = params[i] == null ? String.class : params[i].getClass();
             }
             try {
-                method = GuessImage.class.getMethod(name, classes);
+                method = getClass().getMethod(name, classes);
             } catch (Throwable e) {
                 GdxLog.print(TAG, e.toString());
             }
@@ -64,7 +63,7 @@ public abstract class BaseAdapter extends InputAdapter
                 return;
             }
             try {
-                method.invoke(BaseAdapter.this, params);
+                method.invoke(this, params);
             } catch (Throwable e) {
                 GdxLog.print(TAG, e.toString());
             }
