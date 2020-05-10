@@ -1,33 +1,17 @@
 package com.mygdx.guessimage.screen.editor
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider.NewInstanceFactory
+import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 
-class PuzzleModel(private val puzzle: PuzzleEntity) : ViewModel() {
+class PuzzleModel : ViewModel() {
 
-    val articleList: LiveData<List<Article>>? = null
+    lateinit var puzzle: PuzzleEntity
 
-    var selectedArticle: MutableLiveData<Article> = MutableLiveData<Article>()
-        set(article) {
-            selectedArticle.setValue(article)
-        }
+    val objects = mutableListOf<ObjectEntity>()
 
-    fun loadArticles() {
-        // fetch articles here asynchronously
-    }
+    val currentObj = MutableLiveData<ObjectEntity>()
 
-    override fun onCleared() {
-        super.onCleared()
-    }
-
-    class Factory(private val puzzle: PuzzleEntity) : NewInstanceFactory() {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return PuzzleModel(puzzle) as T
-        }
-    }
+    val galleryPath = MutableLiveData<String>()
 }

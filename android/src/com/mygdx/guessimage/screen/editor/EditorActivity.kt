@@ -21,9 +21,8 @@ class EditorActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val puzzle = intent.getSerializableExtra("puzzle") as PuzzleEntity
-        puzzleModel = ViewModelProvider(this, PuzzleModel.Factory(puzzle))
-            .get(PuzzleModel::class.java)
+        puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
+        puzzleModel.puzzle = intent.getSerializableExtra("puzzle") as PuzzleEntity
         val idObject = View.generateViewId()
         val idObjects = View.generateViewId()
         setContentView(UI {
