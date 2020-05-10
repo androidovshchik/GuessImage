@@ -97,10 +97,10 @@ class ObjectsFragment : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            val uri = data?.data ?: return
-            when (requestCode) {
-                ObjectFragment.REQUEST_IMAGE -> {
+        when (requestCode) {
+            ObjectFragment.REQUEST_IMAGE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val uri = data?.data ?: return
                     launch {
                         val path = withContext(Dispatchers.IO) {
                             PathCompat.getFilePath(appContext!!, uri)

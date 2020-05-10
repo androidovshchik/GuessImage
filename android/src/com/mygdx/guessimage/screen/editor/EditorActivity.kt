@@ -40,7 +40,7 @@ class EditorActivity : BaseActivity() {
 
     fun editObject(obj: ObjectEntity) {
         fragmentManager.transact {
-            add(idObject, ObjectFragment.newInstance(obj), ObjectFragment.TAG)
+            replace(idObject, ObjectFragment.newInstance(obj), ObjectFragment.TAG)
         }
     }
 

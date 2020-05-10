@@ -1,5 +1,6 @@
 package com.mygdx.guessimage.screen.editor
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,8 @@ import android.widget.ImageView
 import coil.api.load
 import com.mygdx.guessimage.PathCompat
 import com.mygdx.guessimage.R
+import com.mygdx.guessimage.extension.areGranted
+import com.mygdx.guessimage.extension.isMarshmallowPlus
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
@@ -41,10 +44,17 @@ class ObjectFragment : BaseFragment() {
                 button = button {
                     text = getString(R.string.upload)
                     setOnClickListener {
-                        activity?.startActivityForResult(Intent.createChooser(Intent().apply {
-                            action = Intent.ACTION_GET_CONTENT
-                            type = "image/*"
-                        }, getString(R.string.choose)), REQUEST_IMAGE)
+                        val activity = activity ?: return@setOnClickListener
+                        if (activity.areGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                            activity.startActivityForResult(Intent.createChooser(Intent().apply {
+                                action = Intent.ACTION_GET_CONTENT
+                                type = "image/*"
+                            }, getString(R.string.choose)), REQUEST_IMAGE)
+                        } else if (isMarshmallowPlus()) {
+                            requestPermissions(
+                                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_STORAGE
+                            )
+                        }
                     }
                 }.lparams(wrapContent, wrapContent, Gravity.CENTER)
                 image = imageView {
@@ -59,10 +69,10 @@ class ObjectFragment : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            val uri = data?.data ?: return
-            when (requestCode) {
-                REQUEST_IMAGE -> {
+        when (requestCode) {
+            REQUEST_IMAGE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val uri = data?.data ?: return
                     launch {
                         val path = withContext(Dispatchers.IO) {
                             PathCompat.getFilePath(appContext!!, uri)
@@ -82,7 +92,17 @@ class ObjectFragment : BaseFragment() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, p: Array<out String>, r: IntArray) {
+        when (requestCode) {
+            REQUEST_STORAGE -> {
+                button.performClick()
+            }
+        }
+    }
+
     companion object {
+
+        const val REQUEST_STORAGE = 1
 
         const val REQUEST_IMAGE = 100
 
