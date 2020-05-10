@@ -8,26 +8,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import coil.api.load
 import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.areGranted
 import com.mygdx.guessimage.extension.isMarshmallowPlus
 import com.mygdx.guessimage.extension.isVisible
+import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
-import org.jetbrains.anko.*
+import org.jetbrains.anko.button
+import org.jetbrains.anko.frameLayout
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.support.v4.UI
+import org.jetbrains.anko.wrapContent
 
 class ObjectFragment : BaseFragment() {
+
+    private val idDrawing = View.generateViewId()
 
     private lateinit var puzzleModel: PuzzleModel
 
     private lateinit var button: Button
-
-    private lateinit var image: ImageView
 
     private var obj: ObjectEntity? = null
 
@@ -40,6 +42,9 @@ class ObjectFragment : BaseFragment() {
         return UI {
             frameLayout {
                 layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
+                frameLayout {
+                    id = idDrawing
+                }.lparams(matchParent, matchParent)
                 button = button {
                     text = getString(R.string.upload)
                     isVisible = false
@@ -57,14 +62,14 @@ class ObjectFragment : BaseFragment() {
                         }
                     }
                 }.lparams(wrapContent, wrapContent, Gravity.CENTER)
-                image = imageView {
-                    scaleType = ImageView.ScaleType.FIT_CENTER
-                }.lparams(matchParent, matchParent)
             }
         }.view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        childFragmentManager.transact {
+            add(idDrawing, DrawingFragment.newInstance(), DrawingFragment.TAG)
+        }
         puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
             obj = it
             notifyObject()
@@ -78,10 +83,6 @@ class ObjectFragment : BaseFragment() {
     private fun notifyObject() {
         val uri = obj?.uri
         button.isVisible = uri == null
-        image.apply {
-            isVisible = uri != null
-            load(uri)
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, p: Array<out String>, r: IntArray) {

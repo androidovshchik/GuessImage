@@ -7,21 +7,26 @@ import android.view.ViewGroup
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.mygdx.guessimage.BuildConfig
 import com.mygdx.guessimage.GuessImage
-import com.mygdx.guessimage.R
 
 class DrawingFragment : AndroidFragmentApplication() {
 
+    lateinit var guessImage: GuessImage
+
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
-        val worldWidth: Int = getResources().getDimensionPixelSize(R.dimen.world_width)
-        world = GuessImage(
-            BuildConfig.DEBUG,
-            worldWidth,
-            worldWidth,
-            object : StickersPressListener() {
-                fun onStickerLongPress() {
-                    EventUtil.post(StickerPressEvent())
+        guessImage = GuessImage(BuildConfig.DEBUG, object : GuessImage.Listener {
+        })
+        return initializeForView(guessImage)
+    }
+
+    companion object {
+
+        val TAG = ObjectFragment::class.java.simpleName
+
+        fun newInstance(): DrawingFragment {
+            return DrawingFragment().apply {
+                arguments = Bundle().apply {
                 }
-            })
-        return initializeForView(world)
+            }
+        }
     }
 }
