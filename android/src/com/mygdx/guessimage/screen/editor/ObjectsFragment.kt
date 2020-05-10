@@ -31,13 +31,13 @@ class ObjectViewHolder(itemView: View) : ViewHolder(itemView) {
     val name: TextView = itemView.tv_name
 }
 
+@Suppress("DEPRECATION")
 class ObjectsFragment : BaseFragment() {
 
     private val db by instance<Database>()
 
     private val dataSource = dataSourceOf()
 
-    @Suppress("DEPRECATION")
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
         return UI {
             verticalLayout {
@@ -68,7 +68,7 @@ class ObjectsFragment : BaseFragment() {
                             text = getString(R.string.btn_add)
                             setOnClickListener {
                                 appContext?.activityCallback<EditorActivity> {
-
+                                    editObject(ObjectEntity())
                                 }
                             }
                         }.lparams(matchParent, wrapContent)
@@ -107,6 +107,16 @@ class ObjectsFragment : BaseFragment() {
                         }
                         //image.load(path)
                     }
+                }
+            }
+        }
+    }
+
+    companion object {
+
+        fun newInstance(): ObjectsFragment {
+            return ObjectsFragment().apply {
+                arguments = Bundle().apply {
                 }
             }
         }

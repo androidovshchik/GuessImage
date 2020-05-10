@@ -85,5 +85,13 @@ class ObjectFragment : BaseFragment() {
     companion object {
 
         const val REQUEST_IMAGE = 100
+
+        fun newInstance(obj: ObjectEntity): ObjectFragment {
+            return ObjectFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable("object", obj)
+                }
+            }
+        }
     }
 }
