@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import androidx.annotation.WorkerThread
 import androidx.exifinterface.media.ExifInterface
 import com.mygdx.guessimage.extension.use
 import timber.log.Timber
@@ -12,7 +11,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-@Suppress("MemberVisibilityCanBePrivate", "unused")
+private const val MAX_SIZE = 2048
+
+val randomName: String
+    get() = "${UUID.randomUUID()}.jpg"
+
+@Suppress("MemberVisibilityCanBePrivate")
 class FileManager(context: Context) {
 
     val externalDir: File? = context.getExternalFilesDir(null)?.apply { mkdirs() }
@@ -22,8 +26,8 @@ class FileManager(context: Context) {
     val imagesDir: File
         get() = File(externalDir ?: internalDir, "images").apply { mkdirs() }
 
-    val randomName: String
-        get() = "${UUID.randomUUID()}.jpg"
+    val iconsDir: File
+        get() = File(externalDir ?: internalDir, "icons").apply { mkdirs() }
 }
 
 fun copyImage(src: String, dist: String) {
@@ -33,7 +37,6 @@ fun copyImage(src: String, dist: String) {
 /**
  * @return new path of file
  */
-@WorkerThread
 fun copyImage(src: File, dist: File) {
     if (!src.exists()) {
         return
@@ -139,9 +142,4 @@ private fun BitmapFactory.Options.calculateInSampleSize(reqWidth: Int, reqHeight
         }
     }
     return inSampleSize
-}
-
-companion object {
-
-    private const val MAX_SIZE = 2048
 }

@@ -5,7 +5,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -20,11 +19,11 @@ public class GuessImage extends BaseAdapter {
     private OrthographicCamera camera;
     private FitViewport viewport;
     private ShapeRenderer shapeRenderer;
-    private SpriteBatch spriteBatch;
     private Stage stage;
 
     private Listener listener;
 
+    private float startZoom = 1f;
     private int rendersCount = 0;
 
     public GuessImage(Listener listener) {
@@ -38,7 +37,6 @@ public class GuessImage extends BaseAdapter {
         viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 
         shapeRenderer = new ShapeRenderer();
-        spriteBatch = new SpriteBatch();
 
         stage = new Stage(viewport);
         Background background = new Background(new Texture("image.png"));
@@ -57,12 +55,9 @@ public class GuessImage extends BaseAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         shapeRenderer.setProjectionMatrix(camera.combined);
-        spriteBatch.setProjectionMatrix(camera.combined);
 
-        spriteBatch.begin();
         stage.act();
-        stage.getRoot().draw(spriteBatch, 1);
-        spriteBatch.end();
+        stage.draw();
 
         if (rendersCount >= 2) {
             rendersCount = 0;
@@ -80,17 +75,26 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
+        float zoom = camera.zoom;
+        camera.translate(-deltaX * zoom, deltaY * zoom);
+        camera.update();
         return false;
     }
 
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1,
                          Vector2 pointer2) {
+        Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
+        Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
+        GdxLog.print(TAG, "zoom " + (currentVector.len() / startVector.len()));
+        camera.zoom = Math.min(1, startZoom * currentVector.len() / startVector.len());
+        camera.update();
         return false;
     }
 
     @Override
     public void pinchStop() {
+        startZoom = camera.zoom;
     }
 
     @Override
@@ -101,7 +105,6 @@ public class GuessImage extends BaseAdapter {
     @Override
     public void dispose() {
         shapeRenderer.dispose();
-        spriteBatch.dispose();
         stage.dispose();
     }
 
