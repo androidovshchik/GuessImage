@@ -1,20 +1,17 @@
 package com.mygdx.guessimage.screen.editor
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
-import com.mygdx.guessimage.PathCompat
 import com.mygdx.guessimage.R
-import com.mygdx.guessimage.extension.activityCallback
 import com.mygdx.guessimage.extension.nestedScrollView
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
@@ -24,19 +21,29 @@ import kotlinx.android.synthetic.main.item_object.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.*
+import org.jetbrains.anko.button
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.support.v4.UI
+import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.wrapContent
 import org.kodein.di.generic.instance
 
 class ObjectViewHolder(itemView: View) : ViewHolder(itemView) {
     val name: TextView = itemView.tv_name
 }
 
-@Suppress("DEPRECATION")
 class ObjectsFragment : BaseFragment() {
+
+    private lateinit var puzzleModel: PuzzleModel
 
     private val db by instance<Database>()
 
     private val dataSource = dataSourceOf()
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
         return UI {
@@ -92,22 +99,6 @@ class ObjectsFragment : BaseFragment() {
             dataSource.apply {
                 clear()
                 invalidateAll()
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            ObjectFragment.REQUEST_IMAGE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val uri = data?.data ?: return
-                    launch {
-                        val path = withContext(Dispatchers.IO) {
-                            PathCompat.getFilePath(appContext!!, uri)
-                        }
-                        //image.load(path)
-                    }
-                }
             }
         }
     }

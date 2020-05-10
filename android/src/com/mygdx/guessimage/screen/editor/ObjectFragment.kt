@@ -1,7 +1,6 @@
 package com.mygdx.guessimage.screen.editor
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
@@ -10,31 +9,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import coil.api.load
-import com.mygdx.guessimage.PathCompat
 import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.areGranted
 import com.mygdx.guessimage.extension.isMarshmallowPlus
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.UI
 
-@Suppress("DEPRECATION")
 class ObjectFragment : BaseFragment() {
 
-    private lateinit var obj: ObjectEntity
+    private lateinit var puzzleModel: PuzzleModel
 
     private lateinit var button: Button
 
     private lateinit var image: ImageView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        obj = arguments.getSerializable("object") as ObjectEntity
+    private var obj: ObjectEntity? = null
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -65,23 +64,13 @@ class ObjectFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        notifyPath(obj.uri)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            REQUEST_IMAGE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val uri = data?.data ?: return
-                    launch {
-                        val path = withContext(Dispatchers.IO) {
-                            PathCompat.getFilePath(appContext!!, uri)
-                        }
-                        notifyPath(path)
-                    }
-                }
-            }
-        }
+        puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
+            obj = it
+            notifyPath(it.uri)
+        })
+        puzzleModel.galleryUri.observe(viewLifecycleOwner, Observer {
+            notifyPath(it)
+        })
     }
 
     private fun notifyPath(path: String?) {
@@ -108,10 +97,9 @@ class ObjectFragment : BaseFragment() {
 
         val TAG = ObjectFragment::class.java.simpleName
 
-        fun newInstance(obj: ObjectEntity): ObjectFragment {
+        fun newInstance(): ObjectFragment {
             return ObjectFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable("object", obj)
                 }
             }
         }
