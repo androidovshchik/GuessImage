@@ -68,6 +68,7 @@ class MainActivity : BaseActivity() {
                                 count.text = "10"
                             }
                             onClick { index ->
+                                startActivity<EditorActivity>()
                             }
                         }
                     }
