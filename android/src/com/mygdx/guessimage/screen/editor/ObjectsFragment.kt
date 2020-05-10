@@ -6,9 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.recyclical.ViewHolder
-import com.afollestad.recyclical.datasource.dataSourceOf
+import com.afollestad.recyclical.datasource.dataSourceTypedOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.R
@@ -28,6 +29,7 @@ import org.jetbrains.anko.verticalLayout
 import org.jetbrains.anko.wrapContent
 import org.kodein.di.generic.instance
 
+
 class ObjectViewHolder(itemView: View) : ViewHolder(itemView) {
     val name: TextView = itemView.tv_name
 }
@@ -38,11 +40,22 @@ class ObjectsFragment : BaseFragment() {
 
     private val db by instance<Database>()
 
-    private val dataSource = dataSourceOf()
+    private val dataSource = dataSourceTypedOf(
+        ObjectEntity().apply { name = "object0" },
+        ObjectEntity().apply { name = "object1" },
+        ObjectEntity().apply { name = "object2" },
+        ObjectEntity().apply { name = "object3" },
+        ObjectEntity().apply { name = "object4" },
+        ObjectEntity().apply { name = "object5" },
+        ObjectEntity().apply { name = "object6" },
+        ObjectEntity().apply { name = "object7" },
+        ObjectEntity().apply { name = "object8" },
+        ObjectEntity().apply { name = "object9" }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
+        puzzleModel = ViewModelProvider(requireActivity()).get(PuzzleModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -60,13 +73,21 @@ class ObjectsFragment : BaseFragment() {
                         layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
                         recyclerView {
                             isNestedScrollingEnabled = false
+                            addItemDecoration(
+                                DividerItemDecoration(
+                                    context,
+                                    DividerItemDecoration.VERTICAL
+                                )
+                            )
                             setup {
                                 withLayoutManager(LinearLayoutManager(context))
                                 withDataSource(dataSource)
                                 withItem<ObjectEntity, ObjectViewHolder>(R.layout.item_object) {
-                                    onBind(::ObjectViewHolder) { index, item ->
+                                    onBind(::ObjectViewHolder) { _, item ->
+                                        name.text = item.name
                                     }
                                     onClick { index ->
+                                        puzzleModel.currentObj.value = dataSource[index]
                                     }
                                 }
                             }
@@ -74,7 +95,14 @@ class ObjectsFragment : BaseFragment() {
                         button {
                             text = getString(R.string.btn_add)
                             setOnClickListener {
-                                puzzleModel.currentObj.value = ObjectEntity()
+                                val obj = ObjectEntity().apply {
+                                    name = "object${dataSource.size()}"
+                                }
+                                dataSource.apply {
+                                    add(obj)
+                                    invalidateAt(size() - 1)
+                                }
+                                puzzleModel.currentObj.value = obj
                             }
                         }.lparams(matchParent, wrapContent)
                     }
@@ -95,8 +123,8 @@ class ObjectsFragment : BaseFragment() {
                 db.objectDao().getAll()
             }
             dataSource.apply {
-                clear()
-                invalidateAll()
+                //clear()
+                //invalidateAll()
             }
         }
     }

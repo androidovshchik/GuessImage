@@ -33,7 +33,7 @@ class ObjectFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
+        puzzleModel = ViewModelProvider(requireActivity()).get(PuzzleModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
