@@ -2,6 +2,7 @@ package com.mygdx.guessimage;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,12 +22,17 @@ public class GuessImage extends BaseAdapter {
     private ShapeRenderer shapeRenderer;
     private Stage stage;
 
+    private Mode mode;
     private Listener listener;
+
+    private Sound winSound;
+    private Sound wrongSound;
 
     private float startZoom = 1f;
     private int rendersCount = 0;
 
-    public GuessImage(Listener listener) {
+    public GuessImage(Mode mode, Listener listener) {
+        this.mode = mode;
         this.listener = listener;
     }
 
@@ -41,6 +47,9 @@ public class GuessImage extends BaseAdapter {
         stage = new Stage(viewport);
         Background background = new Background(new Texture("image.png"));
         stage.addActor(background);
+
+        winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
+        wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
 
         GestureDetector gestureDetector = new GestureDetector(this);
         InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -75,26 +84,32 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
-        float zoom = camera.zoom;
-        camera.translate(-deltaX * zoom, deltaY * zoom);
-        camera.update();
+        if (mode == Mode.PLAY) {
+            float zoom = camera.zoom;
+            camera.translate(-deltaX * zoom, deltaY * zoom);
+            camera.update();
+        }
         return false;
     }
 
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1,
                          Vector2 pointer2) {
-        Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
-        Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
-        GdxLog.print(TAG, "zoom " + (currentVector.len() / startVector.len()));
-        camera.zoom = Math.min(1, startZoom * currentVector.len() / startVector.len());
-        camera.update();
+        if (mode == Mode.PLAY) {
+            Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
+            Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
+            float zoom = startZoom * startVector.len() / currentVector.len();
+            camera.zoom = Math.max(0.2f, Math.min(1, zoom));
+            camera.update();
+        }
         return false;
     }
 
     @Override
     public void pinchStop() {
-        startZoom = camera.zoom;
+        if (mode == Mode.PLAY) {
+            startZoom = camera.zoom;
+        }
     }
 
     @Override
@@ -106,6 +121,8 @@ public class GuessImage extends BaseAdapter {
     public void dispose() {
         shapeRenderer.dispose();
         stage.dispose();
+        winSound.dispose();
+        wrongSound.dispose();
     }
 
     public interface Listener {
