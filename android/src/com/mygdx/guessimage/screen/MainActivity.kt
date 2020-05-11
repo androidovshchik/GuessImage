@@ -12,6 +12,7 @@ import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
+import com.mygdx.guessimage.FileManager
 import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
@@ -26,17 +27,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
 import org.kodein.di.generic.instance
+import java.io.File
 
 class DummyHolder(itemView: View) : ViewHolder(itemView)
 
 class PuzzleViewHolder(itemView: View) : ViewHolder(itemView) {
-    val pictogram: ImageView = itemView.iv_pictogram
+    val icon: ImageView = itemView.iv_icon
     val count: TextView = itemView.tv_count
 }
 
 class MainActivity : BaseActivity() {
 
     private val db by instance<Database>()
+
+    private val fileManager by instance<FileManager>()
 
     private val dataSource = dataSourceOf("")
 
@@ -64,12 +68,13 @@ class MainActivity : BaseActivity() {
                             }
                         }
                         withItem<PuzzleEntity, PuzzleViewHolder>(R.layout.item_puzzle) {
-                            onBind(::PuzzleViewHolder) { index, item ->
-                                pictogram.load(item.uri)
-                                count.text = "10"
+                            onBind(::PuzzleViewHolder) { _, item ->
+                                icon.load(File(fileManager.iconsDir, item.filename))
                             }
                             onClick { index ->
-
+                                startActivity<EditorActivity>(
+                                    "puzzle" to dataSource[index]
+                                )
                             }
                         }
                     }
