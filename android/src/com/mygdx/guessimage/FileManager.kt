@@ -13,8 +13,8 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.roundToInt
 
 private const val MAX_SIZE = 2048
 
@@ -82,7 +82,7 @@ private fun createCopy(file: File): Bitmap? {
         val height = bitmap.height
         if (width > MAX_SIZE || height > MAX_SIZE) {
             val ratio = width.toFloat() / height
-            val newWidth = if (ratio < 1) MAX_SIZE * ratio else MAX_SIZE.toFloat()
+            val newWidth = MAX_SIZE * min(1f, ratio)
             val scale = newWidth / width
             matrix.preScale(scale, scale)
         }
@@ -139,22 +139,15 @@ private fun Bitmap.createThumb(): Bitmap? {
     return try {
         val matrix = Matrix()
         val minSize = min(width, height)
-        var scale = 1f
         if (minSize < THUMB_SIZE) {
-            scale = THUMB_SIZE.toFloat() / minSize
+            val scale = THUMB_SIZE.toFloat() / minSize
             matrix.preScale(scale, scale)
         }
-        val x = (width * scale - THUMB_SIZE) / 2
-        val y = (height * scale - THUMB_SIZE) / 2
-        Bitmap.createBitmap(
-            this,
-            x.roundToInt(),
-            y.roundToInt(),
-            THUMB_SIZE,
-            THUMB_SIZE,
-            matrix,
-            true
-        )
+        val x = max(0, (width - THUMB_SIZE) / 2)
+        val y = max(0, (height - THUMB_SIZE) / 2)
+        val width = min(THUMB_SIZE, width)
+        val height = min(THUMB_SIZE, height)
+        Bitmap.createBitmap(this, x, y, width, height, matrix, true)
     } catch (e: Throwable) {
         Timber.e(e)
         null
