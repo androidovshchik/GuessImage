@@ -1,6 +1,7 @@
 package com.mygdx.guessimage.local.entities
 
 import androidx.room.*
+import java.io.Serializable
 
 @Entity(
     tableName = "objects",
@@ -17,12 +18,12 @@ import androidx.room.*
         Index(value = ["o_id"])
     ]
 )
-class ObjectEntity(
+class ObjectEntity : Serializable {
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "o_id")
-    var id: Long = 0L,
-    @ColumnInfo(name = "o_path")
-    var path: String,
+    var id: Long = 0L
+
     @ColumnInfo(name = "o_name")
-    var name: String
-)
+    var name: String? = null
+}

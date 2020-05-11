@@ -13,7 +13,7 @@ import com.mygdx.guessimage.local.entities.PuzzleEntity
         PuzzleEntity::class,
         ObjectEntity::class
     ],
-    version = 2
+    version = 3
 )
 abstract class Database : RoomDatabase() {
 
