@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package com.mygdx.guessimage
+package com.mygdx.guessimage.local
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -63,6 +63,30 @@ class FileManager(context: Context) {
     }
 }
 
+fun deleteFile(file: File?) {
+    try {
+        if (file?.isFile == true) {
+            file.delete()
+        }
+    } catch (e: Throwable) {
+        Timber.e(e)
+    }
+}
+
+inline fun writeFile(dist: File, block: (FileOutputStream) -> Unit): Boolean {
+    return try {
+        FileOutputStream(dist).use { output ->
+            block(output)
+            output.flush()
+        }
+        true
+    } catch (e: Throwable) {
+        Timber.e(e)
+        deleteFile(dist)
+        false
+    }
+}
+
 private fun createCopy(file: File): Bitmap? {
     if (!file.exists()) {
         return null
@@ -108,30 +132,6 @@ private fun createCopy(file: File): Bitmap? {
     } catch (e: Throwable) {
         Timber.e(e)
         return null
-    }
-}
-
-fun deleteFile(file: File?) {
-    try {
-        if (file?.isFile == true) {
-            file.delete()
-        }
-    } catch (e: Throwable) {
-        Timber.e(e)
-    }
-}
-
-inline fun writeFile(dist: File, block: (FileOutputStream) -> Unit): Boolean {
-    return try {
-        FileOutputStream(dist).use { output ->
-            block(output)
-            output.flush()
-        }
-        true
-    } catch (e: Throwable) {
-        Timber.e(e)
-        deleteFile(dist)
-        false
     }
 }
 

@@ -1,14 +1,14 @@
 package com.mygdx.guessimage.screen.editor
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
-import com.mygdx.guessimage.PathCompat
 import com.mygdx.guessimage.extension.transact
+import com.mygdx.guessimage.local.FileManager
+import com.mygdx.guessimage.local.PathCompat
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 import com.mygdx.guessimage.screen.base.BaseActivity
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +18,12 @@ import org.jetbrains.anko.UI
 import org.jetbrains.anko.frameLayout
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
+import org.kodein.di.generic.instance
+import java.io.File
 
 class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
+
+    private val fileManager by instance<FileManager>()
 
     private lateinit var puzzleModel: PuzzleModel
 
@@ -34,7 +38,6 @@ class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
                 layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
                 frameLayout {
                     id = idObject
-                    setBackgroundColor(Color.parseColor("#E0E0E0"))
                 }.lparams(0, matchParent, 3f)
                 frameLayout {
                     id = idObjects
@@ -54,10 +57,16 @@ class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
                 if (resultCode == RESULT_OK) {
                     val uri = data?.data ?: return
                     launch {
-                        val path = withContext(Dispatchers.IO) {
-                            PathCompat.getFilePath(applicationContext, uri)
+                        val (path, filename) = withContext(Dispatchers.IO) {
+                            val path = PathCompat.getFilePath(applicationContext, uri)
+                            path to fileManager.copyImage(File(path.orEmpty()))
                         }
-                        puzzleModel.galleryUri.value = "file://$path"
+                        puzzleModel.apply {
+                            puzzle.filename = filename
+                            if (path != null) {
+                                galleryUri.value = "file://$path"
+                            }
+                        }
                     }
                 }
             }

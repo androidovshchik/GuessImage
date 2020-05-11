@@ -1,4 +1,4 @@
-package com.mygdx.guessimage
+package com.mygdx.guessimage.local
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
