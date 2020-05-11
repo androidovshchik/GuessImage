@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import coil.Coil
 import coil.ImageLoader
 import com.mygdx.guessimage.local.Database
+import com.mygdx.guessimage.local.FileManager
 import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware

@@ -6,12 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.mygdx.guessimage.GuessImage
+import com.mygdx.guessimage.Mode
 
 @Suppress("MemberVisibilityCanBePrivate")
 class DrawingFragment : AndroidFragmentApplication() {
 
-    val guessImage = GuessImage(object : GuessImage.Listener {
-    })
+    lateinit var guessImage: GuessImage
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val mode = Mode.valueOf(arguments!!.getString("mode")!!)
+        guessImage = GuessImage(mode, object : GuessImage.Listener {
+        })
+    }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
         return initializeForView(guessImage)
@@ -21,9 +28,10 @@ class DrawingFragment : AndroidFragmentApplication() {
 
         val TAG = ObjectFragment::class.java.simpleName
 
-        fun newInstance(): DrawingFragment {
+        fun newInstance(mode: Mode): DrawingFragment {
             return DrawingFragment().apply {
                 arguments = Bundle().apply {
+                    putString("mode", mode.name)
                 }
             }
         }

@@ -12,10 +12,10 @@ import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
-import com.mygdx.guessimage.FileManager
 import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
+import com.mygdx.guessimage.local.FileManager
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 import com.mygdx.guessimage.screen.base.BaseActivity
 import com.mygdx.guessimage.screen.editor.EditorActivity
