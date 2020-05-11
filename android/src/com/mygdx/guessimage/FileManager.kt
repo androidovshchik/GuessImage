@@ -13,10 +13,14 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 private const val MAX_SIZE = 2048
 
 private const val THUMB_SIZE = 512
+
+private const val QUALITY = 80
 
 val File.randomName: String
     get() = "${UUID.randomUUID()}.$extension"
@@ -33,27 +37,33 @@ class FileManager(context: Context) {
 
     val iconsDir: File
         get() = File(externalDir ?: internalDir, "icons").apply { mkdirs() }
-}
 
-@SuppressLint("DefaultLocale")
-fun copyImage(src: File, dist: File) {
-    if (!src.exists()) {
-        return
-    }
-    createCopy(src)?.use {
-        writeFile(dist) {
+    @SuppressLint("DefaultLocale")
+    fun copyImage(src: File): String? {
+        if (!src.exists()) {
+            return null
+        }
+        return createCopy(src)?.use {
+            val filename = src.randomName
             val format = when (src.extension.toLowerCase()) {
                 "png" -> Bitmap.CompressFormat.PNG
                 "webp" -> Bitmap.CompressFormat.WEBP
                 else -> Bitmap.CompressFormat.JPEG
             }
-            compress(format, 80, it)
+            writeFile(File(imagesDir, filename)) {
+                compress(format, QUALITY, it)
+            }
+            createThumb()?.use {
+                writeFile(File(iconsDir, filename)) {
+                    compress(format, QUALITY, it)
+                }
+            }
+            filename
         }
-        createThumb()
     }
 }
 
-fun createCopy(file: File): Bitmap? {
+private fun createCopy(file: File): Bitmap? {
     if (!file.exists()) {
         return null
     }
@@ -101,36 +111,6 @@ fun createCopy(file: File): Bitmap? {
     }
 }
 
-fun createThumb(bitmap: Bitmap) {
-    try {
-        val matrix = Matrix()
-        val width = bitmap.width
-        val height = bitmap.height
-        if (width > THUMB_SIZE || height > THUMB_SIZE) {
-            val ratio = width.toFloat() / height
-            val newWidth = if (ratio < 1) THUMB_SIZE * ratio else THUMB_SIZE.toFloat()
-            val scale = newWidth / width
-            matrix.preScale(scale, scale)
-        }
-        val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true)
-        if (newBitmap != bitmap) {
-            try {
-                bitmap.recycle()
-            } catch (e: Throwable) {
-                Timber.e(e)
-            }
-        }
-        return newBitmap
-    } catch (e: Throwable) {
-        Timber.e(e)
-        return null
-    }
-}
-
-fun deleteFile(path: String) {
-    deleteFile(File(path))
-}
-
 fun deleteFile(file: File?) {
     try {
         if (file?.isFile == true) {
@@ -152,6 +132,32 @@ inline fun writeFile(dist: File, block: (FileOutputStream) -> Unit): Boolean {
         Timber.e(e)
         deleteFile(dist)
         false
+    }
+}
+
+private fun Bitmap.createThumb(): Bitmap? {
+    return try {
+        val matrix = Matrix()
+        val minSize = min(width, height)
+        var scale = 1f
+        if (minSize < THUMB_SIZE) {
+            scale = THUMB_SIZE.toFloat() / minSize
+            matrix.preScale(scale, scale)
+        }
+        val x = (width * scale - THUMB_SIZE) / 2
+        val y = (height * scale - THUMB_SIZE) / 2
+        Bitmap.createBitmap(
+            this,
+            x.roundToInt(),
+            y.roundToInt(),
+            THUMB_SIZE,
+            THUMB_SIZE,
+            matrix,
+            true
+        )
+    } catch (e: Throwable) {
+        Timber.e(e)
+        null
     }
 }
 
