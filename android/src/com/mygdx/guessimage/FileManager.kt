@@ -1,5 +1,8 @@
+@file:Suppress("unused")
+
 package com.mygdx.guessimage
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,8 +16,10 @@ import java.util.*
 
 private const val MAX_SIZE = 2048
 
-val randomName: String
-    get() = "${UUID.randomUUID()}.jpg"
+private const val THUMB_SIZE = 512
+
+val File.randomName: String
+    get() = "${UUID.randomUUID()}.$extension"
 
 @Suppress("MemberVisibilityCanBePrivate")
 class FileManager(context: Context) {
@@ -30,29 +35,25 @@ class FileManager(context: Context) {
         get() = File(externalDir ?: internalDir, "icons").apply { mkdirs() }
 }
 
-fun copyImage(src: String, dist: String) {
-    copyImage(File(src), File(dist))
-}
-
-/**
- * @return new path of file
- */
+@SuppressLint("DefaultLocale")
 fun copyImage(src: File, dist: File) {
     if (!src.exists()) {
         return
     }
-    readBitmap(src)?.use {
+    createCopy(src)?.use {
         writeFile(dist) {
-            compress(Bitmap.CompressFormat.JPEG, 75, it)
+            val format = when (src.extension.toLowerCase()) {
+                "png" -> Bitmap.CompressFormat.PNG
+                "webp" -> Bitmap.CompressFormat.WEBP
+                else -> Bitmap.CompressFormat.JPEG
+            }
+            compress(format, 80, it)
         }
+        createThumb()
     }
 }
 
-fun readBitmap(path: String): Bitmap? {
-    return readBitmap(File(path))
-}
-
-fun readBitmap(file: File): Bitmap? {
+fun createCopy(file: File): Bitmap? {
     if (!file.exists()) {
         return null
     }
@@ -84,6 +85,32 @@ fun readBitmap(file: File): Bitmap? {
         }
         if (rotation % 360 != 0) {
             matrix.postRotate(rotation.toFloat())
+        }
+        val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true)
+        if (newBitmap != bitmap) {
+            try {
+                bitmap.recycle()
+            } catch (e: Throwable) {
+                Timber.e(e)
+            }
+        }
+        return newBitmap
+    } catch (e: Throwable) {
+        Timber.e(e)
+        return null
+    }
+}
+
+fun createThumb(bitmap: Bitmap) {
+    try {
+        val matrix = Matrix()
+        val width = bitmap.width
+        val height = bitmap.height
+        if (width > THUMB_SIZE || height > THUMB_SIZE) {
+            val ratio = width.toFloat() / height
+            val newWidth = if (ratio < 1) THUMB_SIZE * ratio else THUMB_SIZE.toFloat()
+            val scale = newWidth / width
+            matrix.preScale(scale, scale)
         }
         val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true)
         if (newBitmap != bitmap) {
