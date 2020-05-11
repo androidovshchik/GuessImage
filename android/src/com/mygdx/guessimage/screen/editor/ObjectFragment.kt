@@ -47,7 +47,7 @@ class ObjectFragment : BaseFragment() {
                 }.lparams(matchParent, matchParent)
                 button = button {
                     text = getString(R.string.upload)
-                    isVisible = false
+                    isVisible = puzzleModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         val activity = activity ?: return@setOnClickListener
                         if (activity.areGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -72,17 +72,14 @@ class ObjectFragment : BaseFragment() {
         }
         puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
             obj = it
-            notifyObject()
         })
         puzzleModel.galleryUri.observe(viewLifecycleOwner, Observer {
-            obj?.uri = it
             notifyObject()
         })
     }
 
     private fun notifyObject() {
-        val uri = obj?.uri
-        button.isVisible = uri == null
+        button.isVisible = puzzleModel.puzzle.filename.isNullOrBlank()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, p: Array<out String>, r: IntArray) {

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.emptyDataSourceTyped
@@ -69,12 +70,7 @@ class ObjectsFragment : BaseFragment() {
                     }
                 }.lparams(matchParent, wrapContent)
                 recyclerView {
-                    addItemDecoration(
-                        DividerItemDecoration(
-                            context,
-                            DividerItemDecoration.VERTICAL
-                        )
-                    )
+                    addItemDecoration(DividerItemDecoration(context, VERTICAL))
                     setup {
                         withLayoutManager(LinearLayoutManager(context))
                         withDataSource(dataSource)

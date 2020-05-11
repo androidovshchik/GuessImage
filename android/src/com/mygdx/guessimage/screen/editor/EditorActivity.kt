@@ -63,9 +63,7 @@ class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
                         }
                         puzzleModel.apply {
                             puzzle.filename = filename
-                            if (path != null) {
-                                galleryUri.value = "file://$path"
-                            }
+                            galleryUri.value = "file://$path"
                         }
                     }
                 }
