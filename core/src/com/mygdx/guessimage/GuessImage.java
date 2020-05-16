@@ -6,7 +6,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -89,7 +88,7 @@ public class GuessImage extends BaseAdapter {
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (mode == Mode.PLAY) {
             float zoom = camera.zoom;
-            GdxLog.print(TAG, "ca " + camera.position);
+            camera.setTranslation(-deltaX * zoom, deltaY * zoom);
             /*cameraPosition.set(camera.position.x - deltaX * zoom, camera.position.y + deltaY * zoom);
             if (worldBounds.contains(cameraPosition)) {
                 camera.position.set(cameraPosition, 0f);
@@ -124,17 +123,7 @@ public class GuessImage extends BaseAdapter {
         if (mode == Mode.PLAY) {
             Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
             Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
-            float zoom = startZoom * startVector.len() / currentVector.len();
-            GdxLog.print(TAG, "start " + camera.viewportWidth + " " + camera.viewportHeight);
-            camera.zoom = MathUtils.clamp(zoom, 0.2f, 1);
-
-            float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-            float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
-
-            camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f, 100 - effectiveViewportWidth / 2f);
-            camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f, 100 - effectiveViewportHeight / 2f);
-            camera.update();
-            GdxLog.print(TAG, "end " + camera.viewportWidth + " " + camera.viewportHeight);
+            camera.setZoom(camera.startZoom * startVector.len() / currentVector.len());
         }
         return false;
     }
@@ -142,7 +131,7 @@ public class GuessImage extends BaseAdapter {
     @Override
     public void pinchStop() {
         if (mode == Mode.PLAY) {
-            startZoom = camera.zoom;
+            camera.startZoom = camera.zoom;
         }
     }
 
