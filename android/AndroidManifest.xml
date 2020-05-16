@@ -17,6 +17,7 @@
             android:name=".screen.MainActivity"
             android:screenOrientation="sensorLandscape"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +28,7 @@
             android:name=".screen.editor.EditorActivity"
             android:screenOrientation="sensorLandscape"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             tools:ignore="LockedOrientationActivity" />
     </application>
 

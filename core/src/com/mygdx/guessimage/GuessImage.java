@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.guessimage.model.Background;
 
@@ -17,10 +19,11 @@ public class GuessImage extends BaseAdapter {
 
     private static final String TAG = GuessImage.class.getSimpleName();
 
-    private OrthographicCamera camera;
+    private CustomCamera camera;
     private FitViewport viewport;
-    private ShapeRenderer shapeRenderer;
-    private Stage stage;
+
+    private Stage backgroundStage;
+    private Stage framesStage;
 
     private Mode mode;
     private Listener listener;
@@ -28,7 +31,6 @@ public class GuessImage extends BaseAdapter {
     private Sound winSound;
     private Sound wrongSound;
 
-    private float startZoom = 1f;
     private int rendersCount = 0;
 
     public GuessImage(Mode mode, Listener listener) {
@@ -38,15 +40,16 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void create() {
-        camera = new OrthographicCamera();
+        camera = new CustomCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 
-        shapeRenderer = new ShapeRenderer();
-
-        stage = new Stage(viewport);
-        Background background = new Background(new Texture("image.png"));
-        stage.addActor(background);
+        backgroundStage = new Stage(viewport);
+        Texture image = new Texture("image.png");
+        camera.setImageBounds(image.getWidth(), image.getHeight());
+        Background background = new Background(image);
+        backgroundStage.addActor(background);
+        framesStage = new Stage(viewport);
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -63,10 +66,10 @@ public class GuessImage extends BaseAdapter {
         Gdx.gl.glClearColor(224f / 255, 224f / 255, 224f / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        shapeRenderer.setProjectionMatrix(camera.combined);
-
-        stage.act();
-        stage.draw();
+        backgroundStage.act();
+        backgroundStage.draw();
+        framesStage.act();
+        framesStage.draw();
 
         if (rendersCount >= 2) {
             rendersCount = 0;
@@ -86,9 +89,32 @@ public class GuessImage extends BaseAdapter {
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (mode == Mode.PLAY) {
             float zoom = camera.zoom;
-            camera.translate(-deltaX * zoom, deltaY * zoom);
-            camera.update();
+            GdxLog.print(TAG, "ca " + camera.position);
+            /*cameraPosition.set(camera.position.x - deltaX * zoom, camera.position.y + deltaY * zoom);
+            if (worldBounds.contains(cameraPosition)) {
+                camera.position.set(cameraPosition, 0f);
+                camera.update();
+            }*/
+            //spaceBounds.contains(camera.position.)
+            //camera.translateSafe(-deltaX * zoom, deltaY * zoom);
+            /*float minCameraX = camera.zoom * (camera.viewportWidth / 2);
+            float maxCameraX = 700 - minCameraX;
+            float minCameraY = camera.zoom * (camera.viewportHeight / 2);
+            float maxCameraY = 700 - minCameraY;
+            camera.position.set(Math.min(maxCameraX, Math.max(camera.position.x - deltaX * zoom, minCameraX)),
+                    Math.min(maxCameraY, Math.max(camera.position.y + deltaY * zoom, minCameraY)),
+                    0);*/
+            /*Vector3 camPos = camera.position;
+            float HW = camera.viewportWidth / 2, HH = camera.viewportHeight / 2;
+            camPos.x = MathUtils.clamp(camPos.x, HW, Gdx.graphics.getWidth() - HW);
+            camPos.y = MathUtils.clamp(camPos.y, HH, Gdx.graphics.getHeight() - HH);
+            GdxLog.print(TAG, "asdasdasd " + camera.viewportWidth + " " + Gdx.graphics.getWidth());*/
         }
+        return false;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
         return false;
     }
 
@@ -99,8 +125,16 @@ public class GuessImage extends BaseAdapter {
             Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
             Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
             float zoom = startZoom * startVector.len() / currentVector.len();
-            camera.zoom = Math.max(0.2f, Math.min(1, zoom));
+            GdxLog.print(TAG, "start " + camera.viewportWidth + " " + camera.viewportHeight);
+            camera.zoom = MathUtils.clamp(zoom, 0.2f, 1);
+
+            float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
+            float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
+
+            camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f, 100 - effectiveViewportWidth / 2f);
+            camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f, 100 - effectiveViewportHeight / 2f);
             camera.update();
+            GdxLog.print(TAG, "end " + camera.viewportWidth + " " + camera.viewportHeight);
         }
         return false;
     }
@@ -119,8 +153,22 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void dispose() {
-        shapeRenderer.dispose();
-        stage.dispose();
+        Array<Actor> actors = backgroundStage.getActors();
+        for (int i = 0; i < actors.size; i++) {
+            Actor actor = actors.get(i);
+            if (actor instanceof Disposable) {
+                ((Disposable) actor).dispose();
+            }
+        }
+        backgroundStage.dispose();
+        actors = framesStage.getActors();
+        for (int i = 0; i < actors.size; i++) {
+            Actor actor = actors.get(i);
+            if (actor instanceof Disposable) {
+                ((Disposable) actor).dispose();
+            }
+        }
+        framesStage.dispose();
         winSound.dispose();
         wrongSound.dispose();
     }
