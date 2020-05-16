@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class Frame extends Actor implements Disposable {
 
+    private static final String TAG = Frame.class.getSimpleName();
+
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     @Override

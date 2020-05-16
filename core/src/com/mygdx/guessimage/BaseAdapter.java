@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Vector2;
 
 import java.lang.reflect.Method;
 
@@ -18,6 +19,11 @@ public abstract class BaseAdapter extends InputAdapter
     }
 
     @Override
+    public boolean touchDown(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
     public boolean tap(float x, float y, int count, int button) {
         return false;
     }
@@ -28,8 +34,22 @@ public abstract class BaseAdapter extends InputAdapter
     }
 
     @Override
-    public boolean zoom(float initialDistance, float distance) {
+    public boolean pan(float x, float y, float deltaX, float deltaY) {
         return false;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+        return false;
+    }
+
+    @Override
+    public void pinchStop() {
     }
 
     @Override
@@ -38,7 +58,7 @@ public abstract class BaseAdapter extends InputAdapter
     }
 
     @Override
-    public boolean panStop(float x, float y, int pointer, int button) {
+    public boolean zoom(float initialDistance, float distance) {
         return false;
     }
 

@@ -23,4 +23,8 @@ public class CustomCamera extends OrthographicCamera {
         lastPosition.set(position.x, position.y, 0);
         super.translate(x, y);
     }
+
+    public void setZoom(float zoom) {
+
+    }
 }
