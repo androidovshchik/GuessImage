@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.guessimage.model.Background;
 
 public class GuessImage extends BaseAdapter {
@@ -19,7 +19,7 @@ public class GuessImage extends BaseAdapter {
     private static final String TAG = GuessImage.class.getSimpleName();
 
     private CustomCamera camera;
-    private FitViewport viewport;
+    private ScreenViewport viewport;
 
     private Stage backgroundStage;
     private Stage framesStage;
@@ -41,12 +41,11 @@ public class GuessImage extends BaseAdapter {
     public void create() {
         camera = new CustomCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+        viewport = new ScreenViewport(camera);
 
         backgroundStage = new Stage(viewport);
-        Texture image = new Texture("image.png");
-        camera.setImageBounds(image.getWidth(), image.getHeight());
-        Background background = new Background(image);
+        Background background = new Background(new Texture("image.png"));
+        camera.setBackgroundBounds(background.getScaledWidth(), background.getScaledHeight());
         backgroundStage.addActor(background);
         framesStage = new Stage(viewport);
 

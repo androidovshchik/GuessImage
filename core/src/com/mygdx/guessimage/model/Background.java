@@ -20,4 +20,12 @@ public class Background extends Image {
         float ratio = Math.min(hRatio, vRatio);
         setScale(ratio);
     }
+
+    public float getScaledWidth() {
+        return getWidth() * getScaleX();
+    }
+
+    public float getScaledHeight() {
+        return getHeight() * getScaleY();
+    }
 }
