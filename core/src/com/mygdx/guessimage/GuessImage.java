@@ -48,7 +48,7 @@ public class GuessImage extends BaseAdapter {
         camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
         backgroundStage.addActor(background);
         framesStage = new Stage(viewport, spriteBatch);
-        framesStage.addActor(new Frame());
+        addFrame();
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -64,7 +64,6 @@ public class GuessImage extends BaseAdapter {
     public void render() {
         Gdx.gl.glClearColor(224f / 255, 224f / 255, 224f / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glLineWidth(Utils.dip(4));
 
         if (mode == Mode.PLAY) {
             camera.normalize();
@@ -141,8 +140,26 @@ public class GuessImage extends BaseAdapter {
     }
 
     @Override
+    public boolean tap(float x, float y, int count, int button) {
+        if (mode == Mode.PLAY) {
+            Vector2 coordinates = framesStage.screenToStageCoordinates(new Vector2(x, y));
+            Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
+            if (frame != null) {
+
+            } else {
+                wrongSound.play(1f);
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void resize(int width, int height) {
         // todo
+    }
+
+    public void addFrame() {
+        framesStage.addActor(new Frame());
     }
 
     @Override
