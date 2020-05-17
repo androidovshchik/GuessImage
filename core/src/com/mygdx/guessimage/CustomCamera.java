@@ -1,5 +1,6 @@
 package com.mygdx.guessimage;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -54,7 +55,7 @@ public class CustomCamera extends OrthographicCamera {
                 dy = -bottomDiff;
             }
         } else {
-
+            dy = viewportHeight / 2 - position.y;
         }
         if (getWidth() < imageBounds.width) {
             float leftDiff = getVisualLeft() - imageBounds.x;
@@ -65,11 +66,12 @@ public class CustomCamera extends OrthographicCamera {
                 dx = -rightDiff;
             }
         } else {
-
+            dx = viewportWidth / 2 - position.x;
         }
         if (dx > 0.1 || dx < -0.1 || dy > 0.1 || dy < -0.1) {
-            dx = MathUtils.clamp(20 * Math.signum(dx), -Math.abs(dx), Math.abs(dx));
-            dy = MathUtils.clamp(20 * Math.signum(dy), -Math.abs(dy), Math.abs(dy));
+            float delta = Gdx.graphics.getDeltaTime();
+            dx = MathUtils.clamp(10 * Math.signum(dx) + dx * delta * 3, -Math.abs(dx), Math.abs(dx));
+            dy = MathUtils.clamp(10 * Math.signum(dy) + dy * delta * 3, -Math.abs(dy), Math.abs(dy));
             setTranslation(dx, dy);
         }
     }
@@ -96,27 +98,5 @@ public class CustomCamera extends OrthographicCamera {
 
     public float getVisualBottom() {
         return position.y - getHeight() / 2;
-    }
-
-    public float getTop() {
-        return position.y + viewportHeight / 2;
-    }
-
-    public float getLeft() {
-        return position.x - viewportWidth / 2;
-    }
-
-    public float getRight() {
-        return position.x + viewportWidth / 2;
-    }
-
-    public float getBottom() {
-        return position.y - viewportHeight / 2;
-    }
-
-    private static float clampReverse(float value, float min, float max) {
-        if (value < 0 && value > min) return min;
-        if (value > 0 && value < max) return max;
-        return value;
     }
 }
