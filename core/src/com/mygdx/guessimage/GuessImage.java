@@ -32,7 +32,6 @@ public class GuessImage extends BaseAdapter {
     private Sound winSound;
     private Sound wrongSound;
 
-    private boolean pinchingCamera = false;
     private int rendersCount = 0;
 
     public GuessImage(Mode mode, Listener listener) {
@@ -49,7 +48,7 @@ public class GuessImage extends BaseAdapter {
         spriteBatch = new SpriteBatch();
         backgroundStage = new Stage(viewport, spriteBatch);
         Background background = new Background(new Texture("image.png"));
-        camera.setBackgroundBounds(background.getScaledWidth(), background.getScaledHeight());
+        camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
         backgroundStage.addActor(background);
         framesStage = new Stage(viewport, spriteBatch);
 
@@ -74,9 +73,7 @@ public class GuessImage extends BaseAdapter {
         framesStage.draw();
 
         if (mode == Mode.PLAY) {
-            if (!pinchingCamera) {
-                camera.normalize();
-            }
+            camera.normalize();
         }
 
         if (rendersCount >= 2) {
@@ -103,6 +100,9 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public boolean panStop(float x, float y, int pointer, int button) {
+        if (mode == Mode.PLAY) {
+            camera.translating = false;
+        }
         return false;
     }
 
@@ -110,7 +110,6 @@ public class GuessImage extends BaseAdapter {
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1,
                          Vector2 pointer2) {
         if (mode == Mode.PLAY) {
-            pinchingCamera = true;
             Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
             Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
             camera.setZoom(camera.startZoom * startVector.len() / currentVector.len());
@@ -122,7 +121,7 @@ public class GuessImage extends BaseAdapter {
     public void pinchStop() {
         if (mode == Mode.PLAY) {
             camera.startZoom = camera.zoom;
-            pinchingCamera = false;
+            camera.scaling = false;
         }
     }
 

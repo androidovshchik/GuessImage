@@ -15,7 +15,8 @@ public class CustomCamera extends OrthographicCamera {
 
     float startZoom = 1f;
 
-    boolean pinchingCamera = false;
+    boolean scaling = false;
+    boolean translating = false;
 
     public CustomCamera() {
     }
@@ -27,35 +28,43 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void setTranslation(float dX, float dY) {
+        translating = true;
         translate(dX, dY);
         update();
     }
 
     public void setZoom(float zoom) {
+        scaling = true;
         zoom = MathUtils.clamp(zoom, 0.2f, 1);
         this.zoom = zoom;
         update();
     }
 
     public void normalize() {
-        float dx = 0, dy = 0;
+        if (scaling || translating) {
+            return;
+        }
+        float dx = 0;
+        float dy = 0;
         float delta = Gdx.graphics.getDeltaTime();
-        float visualWidth = viewportWidth * zoom;
-        float visualHeight = viewportHeight * zoom;
-        if (visualHeight < imageBounds.height) {
-            if (getTop() > imageTop) {
-
-            } else if (getBottom() < imageBounds.y) {
-
+        if (getHeight() < imageBounds.height) {
+            float topDiff = getVisualTop() - imageTop;
+            float bottomDiff = getVisualBottom() - imageBounds.y;
+            if (topDiff > 0) {
+                dy = getTop();
+            } else if (bottomDiff < 0) {
+                dy = getBottom();
             }
         } else {
 
         }
-        if (visualWidth < imageBounds.width) {
-            if (getLeft() < imageBounds.x) {
-
-            } else if (getRight() > imageRight) {
-
+        if (getWidth() < imageBounds.width) {
+            float leftDiff = getVisualLeft() - imageBounds.x;
+            float rightDiff = getVisualRight() - imageRight;
+            if (leftDiff < 0) {
+                dx = getVisualLeft();
+            } else if (rightDiff > 0) {
+                dx = getVisualRight();
             }
         } else {
 
@@ -74,19 +83,35 @@ public class CustomCamera extends OrthographicCamera {
         return viewportHeight * zoom;
     }
 
-    public float getTop() {
+    public float getVisualTop() {
         return position.y + getHeight() / 2;
     }
 
-    public float getLeft() {
+    public float getVisualLeft() {
         return position.x - getWidth() / 2;
     }
 
-    public float getRight() {
+    public float getVisualRight() {
         return position.x + getWidth() / 2;
     }
 
-    public float getBottom() {
+    public float getVisualBottom() {
         return position.y - getHeight() / 2;
+    }
+
+    public float getTop() {
+        return position.y + viewportHeight / 2;
+    }
+
+    public float getLeft() {
+        return position.x - viewportWidth / 2;
+    }
+
+    public float getRight() {
+        return position.x + viewportWidth / 2;
+    }
+
+    public float getBottom() {
+        return position.y - viewportHeight / 2;
     }
 }
