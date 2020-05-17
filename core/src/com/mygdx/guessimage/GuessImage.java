@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -21,6 +22,7 @@ public class GuessImage extends BaseAdapter {
     private CustomCamera camera;
     private ScreenViewport viewport;
 
+    private SpriteBatch spriteBatch;
     private Stage backgroundStage;
     private Stage framesStage;
 
@@ -30,6 +32,7 @@ public class GuessImage extends BaseAdapter {
     private Sound winSound;
     private Sound wrongSound;
 
+    private boolean pinchingCamera = false;
     private int rendersCount = 0;
 
     public GuessImage(Mode mode, Listener listener) {
@@ -43,11 +46,12 @@ public class GuessImage extends BaseAdapter {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport = new ScreenViewport(camera);
 
-        backgroundStage = new Stage(viewport);
+        spriteBatch = new SpriteBatch();
+        backgroundStage = new Stage(viewport, spriteBatch);
         Background background = new Background(new Texture("image.png"));
         camera.setBackgroundBounds(background.getScaledWidth(), background.getScaledHeight());
         backgroundStage.addActor(background);
-        framesStage = new Stage(viewport);
+        framesStage = new Stage(viewport, spriteBatch);
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -69,6 +73,12 @@ public class GuessImage extends BaseAdapter {
         framesStage.act();
         framesStage.draw();
 
+        if (mode == Mode.PLAY) {
+            if (!pinchingCamera) {
+                camera.normalize();
+            }
+        }
+
         if (rendersCount >= 2) {
             rendersCount = 0;
             Gdx.graphics.setContinuousRendering(false);
@@ -86,27 +96,7 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (mode == Mode.PLAY) {
-            float zoom = camera.zoom;
-            camera.setTranslation(-deltaX * zoom, deltaY * zoom);
-            /*cameraPosition.set(camera.position.x - deltaX * zoom, camera.position.y + deltaY * zoom);
-            if (worldBounds.contains(cameraPosition)) {
-                camera.position.set(cameraPosition, 0f);
-                camera.update();
-            }*/
-            //spaceBounds.contains(camera.position.)
-            //camera.translateSafe(-deltaX * zoom, deltaY * zoom);
-            /*float minCameraX = camera.zoom * (camera.viewportWidth / 2);
-            float maxCameraX = 700 - minCameraX;
-            float minCameraY = camera.zoom * (camera.viewportHeight / 2);
-            float maxCameraY = 700 - minCameraY;
-            camera.position.set(Math.min(maxCameraX, Math.max(camera.position.x - deltaX * zoom, minCameraX)),
-                    Math.min(maxCameraY, Math.max(camera.position.y + deltaY * zoom, minCameraY)),
-                    0);*/
-            /*Vector3 camPos = camera.position;
-            float HW = camera.viewportWidth / 2, HH = camera.viewportHeight / 2;
-            camPos.x = MathUtils.clamp(camPos.x, HW, Gdx.graphics.getWidth() - HW);
-            camPos.y = MathUtils.clamp(camPos.y, HH, Gdx.graphics.getHeight() - HH);
-            GdxLog.print(TAG, "asdasdasd " + camera.viewportWidth + " " + Gdx.graphics.getWidth());*/
+            camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
         }
         return false;
     }
@@ -120,6 +110,7 @@ public class GuessImage extends BaseAdapter {
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1,
                          Vector2 pointer2) {
         if (mode == Mode.PLAY) {
+            pinchingCamera = true;
             Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
             Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
             camera.setZoom(camera.startZoom * startVector.len() / currentVector.len());
@@ -131,6 +122,7 @@ public class GuessImage extends BaseAdapter {
     public void pinchStop() {
         if (mode == Mode.PLAY) {
             camera.startZoom = camera.zoom;
+            pinchingCamera = false;
         }
     }
 
@@ -141,6 +133,7 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void dispose() {
+        spriteBatch.dispose();
         Array<Actor> actors = backgroundStage.getActors();
         for (int i = 0; i < actors.size; i++) {
             Actor actor = actors.get(i);

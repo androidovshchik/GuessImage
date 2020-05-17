@@ -1,10 +1,9 @@
 package com.mygdx.guessimage;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 public class CustomCamera extends OrthographicCamera {
 
@@ -12,15 +11,9 @@ public class CustomCamera extends OrthographicCamera {
 
     private Rectangle imageBounds = new Rectangle();
 
-    private Vector3 lastPosition = new Vector3();
-    private Vector2 cameraPosition = new Vector2();
     float startZoom = 1f;
 
     public CustomCamera() {
-    }
-
-    public CustomCamera(float viewportWidth, float viewportHeight) {
-        super(viewportWidth, viewportHeight);
     }
 
     public void setBackgroundBounds(float width, float height) {
@@ -33,13 +26,30 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void setZoom(float zoom) {
-        GdxLog.print(TAG, " position " + position + " viewportWidth " + viewportWidth);
         zoom = MathUtils.clamp(zoom, 0.2f, 1);
         this.zoom = zoom;
         update();
     }
 
-    public void setToBounds() {
+    public void normalize() {
+        //imageBounds.overlaps()
+        float dx = 0, dy = 0;
+        float delta = Gdx.graphics.getDeltaTime();
+        float visualWidth = viewportWidth * zoom;
+        float visualHeight = viewportHeight * zoom;
+        if (visualHeight < imageBounds.height) {
 
+        } else {
+
+        }
+        if (visualWidth < imageBounds.width) {
+            imageBounds.fitOutside()
+        } else {
+
+        }
+        if (dx > 0 || dy > 0) {
+            setTranslation(dx, dy);
+        }
+        //GdxLog.print(TAG, " effectiveViewportWidth " + effectiveViewportWidth + " effectiveViewportHeight " + effectiveViewportHeight);
     }
 }
