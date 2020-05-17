@@ -29,8 +29,7 @@ public class GuessImage extends BaseAdapter {
     private Mode mode;
     private Listener listener;
 
-    private Sound winSound;
-    private Sound wrongSound;
+    private Sound winSound, wrongSound;
 
     private int rendersCount = 0;
 
@@ -74,41 +73,35 @@ public class GuessImage extends BaseAdapter {
 
         if (mode == Mode.PLAY) {
             camera.normalize();
-            Gdx.graphics.setContinuousRendering(true);
+        }
+
+        if (rendersCount >= 2) {
+            rendersCount = 0;
+            Gdx.graphics.setContinuousRendering(false);
         } else {
-            if (rendersCount >= 2) {
-                rendersCount = 0;
-                Gdx.graphics.setContinuousRendering(false);
-            } else {
-                Gdx.graphics.setContinuousRendering(true);
-                rendersCount++;
-            }
+            Gdx.graphics.setContinuousRendering(true);
+            rendersCount++;
         }
     }
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
+        if (mode == Mode.PLAY) {
+            camera.idle = false;
+        }
         return false;
     }
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (mode == Mode.PLAY) {
-            if (!camera.zooming) {
-                camera.translating = true;
-                camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
-            }
+            camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
         }
         return false;
     }
 
     @Override
     public boolean panStop(float x, float y, int pointer, int button) {
-        if (mode == Mode.PLAY) {
-            if (!camera.zooming) {
-                camera.translating = false;
-            }
-        }
         return false;
     }
 
@@ -116,7 +109,6 @@ public class GuessImage extends BaseAdapter {
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1,
                          Vector2 pointer2) {
         if (mode == Mode.PLAY) {
-            camera.zooming = true;
             Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
             Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
             camera.setZoom(camera.startZoom * startVector.len() / currentVector.len());
@@ -128,8 +120,21 @@ public class GuessImage extends BaseAdapter {
     public void pinchStop() {
         if (mode == Mode.PLAY) {
             camera.startZoom = camera.zoom;
-            camera.zooming = false;
         }
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (mode == Mode.PLAY) {
+            int activeTouch = 0;
+            for (int i = 0; i < 20; i++) {
+                if (Gdx.input.isTouched(i)) {
+                    activeTouch++;
+                }
+            }
+            camera.idle = activeTouch == 0;
+        }
+        return false;
     }
 
     @Override

@@ -14,8 +14,7 @@ public class CustomCamera extends OrthographicCamera {
 
     float startZoom = 1f;
 
-    boolean zooming = false;
-    boolean translating = false;
+    boolean idle = false;
 
     public CustomCamera() {
     }
@@ -40,7 +39,7 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void normalize() {
-        if (zooming || translating) {
+        if (!idle) {
             return;
         }
         float dx = 0, dy = 0, dz = 0;
@@ -70,15 +69,17 @@ public class CustomCamera extends OrthographicCamera {
             dz = zoom - 1;
         }
         float delta = Gdx.graphics.getDeltaTime();
-        if (dx > 0.1f || dx < -0.1f || dy > 0.1f || dy < -0.1f) {
-            dx = MathUtils.clamp(Math.signum(dx) * 10 + dx * delta * 3, -Math.abs(dx), Math.abs(dx));
-            dy = MathUtils.clamp(Math.signum(dy) * 10 + dy * delta * 3, -Math.abs(dy), Math.abs(dy));
+        if (dx != 0 || dy != 0) {
+            dx = MathUtils.clamp(Math.signum(dx) * 10 + dx * delta * 5, -Math.abs(dx), Math.abs(dx));
+            dy = MathUtils.clamp(Math.signum(dy) * 10 + dy * delta * 5, -Math.abs(dy), Math.abs(dy));
             setTranslation(dx, dy);
+            Gdx.graphics.requestRendering();
         }
         if (dz > 0) {
             float zoom = Math.max(this.zoom - 0.05f - dz * delta * 3, 1);
             setZoom(zoom);
             startZoom = zoom;
+            Gdx.graphics.requestRendering();
         }
     }
 
