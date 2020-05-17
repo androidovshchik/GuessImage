@@ -30,12 +30,14 @@ public class CustomCamera extends OrthographicCamera {
         update();
     }
 
-    public void setZoom(float zoom) {
+    public boolean setZoom(float zoom) {
         zoom = MathUtils.clamp(zoom, 0.2f, 2);
         if (this.zoom != zoom) {
             this.zoom = zoom;
             update();
+            return true;
         }
+        return false;
     }
 
     public void normalize() {
@@ -77,9 +79,10 @@ public class CustomCamera extends OrthographicCamera {
         }
         if (dz > 0) {
             float zoom = Math.max(this.zoom - 0.05f - dz * delta * 3, 1);
-            setZoom(zoom);
-            startZoom = zoom;
-            Gdx.graphics.requestRendering();
+            if (setZoom(zoom)) {
+                startZoom = zoom;
+                Gdx.graphics.requestRendering();
+            }
         }
     }
 
