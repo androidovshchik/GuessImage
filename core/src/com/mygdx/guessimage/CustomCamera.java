@@ -9,6 +9,8 @@ public class CustomCamera extends OrthographicCamera {
 
     private static final String TAG = CustomCamera.class.getSimpleName();
 
+    private static final float ZERO = 0.1f;
+
     private Rectangle imageBounds = new Rectangle();
     private float imageTop;
     private float imageRight;
@@ -33,7 +35,7 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void setZoom(float zoom) {
-        zoom = MathUtils.clamp(zoom, 0.2f, 1);
+        zoom = MathUtils.clamp(zoom, 0.2f, 2);
         if (this.zoom != zoom) {
             this.zoom = zoom;
             update();
@@ -46,17 +48,6 @@ public class CustomCamera extends OrthographicCamera {
         }
         float dx = 0;
         float dy = 0;
-        if (getHeight() < imageBounds.height) {
-            float topDiff = getVisualTop() - imageTop;
-            float bottomDiff = getVisualBottom() - imageBounds.y;
-            if (topDiff > 0) {
-                dy = -topDiff;
-            } else if (bottomDiff < 0) {
-                dy = -bottomDiff;
-            }
-        } else {
-            dy = viewportHeight / 2 - position.y;
-        }
         if (getWidth() < imageBounds.width) {
             float leftDiff = getVisualLeft() - imageBounds.x;
             float rightDiff = getVisualRight() - imageRight;
@@ -68,11 +59,27 @@ public class CustomCamera extends OrthographicCamera {
         } else {
             dx = viewportWidth / 2 - position.x;
         }
-        if (dx > 0.1 || dx < -0.1 || dy > 0.1 || dy < -0.1) {
-            float delta = Gdx.graphics.getDeltaTime();
-            dx = MathUtils.clamp(10 * Math.signum(dx) + dx * delta * 3, -Math.abs(dx), Math.abs(dx));
-            dy = MathUtils.clamp(10 * Math.signum(dy) + dy * delta * 3, -Math.abs(dy), Math.abs(dy));
+        if (getHeight() < imageBounds.height) {
+            float topDiff = getVisualTop() - imageTop;
+            float bottomDiff = getVisualBottom() - imageBounds.y;
+            if (topDiff > 0) {
+                dy = -topDiff;
+            } else if (bottomDiff < 0) {
+                dy = -bottomDiff;
+            }
+        } else {
+            dy = viewportHeight / 2 - position.y;
+        }
+        float delta = Gdx.graphics.getDeltaTime();
+        if (dx > ZERO || dx < -ZERO || dy > ZERO || dy < -ZERO) {
+            dx = MathUtils.clamp(Math.signum(dx) * 10 + dx * delta * 3, -Math.abs(dx), Math.abs(dx));
+            dy = MathUtils.clamp(Math.signum(dy) * 10 + dy * delta * 3, -Math.abs(dy), Math.abs(dy));
             setTranslation(dx, dy);
+        }
+        if (zoom > 1) {
+            float dZ = zoom - 1;
+            setZoom(Math.max(Math.signum(dZ) * 0.01f + dZ * delta, 1));
+            startZoom = zoom;
         }
     }
 
