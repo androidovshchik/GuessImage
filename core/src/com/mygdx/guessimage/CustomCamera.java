@@ -15,7 +15,7 @@ public class CustomCamera extends OrthographicCamera {
 
     float startZoom = 1f;
 
-    boolean scaling = false;
+    boolean zooming = false;
     boolean translating = false;
 
     public CustomCamera() {
@@ -28,32 +28,29 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void setTranslation(float dX, float dY) {
-        translating = true;
         translate(dX, dY);
         update();
     }
 
     public void setZoom(float zoom) {
-        scaling = true;
         zoom = MathUtils.clamp(zoom, 0.2f, 1);
         this.zoom = zoom;
         update();
     }
 
     public void normalize() {
-        if (scaling || translating) {
+        if (zooming || translating) {
             return;
         }
         float dx = 0;
         float dy = 0;
-        float delta = Gdx.graphics.getDeltaTime();
         if (getHeight() < imageBounds.height) {
             float topDiff = getVisualTop() - imageTop;
             float bottomDiff = getVisualBottom() - imageBounds.y;
             if (topDiff > 0) {
-                dy = getTop();
+                dy = -topDiff;
             } else if (bottomDiff < 0) {
-                dy = getBottom();
+                dy = -bottomDiff;
             }
         } else {
 
@@ -62,17 +59,18 @@ public class CustomCamera extends OrthographicCamera {
             float leftDiff = getVisualLeft() - imageBounds.x;
             float rightDiff = getVisualRight() - imageRight;
             if (leftDiff < 0) {
-                dx = getVisualLeft();
+                dx = -leftDiff;
             } else if (rightDiff > 0) {
-                dx = getVisualRight();
+                dx = -rightDiff;
             }
         } else {
 
         }
-        if (dx > 0 || dy > 0) {
-            setTranslation(dx, dy);
+        if (dx > 0.1 || dx < -0.1 || dy > 0.1 || dy < -0.1) {
+            float delta = Gdx.graphics.getDeltaTime() * 3;
+            GdxLog.print(TAG, " deltax " + (dx * delta) + " deltay " + clampReverse(dy, -50, 50));
+            setTranslation(clampReverse(dx, -10, 10) * delta, clampReverse(dy, -50, 50) * delta);
         }
-        //GdxLog.print(TAG, " effectiveViewportWidth " + effectiveViewportWidth + " effectiveViewportHeight " + effectiveViewportHeight);
     }
 
     public float getWidth() {
@@ -113,5 +111,11 @@ public class CustomCamera extends OrthographicCamera {
 
     public float getBottom() {
         return position.y - viewportHeight / 2;
+    }
+
+    private static float clampReverse(float value, float min, float max) {
+        if (value < 0 && value > min) return min;
+        if (value > 0 && value < max) return max;
+        return value;
     }
 }
