@@ -9,11 +9,8 @@ public class CustomCamera extends OrthographicCamera {
 
     private static final String TAG = CustomCamera.class.getSimpleName();
 
-    private static final float ZERO = 0.1f;
-
     private Rectangle imageBounds = new Rectangle();
-    private float imageTop;
-    private float imageRight;
+    private float imageTop, imageRight;
 
     float startZoom = 1f;
 
@@ -46,8 +43,7 @@ public class CustomCamera extends OrthographicCamera {
         if (zooming || translating) {
             return;
         }
-        float dx = 0;
-        float dy = 0;
+        float dx = 0, dy = 0, dz = 0;
         if (getWidth() < imageBounds.width) {
             float leftDiff = getVisualLeft() - imageBounds.x;
             float rightDiff = getVisualRight() - imageRight;
@@ -70,15 +66,18 @@ public class CustomCamera extends OrthographicCamera {
         } else {
             dy = viewportHeight / 2 - position.y;
         }
+        if (zoom > 1) {
+            dz = zoom - 1;
+        }
         float delta = Gdx.graphics.getDeltaTime();
-        if (dx > ZERO || dx < -ZERO || dy > ZERO || dy < -ZERO) {
+        if (dx > 0.1f || dx < -0.1f || dy > 0.1f || dy < -0.1f) {
             dx = MathUtils.clamp(Math.signum(dx) * 10 + dx * delta * 3, -Math.abs(dx), Math.abs(dx));
             dy = MathUtils.clamp(Math.signum(dy) * 10 + dy * delta * 3, -Math.abs(dy), Math.abs(dy));
             setTranslation(dx, dy);
         }
-        if (zoom > 1) {
-            float dZ = zoom - 1;
-            setZoom(Math.max(Math.signum(dZ) * 0.01f + dZ * delta, 1));
+        if (dz > 0) {
+            float zoom = Math.max(this.zoom - 0.05f - dz * delta * 3, 1);
+            setZoom(zoom);
             startZoom = zoom;
         }
     }

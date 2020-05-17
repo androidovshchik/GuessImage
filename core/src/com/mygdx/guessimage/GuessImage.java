@@ -94,8 +94,10 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (mode == Mode.PLAY) {
-            camera.translating = true;
-            camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
+            if (!camera.zooming) {
+                camera.translating = true;
+                camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
+            }
         }
         return false;
     }
@@ -103,7 +105,9 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean panStop(float x, float y, int pointer, int button) {
         if (mode == Mode.PLAY) {
-            camera.translating = false;
+            if (!camera.zooming) {
+                camera.translating = false;
+            }
         }
         return false;
     }
