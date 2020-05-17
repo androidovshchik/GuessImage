@@ -1,6 +1,5 @@
 package com.mygdx.guessimage;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -34,8 +33,10 @@ public class CustomCamera extends OrthographicCamera {
 
     public void setZoom(float zoom) {
         zoom = MathUtils.clamp(zoom, 0.2f, 1);
-        this.zoom = zoom;
-        update();
+        if (this.zoom != zoom) {
+            this.zoom = zoom;
+            update();
+        }
     }
 
     public void normalize() {
@@ -67,9 +68,9 @@ public class CustomCamera extends OrthographicCamera {
 
         }
         if (dx > 0.1 || dx < -0.1 || dy > 0.1 || dy < -0.1) {
-            float delta = Gdx.graphics.getDeltaTime() * 3;
-            GdxLog.print(TAG, " deltax " + (dx * delta) + " deltay " + clampReverse(dy, -50, 50));
-            setTranslation(clampReverse(dx, -10, 10) * delta, clampReverse(dy, -50, 50) * delta);
+            dx = MathUtils.clamp(20 * Math.signum(dx), -Math.abs(dx), Math.abs(dx));
+            dy = MathUtils.clamp(20 * Math.signum(dy), -Math.abs(dy), Math.abs(dy));
+            setTranslation(dx, dy);
         }
     }
 
