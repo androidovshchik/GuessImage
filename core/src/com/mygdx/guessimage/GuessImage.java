@@ -14,15 +14,16 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.guessimage.model.Background;
+import com.mygdx.guessimage.model.Frame;
 
 public class GuessImage extends BaseAdapter {
 
     private static final String TAG = GuessImage.class.getSimpleName();
 
-    private CustomCamera camera;
+    private BoundedCamera camera = new BoundedCamera();
     private ScreenViewport viewport;
 
-    private SpriteBatch spriteBatch;
+    private SpriteBatch spriteBatch = new SpriteBatch();
     private Stage backgroundStage;
     private Stage framesStage;
 
@@ -40,16 +41,15 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void create() {
-        camera = new CustomCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport = new ScreenViewport(camera);
 
-        spriteBatch = new SpriteBatch();
         backgroundStage = new Stage(viewport, spriteBatch);
         Background background = new Background(new Texture("image.png"));
         camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
         backgroundStage.addActor(background);
         framesStage = new Stage(viewport, spriteBatch);
+        framesStage.addActor(new Frame());
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -65,15 +65,16 @@ public class GuessImage extends BaseAdapter {
     public void render() {
         Gdx.gl.glClearColor(224f / 255, 224f / 255, 224f / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glLineWidth(8);
+
+        if (mode == Mode.PLAY) {
+            camera.normalize();
+        }
 
         backgroundStage.act();
         backgroundStage.draw();
         framesStage.act();
         framesStage.draw();
-
-        if (mode == Mode.PLAY) {
-            camera.normalize();
-        }
 
         if (rendersCount >= 2) {
             rendersCount = 0;
@@ -133,6 +134,9 @@ public class GuessImage extends BaseAdapter {
                 }
             }
             camera.idle = activeTouch == 0;
+            if (camera.idle) {
+                Gdx.graphics.requestRendering();
+            }
         }
         return false;
     }

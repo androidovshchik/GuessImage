@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
-public class CustomCamera extends OrthographicCamera {
+public class BoundedCamera extends OrthographicCamera {
 
-    private static final String TAG = CustomCamera.class.getSimpleName();
+    private static final String TAG = BoundedCamera.class.getSimpleName();
 
     private Rectangle imageBounds = new Rectangle();
     private float imageTop, imageRight;
@@ -15,9 +15,6 @@ public class CustomCamera extends OrthographicCamera {
     float startZoom = 1f;
 
     boolean idle = false;
-
-    public CustomCamera() {
-    }
 
     public void setImageBounds(float width, float height) {
         imageBounds.set((viewportWidth - width) / 2, (viewportHeight - height) / 2, width, height);
@@ -41,6 +38,9 @@ public class CustomCamera extends OrthographicCamera {
     }
 
     public void normalize() {
+        if (imageBounds.perimeter() <= 0) {
+            return;
+        }
         if (!idle) {
             return;
         }
