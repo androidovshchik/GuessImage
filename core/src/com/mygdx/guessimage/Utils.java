@@ -1,10 +1,15 @@
 package com.mygdx.guessimage;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 
 public class Utils {
 
     private Utils() {
+    }
+
+    public static float dip(float value) {
+        return value * Gdx.graphics.getDensity();
     }
 
     public static Color parseColor(String hex) {

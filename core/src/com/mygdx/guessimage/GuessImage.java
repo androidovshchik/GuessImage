@@ -22,8 +22,7 @@ public class GuessImage extends BaseAdapter {
 
     private BoundedCamera camera = new BoundedCamera();
     private ScreenViewport viewport;
-
-    private SpriteBatch spriteBatch = new SpriteBatch();
+    private SpriteBatch spriteBatch;
     private Stage backgroundStage;
     private Stage framesStage;
 
@@ -43,7 +42,7 @@ public class GuessImage extends BaseAdapter {
     public void create() {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport = new ScreenViewport(camera);
-
+        spriteBatch = new SpriteBatch();
         backgroundStage = new Stage(viewport, spriteBatch);
         Background background = new Background(new Texture("image.png"));
         camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
@@ -65,7 +64,7 @@ public class GuessImage extends BaseAdapter {
     public void render() {
         Gdx.gl.glClearColor(224f / 255, 224f / 255, 224f / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glLineWidth(8);
+        Gdx.gl.glLineWidth(Utils.dip(4));
 
         if (mode == Mode.PLAY) {
             camera.normalize();

@@ -72,8 +72,9 @@ public class BoundedCamera extends OrthographicCamera {
         }
         float delta = Gdx.graphics.getDeltaTime();
         if (dx != 0 || dy != 0) {
-            dx = MathUtils.clamp(Math.signum(dx) * 10 + dx * delta * 5, -Math.abs(dx), Math.abs(dx));
-            dy = MathUtils.clamp(Math.signum(dy) * 10 + dy * delta * 5, -Math.abs(dy), Math.abs(dy));
+            float min = Utils.dip(5);
+            dx = MathUtils.clamp(Math.signum(dx) * min + dx * delta * 5, -Math.abs(dx), Math.abs(dx));
+            dy = MathUtils.clamp(Math.signum(dy) * min + dy * delta * 5, -Math.abs(dy), Math.abs(dy));
             setTranslation(dx, dy);
             Gdx.graphics.requestRendering();
         }

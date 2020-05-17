@@ -16,7 +16,7 @@ public class Frame extends Actor implements Disposable {
     public void draw(Batch batch, float parentAlpha) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Utils.parseColor("ff0000"));
-        shapeRenderer.rect(0, 0, 100, 100);
+        shapeRenderer.rect(0, 0, Utils.dip(100), Utils.dip(100));
         shapeRenderer.end();
     }
 
