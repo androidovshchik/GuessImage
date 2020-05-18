@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.areGranted
 import com.mygdx.guessimage.extension.isMarshmallowPlus
@@ -31,7 +32,7 @@ class ObjectFragment : BaseFragment() {
 
     private lateinit var button: Button
 
-    private var obj: ObjectEntity? = null
+    private var currentObj: ObjectEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +48,8 @@ class ObjectFragment : BaseFragment() {
                 }.lparams(matchParent, matchParent)
                 button = button {
                     text = getString(R.string.upload)
-                    isVisible = puzzleModel.puzzle.filename.isNullOrBlank()
+                    isVisible =
+                        puzzleModel.mode == Mode.EDIT && puzzleModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         val activity = activity ?: return@setOnClickListener
                         if (activity.areGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -71,15 +73,11 @@ class ObjectFragment : BaseFragment() {
             add(idDrawing, DrawingFragment.newInstance(), DrawingFragment.TAG)
         }
         puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
-            obj = it
+            currentObj = it
         })
-        puzzleModel.galleryUri.observe(viewLifecycleOwner, Observer {
-            notifyObject()
+        puzzleModel.galleryPath.observe(viewLifecycleOwner, Observer {
+            button.isVisible = false
         })
-    }
-
-    private fun notifyObject() {
-        button.isVisible = puzzleModel.puzzle.filename.isNullOrBlank()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, p: Array<out String>, r: IntArray) {

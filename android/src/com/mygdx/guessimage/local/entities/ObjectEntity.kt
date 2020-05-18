@@ -29,4 +29,16 @@ class ObjectEntity : Serializable {
 
     @ColumnInfo(name = "o_name")
     var name: String? = null
+
+    @ColumnInfo(name = "o_x")
+    var x = 0f
+
+    @ColumnInfo(name = "o_y")
+    var y = 0f
+
+    @ColumnInfo(name = "o_w")
+    var width = 0f
+
+    @ColumnInfo(name = "o_h")
+    var height = 0f
 }

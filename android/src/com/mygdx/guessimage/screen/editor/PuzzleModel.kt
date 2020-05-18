@@ -14,5 +14,5 @@ class PuzzleModel : ViewModel() {
 
     val currentObj = MutableLiveData<ObjectEntity>()
 
-    val galleryUri = MutableLiveData<String>()
+    val galleryPath = MutableLiveData<String>()
 }
