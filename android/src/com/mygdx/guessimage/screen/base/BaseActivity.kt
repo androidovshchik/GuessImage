@@ -17,6 +17,17 @@ abstract class BaseActivity : AppCompatActivity(), KodeinAware, CoroutineScope {
 
     protected val job = SupervisorJob()
 
+    var isTouchable
+        get() = window.attributes.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE == 0
+        set(value) {
+            val flag = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            if (value) {
+                window.clearFlags(flag)
+            } else {
+                window.setFlags(flag, flag)
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
