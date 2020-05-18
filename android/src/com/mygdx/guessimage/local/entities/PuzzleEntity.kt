@@ -12,7 +12,7 @@ class PuzzleEntity : Serializable {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "p_id")
-    var id: Long = 0L
+    var id = 0L
 
     @ColumnInfo(name = "p_filename")
     var filename: String? = null

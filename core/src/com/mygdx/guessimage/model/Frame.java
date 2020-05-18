@@ -21,8 +21,17 @@ public class Frame extends Actor implements Disposable {
         int height = Gdx.graphics.getHeight();
         setSize(Utils.dip(MIN_SIZE), Utils.dip(MIN_SIZE));
         setOrigin(getWidth() / 2, getHeight() / 2);
-        setX(width / 2f - getWidth() / 2);
-        setY(height / 2f - getHeight() / 2);
+        setX((width - getWidth()) / 2);
+        setY((height - getHeight()) / 2);
+    }
+
+    public Frame(float x, float y, float w, float h) {
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+        setSize(w, h);
+        setOrigin(getWidth() / 2, getHeight() / 2);
+        setX(cX);
+        setY(cY);
     }
 
     @Override

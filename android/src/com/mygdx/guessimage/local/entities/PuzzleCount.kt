@@ -8,6 +8,6 @@ class PuzzleCount {
     @Embedded
     lateinit var puzzle: PuzzleEntity
 
-    @ColumnInfo(name = "objects", defaultValue = "0")
-    var objects = 0
+    @ColumnInfo(name = "count")
+    var count = 0
 }

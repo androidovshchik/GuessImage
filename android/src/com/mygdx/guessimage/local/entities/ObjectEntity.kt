@@ -9,20 +9,23 @@ import java.io.Serializable
         ForeignKey(
             entity = PuzzleEntity::class,
             parentColumns = ["p_id"],
-            childColumns = ["o_id"],
+            childColumns = ["o_p_id"],
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [
-        Index(value = ["o_id"])
+        Index(value = ["o_p_id"])
     ]
 )
 class ObjectEntity : Serializable {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "o_id")
-    var id: Long = 0L
+    var id = 0L
+
+    @ColumnInfo(name = "o_p_id")
+    var puzzleId = 0L
 
     @ColumnInfo(name = "o_name")
     var name: String? = null
