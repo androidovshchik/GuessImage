@@ -28,6 +28,8 @@ class ObjectFragment : BaseFragment() {
 
     private val idDrawing = View.generateViewId()
 
+    private val drawingFragment = DrawingFragment.newInstance()
+
     private lateinit var puzzleModel: PuzzleModel
 
     private lateinit var button: Button
@@ -70,7 +72,7 @@ class ObjectFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         childFragmentManager.transact {
-            add(idDrawing, DrawingFragment.newInstance(), DrawingFragment.TAG)
+            add(idDrawing, drawingFragment, DrawingFragment.TAG)
         }
         puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
             currentObj = it
@@ -78,6 +80,7 @@ class ObjectFragment : BaseFragment() {
         if (puzzleModel.mode == Mode.EDIT) {
             puzzleModel.galleryPath.observe(viewLifecycleOwner, Observer {
                 button.isVisible = false
+                drawingFragment.guessImage.postRunnable("setBackground", it)
             })
         }
     }

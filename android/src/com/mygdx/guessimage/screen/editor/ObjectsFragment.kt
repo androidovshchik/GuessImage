@@ -22,6 +22,7 @@ import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
 import kotlinx.android.synthetic.main.item_object.view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.button
@@ -89,14 +90,18 @@ class ObjectsFragment : BaseFragment() {
                     text = getString(R.string.btn_save)
                     isVisible = puzzleModel.mode == Mode.EDIT
                     setOnClickListener {
-                        launch {
-                            if (puzzleModel.puzzle.id == 0L) {
-                                withContext(Dispatchers.IO) {
-                                    db.puzzleDao().insert(puzzleModel.puzzle)
-                                    db.objectDao().insert(dataSource.toList())
+                        it.isEnabled = false
+                        GlobalScope.launch(Dispatchers.Main) {
+                            try {
+                                if (puzzleModel.puzzle.id == 0L) {
+                                    withContext(Dispatchers.IO) {
+                                        db.puzzleDao().insert(puzzleModel.puzzle)
+                                        db.objectDao().insert(dataSource.toList())
+                                    }
                                 }
+                            } finally {
+                                activity?.finish()
                             }
-                            activity?.finish()
                         }
                     }
                 }.lparams(matchParent, wrapContent)
