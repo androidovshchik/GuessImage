@@ -44,11 +44,7 @@ public class GuessImage extends BaseAdapter {
         viewport = new ScreenViewport(camera);
         spriteBatch = new SpriteBatch();
         backgroundStage = new Stage(viewport, spriteBatch);
-        Background background = new Background(new Texture("image.png"));
-        camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
-        backgroundStage.addActor(background);
         framesStage = new Stage(viewport, spriteBatch);
-        addFrame();
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -158,8 +154,21 @@ public class GuessImage extends BaseAdapter {
         // todo
     }
 
+    public void setBackground(String path) {
+        backgroundStage.clear();
+        Background background = new Background(new Texture(Gdx.files.external(path)));
+        camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
+        backgroundStage.addActor(background);
+    }
+
     public void addFrame() {
+        framesStage.clear();
         framesStage.addActor(new Frame());
+    }
+
+    public void addFrame(float x, float y, float width, float height) {
+        framesStage.clear();
+        framesStage.addActor(new Frame(x, y, width, height));
     }
 
     @Override

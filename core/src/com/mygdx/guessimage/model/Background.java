@@ -13,8 +13,8 @@ public class Background extends Image {
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
         setOrigin(getWidth() / 2, getHeight() / 2);
-        setX(width / 2f - getWidth() / 2);
-        setY(height / 2f - getHeight() / 2);
+        setX((width - getWidth()) / 2);
+        setY((height - getHeight()) / 2);
         float hRatio = width / getWidth();
         float vRatio = height / getHeight();
         float ratio = Math.min(hRatio, vRatio);
