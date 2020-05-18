@@ -7,9 +7,18 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.mygdx.guessimage.GuessImage
+import com.mygdx.guessimage.local.FileManager
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.closestKodein
+import org.kodein.di.generic.instance
+import java.io.File
 
 @Suppress("MemberVisibilityCanBePrivate")
-class DrawingFragment : AndroidFragmentApplication() {
+class DrawingFragment : AndroidFragmentApplication(), KodeinAware {
+
+    override val kodein by closestKodein()
+
+    private val fileManager by instance<FileManager>()
 
     private lateinit var puzzleModel: PuzzleModel
 
@@ -18,7 +27,11 @@ class DrawingFragment : AndroidFragmentApplication() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         puzzleModel = ViewModelProvider(requireActivity()).get(PuzzleModel::class.java)
-        guessImage = GuessImage(puzzleModel.mode, object : GuessImage.Listener {
+        var filename = puzzleModel.puzzle.filename
+        if (!filename.isNullOrBlank()) {
+            filename = File(fileManager.imagesDir, filename).path
+        }
+        guessImage = GuessImage(puzzleModel.mode, filename, object : GuessImage.Listener {
         })
     }
 

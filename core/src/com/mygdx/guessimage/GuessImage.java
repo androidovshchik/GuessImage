@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.guessimage.model.Background;
 import com.mygdx.guessimage.model.Frame;
 
+@SuppressWarnings("unused")
 public class GuessImage extends BaseAdapter {
 
     private static final String TAG = GuessImage.class.getSimpleName();
@@ -31,10 +32,12 @@ public class GuessImage extends BaseAdapter {
 
     private Sound winSound, wrongSound;
 
+    private String initialPath;
     private int rendersCount = 0;
 
-    public GuessImage(Mode mode, Listener listener) {
+    public GuessImage(Mode mode, String background, Listener listener) {
         this.mode = mode;
+        this.initialPath = background;
         this.listener = listener;
     }
 
@@ -45,6 +48,9 @@ public class GuessImage extends BaseAdapter {
         spriteBatch = new SpriteBatch();
         backgroundStage = new Stage(viewport, spriteBatch);
         framesStage = new Stage(viewport, spriteBatch);
+        if (initialPath != null) {
+            setBackground(initialPath);
+        }
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -156,7 +162,7 @@ public class GuessImage extends BaseAdapter {
 
     public void setBackground(String path) {
         backgroundStage.clear();
-        Background background = new Background(new Texture(Gdx.files.external(path)));
+        Background background = new Background(new Texture(Gdx.files.absolute(path)));
         camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
         backgroundStage.addActor(background);
     }
