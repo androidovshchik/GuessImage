@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
+import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.FileManager
 import com.mygdx.guessimage.local.PathCompat
@@ -29,8 +30,11 @@ class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java)
-        puzzleModel.puzzle = intent.getSerializableExtra("puzzle") as PuzzleEntity
+        val puzzle = intent.getSerializableExtra("puzzle") as PuzzleEntity
+        puzzleModel = ViewModelProvider(this).get(PuzzleModel::class.java).also {
+            it.mode = if (puzzle.id > 0) Mode.PLAY else Mode.EDIT
+            it.puzzle = puzzle
+        }
         val idObject = View.generateViewId()
         val idObjects = View.generateViewId()
         setContentView(UI {
