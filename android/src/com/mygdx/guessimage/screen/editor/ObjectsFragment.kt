@@ -89,7 +89,15 @@ class ObjectsFragment : BaseFragment() {
                     text = getString(R.string.btn_save)
                     isVisible = puzzleModel.mode == Mode.EDIT
                     setOnClickListener {
-
+                        launch {
+                            if (puzzleModel.puzzle.id == 0L) {
+                                withContext(Dispatchers.IO) {
+                                    db.puzzleDao().insert(puzzleModel.puzzle)
+                                    db.objectDao().insert(dataSource.toList())
+                                }
+                            }
+                            activity?.finish()
+                        }
                     }
                 }.lparams(matchParent, wrapContent)
             }
@@ -97,10 +105,11 @@ class ObjectsFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (puzzleModel.puzzle.id > 0) {
+        val puzzleId = puzzleModel.puzzle.id
+        if (puzzleId > 0) {
             launch {
                 val items = withContext(Dispatchers.IO) {
-                    db.objectDao().getAllByPuzzle(puzzleModel.puzzle.id)
+                    db.objectDao().getAllByPuzzle(puzzleId)
                 }
                 dataSource.apply {
                     clear()

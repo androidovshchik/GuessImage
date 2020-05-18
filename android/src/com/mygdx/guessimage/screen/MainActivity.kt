@@ -80,7 +80,7 @@ class MainActivity : BaseActivity() {
                             }
                             onClick { index ->
                                 startActivity<EditorActivity>(
-                                    "puzzle" to dataSource[index]
+                                    "puzzle" to (dataSource[index] as PuzzleCount).puzzle
                                 )
                             }
                         }
