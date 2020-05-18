@@ -70,8 +70,10 @@ class MainActivity : BaseActivity() {
                         }
                         withItem<PuzzleCount, PuzzleViewHolder>(R.layout.item_puzzle) {
                             onBind(::PuzzleViewHolder) { _, item ->
-                                val filename = item.puzzle.filename.orEmpty()
-                                icon.load(File(fileManager.iconsDir, filename))
+                                val filename = item.puzzle.filename
+                                if (!filename.isNullOrBlank()) {
+                                    icon.load(File(fileManager.iconsDir, filename))
+                                }
                                 count.text = item.count.toString()
                             }
                             onClick { index ->

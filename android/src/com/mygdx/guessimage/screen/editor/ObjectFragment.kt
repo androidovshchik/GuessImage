@@ -75,9 +75,11 @@ class ObjectFragment : BaseFragment() {
         puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
             currentObj = it
         })
-        puzzleModel.galleryPath.observe(viewLifecycleOwner, Observer {
-            button.isVisible = false
-        })
+        if (puzzleModel.mode == Mode.EDIT) {
+            puzzleModel.galleryPath.observe(viewLifecycleOwner, Observer {
+                button.isVisible = false
+            })
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, p: Array<out String>, r: IntArray) {
