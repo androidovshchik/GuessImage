@@ -77,8 +77,7 @@ fun deleteFile(file: File?) {
         if (file?.isFile == true) {
             file.delete()
         }
-    } catch (e: Throwable) {
-        Timber.e(e)
+    } catch (ignored: Throwable) {
     }
 }
 

@@ -14,7 +14,7 @@ abstract class BaseFragment : Fragment(), KodeinAware, CoroutineScope {
 
     protected val job = SupervisorJob()
 
-    var isTouchable
+    protected var isTouchable
         get() = activity?.window?.attributes?.flags?.and(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE) == 0
         set(value) {
             val flag = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE

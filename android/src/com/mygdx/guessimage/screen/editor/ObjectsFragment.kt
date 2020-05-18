@@ -18,6 +18,8 @@ import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
+import com.mygdx.guessimage.local.FileManager
+import com.mygdx.guessimage.local.deleteFile
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
 import kotlinx.android.synthetic.main.item_object.view.*
@@ -40,6 +42,8 @@ class ObjectsFragment : BaseFragment() {
 
     private val db by instance<Database>()
 
+    private val fileManager by instance<FileManager>()
+
     private lateinit var puzzleModel: PuzzleModel
 
     private val dataSource = emptyDataSourceTyped<ObjectEntity>()
@@ -56,7 +60,17 @@ class ObjectsFragment : BaseFragment() {
                 button {
                     text = getString(R.string.btn_close)
                     setOnClickListener {
-                        activity?.finish()
+                        isTouchable = false
+                        GlobalScope.launch(Dispatchers.Main) {
+                            val puzzle = puzzleModel.puzzle
+                            if (puzzle.id == 0L && puzzle.filename != null) {
+                                withContext(Dispatchers.IO) {
+                                    deleteFile(fileManager.getImageFile(puzzle.filename))
+                                    deleteFile(fileManager.getIconFile(puzzle.filename))
+                                }
+                            }
+                            activity?.finish()
+                        }
                     }
                 }.lparams(matchParent, wrapContent)
                 button {
@@ -90,7 +104,7 @@ class ObjectsFragment : BaseFragment() {
                     text = getString(R.string.btn_save)
                     isVisible = puzzleModel.mode == Mode.EDIT
                     setOnClickListener {
-                        it.isEnabled = false
+                        isTouchable = false
                         GlobalScope.launch(Dispatchers.Main) {
                             val puzzle = puzzleModel.puzzle
                             if (puzzle.id == 0L) {

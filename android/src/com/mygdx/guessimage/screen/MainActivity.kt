@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
 import org.kodein.di.generic.instance
-import java.io.File
 
 class DummyHolder(itemView: View) : ViewHolder(itemView)
 
@@ -72,7 +71,7 @@ class MainActivity : BaseActivity() {
                             onBind(::PuzzleViewHolder) { _, item ->
                                 val filename = item.puzzle.filename
                                 if (!filename.isNullOrBlank()) {
-                                    icon.load(File(fileManager.iconsDir, filename))
+                                    icon.load(fileManager.getIconFile(filename))
                                 } else {
                                     icon.load(0)
                                 }

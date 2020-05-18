@@ -11,7 +11,6 @@ import com.mygdx.guessimage.local.FileManager
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-import java.io.File
 
 @Suppress("MemberVisibilityCanBePrivate")
 class DrawingFragment : AndroidFragmentApplication(), KodeinAware {
@@ -29,7 +28,7 @@ class DrawingFragment : AndroidFragmentApplication(), KodeinAware {
         puzzleModel = ViewModelProvider(requireActivity()).get(PuzzleModel::class.java)
         var filename = puzzleModel.puzzle.filename
         if (!filename.isNullOrBlank()) {
-            filename = File(fileManager.imagesDir, filename).path
+            filename = fileManager.getImageFile(filename).path
         }
         guessImage = GuessImage(puzzleModel.mode, filename, object : GuessImage.Listener {
         })
