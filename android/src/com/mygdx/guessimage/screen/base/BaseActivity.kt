@@ -68,6 +68,12 @@ abstract class BaseActivity : AppCompatActivity(), KodeinAware, CoroutineScope {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onBackPressed() {
+        if (isTouchable) {
+            super.onBackPressed()
+        }
+    }
+
     override fun onDestroy() {
         job.cancelChildren()
         super.onDestroy()

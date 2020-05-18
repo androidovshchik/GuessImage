@@ -20,5 +20,5 @@ abstract class PuzzleDao {
     abstract fun getAllCounted(): List<PuzzleCount>
 
     @Insert
-    abstract fun insert(item: PuzzleEntity)
+    abstract fun insert(item: PuzzleEntity): Long
 }

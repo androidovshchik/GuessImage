@@ -10,6 +10,7 @@ import java.io.Serializable
 )
 class PuzzleEntity : Serializable {
 
+    @Volatile
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "p_id")
     var id = 0L

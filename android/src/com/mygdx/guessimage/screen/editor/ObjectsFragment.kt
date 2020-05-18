@@ -60,17 +60,7 @@ class ObjectsFragment : BaseFragment() {
                 button {
                     text = getString(R.string.btn_close)
                     setOnClickListener {
-                        isTouchable = false
-                        GlobalScope.launch(Dispatchers.Main) {
-                            val puzzle = puzzleModel.puzzle
-                            if (puzzle.id == 0L && puzzle.filename != null) {
-                                withContext(Dispatchers.IO) {
-                                    deleteFile(fileManager.getImageFile(puzzle.filename))
-                                    deleteFile(fileManager.getIconFile(puzzle.filename))
-                                }
-                            }
-                            activity?.finish()
-                        }
+                        activity?.finish()
                     }
                 }.lparams(matchParent, wrapContent)
                 button {
@@ -105,11 +95,11 @@ class ObjectsFragment : BaseFragment() {
                     isVisible = puzzleModel.mode == Mode.EDIT
                     setOnClickListener {
                         isTouchable = false
+                        val puzzle = puzzleModel.puzzle
                         GlobalScope.launch(Dispatchers.Main) {
-                            val puzzle = puzzleModel.puzzle
                             if (puzzle.id == 0L) {
                                 withContext(Dispatchers.IO) {
-                                    db.puzzleDao().insert(puzzle)
+                                    puzzle.id = db.puzzleDao().insert(puzzle)
                                     db.objectDao().insert(dataSource.toList())
                                 }
                             }
@@ -135,6 +125,18 @@ class ObjectsFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        val puzzle = puzzleModel.puzzle
+        if (puzzle.id == 0L && puzzle.filename != null) {
+            val filename = puzzle.filename
+            GlobalScope.launch(Dispatchers.IO) {
+                deleteFile(fileManager.getImageFile(filename))
+                deleteFile(fileManager.getIconFile(filename))
+            }
+        }
+        super.onDestroy()
     }
 
     companion object {
