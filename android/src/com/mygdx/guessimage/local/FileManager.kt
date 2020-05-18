@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import androidx.exifinterface.media.ExifInterface
 import com.mygdx.guessimage.extension.use
+import com.mygdx.guessimage.model.Frame
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -39,7 +40,11 @@ class FileManager(context: Context) {
         get() = File(externalDir ?: internalDir, "icons").apply { mkdirs() }
 
     @SuppressLint("DefaultLocale")
-    fun copyImage(src: File): String? {
+    fun copyImage(path: String?): String? {
+        if (path.isNullOrBlank()) {
+            return null
+        }
+        val src = File(path)
         if (!src.exists()) {
             return null
         }
@@ -95,6 +100,9 @@ private fun createCopy(file: File): Bitmap? {
         val bitmap = BitmapFactory.Options().run {
             inJustDecodeBounds = true
             BitmapFactory.decodeFile(file.path, this)
+            if (outHeight < Frame.MIN_SIZE || outWidth < Frame.MIN_SIZE) {
+                return null
+            }
             // Calculate inSampleSize
             inSampleSize = calculateInSampleSize(MAX_SIZE, MAX_SIZE)
             inJustDecodeBounds = false
@@ -124,8 +132,7 @@ private fun createCopy(file: File): Bitmap? {
         if (newBitmap != bitmap) {
             try {
                 bitmap.recycle()
-            } catch (e: Throwable) {
-                Timber.e(e)
+            } catch (ignored: Throwable) {
             }
         }
         return newBitmap
@@ -138,9 +145,9 @@ private fun createCopy(file: File): Bitmap? {
 private fun Bitmap.createThumb(): Bitmap? {
     return try {
         val matrix = Matrix()
-        val minSize = min(width, height)
-        if (minSize < THUMB_SIZE) {
-            val scale = THUMB_SIZE.toFloat() / minSize
+        val maxSize = max(width, height)
+        if (maxSize > THUMB_SIZE) {
+            val scale = THUMB_SIZE.toFloat() / maxSize
             matrix.preScale(scale, scale)
         }
         val x = max(0, (width - THUMB_SIZE) / 2)

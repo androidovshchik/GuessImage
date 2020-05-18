@@ -73,6 +73,8 @@ class MainActivity : BaseActivity() {
                                 val filename = item.puzzle.filename
                                 if (!filename.isNullOrBlank()) {
                                     icon.load(File(fileManager.iconsDir, filename))
+                                } else {
+                                    icon.load(0)
                                 }
                                 count.text = item.count.toString()
                             }
