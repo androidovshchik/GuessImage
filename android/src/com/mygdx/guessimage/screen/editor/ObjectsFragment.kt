@@ -13,7 +13,9 @@ import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.emptyDataSourceTyped
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
+import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.R
+import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.ObjectEntity
@@ -35,9 +37,9 @@ class ObjectViewHolder(itemView: View) : ViewHolder(itemView) {
 
 class ObjectsFragment : BaseFragment() {
 
-    private lateinit var puzzleModel: PuzzleModel
-
     private val db by instance<Database>()
+
+    private lateinit var puzzleModel: PuzzleModel
 
     private val dataSource = emptyDataSourceTyped<ObjectEntity>()
 
@@ -58,10 +60,9 @@ class ObjectsFragment : BaseFragment() {
                 }.lparams(matchParent, wrapContent)
                 button {
                     text = getString(R.string.btn_add)
+                    isVisible = puzzleModel.mode == Mode.EDIT
                     setOnClickListener {
-                        val obj = ObjectEntity().apply {
-                            name = "object${dataSource.size()}"
-                        }
+                        val obj = ObjectEntity()
                         dataSource.apply {
                             add(obj)
                             invalidateAt(size() - 1)
@@ -86,6 +87,7 @@ class ObjectsFragment : BaseFragment() {
                 }.lparams(matchParent, 0, 1f)
                 button {
                     text = getString(R.string.btn_save)
+                    isVisible = puzzleModel.mode == Mode.EDIT
                     setOnClickListener {
 
                     }
@@ -95,13 +97,16 @@ class ObjectsFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        launch {
-            val items = withContext(Dispatchers.IO) {
-                db.objectDao().getAll()
-            }
-            dataSource.apply {
-                //clear()
-                //invalidateAll()
+        if (puzzleModel.puzzle.id > 0) {
+            launch {
+                val items = withContext(Dispatchers.IO) {
+                    db.objectDao().getAllByPuzzle(puzzleModel.puzzle.id)
+                }
+                dataSource.apply {
+                    clear()
+                    addAll(items)
+                    invalidateAll()
+                }
             }
         }
     }
