@@ -11,9 +11,9 @@ abstract class PuzzleDao {
 
     @Query(
         """
-        SELECT puzzles.*, count() AS count FROM puzzles
+        SELECT puzzles.*, count(o_p_id) AS count FROM puzzles
         LEFT JOIN objects ON p_id = o_p_id
-        GROUP BY o_p_id
+        GROUP BY p_id
         ORDER BY p_id ASC
     """
     )

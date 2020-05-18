@@ -16,6 +16,7 @@ import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.FileManager
+import com.mygdx.guessimage.local.entities.PuzzleCount
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 import com.mygdx.guessimage.screen.base.BaseActivity
 import com.mygdx.guessimage.screen.editor.EditorActivity
@@ -67,9 +68,15 @@ class MainActivity : BaseActivity() {
                                 )
                             }
                         }
-                        withItem<PuzzleEntity, PuzzleViewHolder>(R.layout.item_puzzle) {
+                        withItem<PuzzleCount, PuzzleViewHolder>(R.layout.item_puzzle) {
                             onBind(::PuzzleViewHolder) { _, item ->
-                                icon.load(File(fileManager.iconsDir, item.filename))
+                                icon.load(
+                                    File(
+                                        fileManager.iconsDir,
+                                        item.puzzle.filename.orEmpty()
+                                    )
+                                )
+                                count.text = item.count.toString()
                             }
                             onClick { index ->
                                 startActivity<EditorActivity>(
@@ -88,7 +95,7 @@ class MainActivity : BaseActivity() {
         job.cancelChildren()
         launch {
             val items = withContext(Dispatchers.IO) {
-                db.puzzleDao().getAll()
+                db.puzzleDao().getAllCounted()
             }
             dataSource.apply {
                 clear()
