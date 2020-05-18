@@ -20,6 +20,7 @@ import org.jetbrains.anko.frameLayout
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
 import org.kodein.di.generic.instance
+import java.io.File
 
 class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
 
@@ -60,15 +61,15 @@ class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
                 if (resultCode == RESULT_OK) {
                     val uri = data?.data ?: return
                     launch {
-                        val (path, filename) = withContext(Dispatchers.IO) {
+                        val filename = withContext(Dispatchers.IO) {
                             val path = PathCompat.getFilePath(applicationContext, uri)
-                            path to fileManager.copyImage(path)
+                            fileManager.copyImage(path)
                         }
                         if (!filename.isNullOrBlank()) {
-                            puzzleModel.puzzle.filename = filename
-                        }
-                        if (!path.isNullOrBlank()) {
-                            puzzleModel.galleryPath.value = path
+                            puzzleModel.apply {
+                                puzzle.filename = filename
+                                galleryPath.value = File(fileManager.imagesDir, filename).path
+                            }
                         }
                     }
                 }

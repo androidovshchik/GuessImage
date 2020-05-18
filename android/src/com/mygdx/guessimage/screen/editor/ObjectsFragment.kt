@@ -92,16 +92,14 @@ class ObjectsFragment : BaseFragment() {
                     setOnClickListener {
                         it.isEnabled = false
                         GlobalScope.launch(Dispatchers.Main) {
-                            try {
-                                if (puzzleModel.puzzle.id == 0L) {
-                                    withContext(Dispatchers.IO) {
-                                        db.puzzleDao().insert(puzzleModel.puzzle)
-                                        db.objectDao().insert(dataSource.toList())
-                                    }
+                            val puzzle = puzzleModel.puzzle
+                            if (puzzle.id == 0L) {
+                                withContext(Dispatchers.IO) {
+                                    db.puzzleDao().insert(puzzle)
+                                    db.objectDao().insert(dataSource.toList())
                                 }
-                            } finally {
-                                activity?.finish()
                             }
+                            activity?.finish()
                         }
                     }
                 }.lparams(matchParent, wrapContent)
