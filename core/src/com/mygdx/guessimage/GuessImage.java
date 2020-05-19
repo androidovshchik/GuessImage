@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
@@ -37,7 +38,7 @@ public class GuessImage extends BaseAdapter {
     private long winId, wrongId;
 
     private Frame currentFrame;
-    private Vector2 editPan = new Vector2();
+    private Vector3 coordinates = new Vector3();
 
     private String initialPath;
     private int rendersCount = 0;
@@ -100,7 +101,7 @@ public class GuessImage extends BaseAdapter {
             camera.idle = false;
         } else if (mode == Mode.EDIT) {
             if (Utils.countFingers() == 1) {
-                Vector2 coordinates = framesStage.screenToStageCoordinates(new Vector2(x, y));
+                camera.unproject(coordinates.set(x, y, 0));
                 Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
                 if (frame != null) {
                     frame.setAction(coordinates.x, coordinates.y);
@@ -118,8 +119,7 @@ public class GuessImage extends BaseAdapter {
         } else if (mode == Mode.EDIT) {
             Frame frame = currentFrame;
             if (frame != null) {
-                editPan.set(x, y);
-                Vector2 coordinates = framesStage.screenToStageCoordinates(editPan);
+                camera.unproject(coordinates.set(x, y, 0));
                 frame.pan(coordinates.x, coordinates.y, deltaX * camera.zoom, -deltaY * camera.zoom);
             }
         }
@@ -164,11 +164,13 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean tap(float x, float y, int count, int button) {
         if (mode == Mode.PLAY) {
-            Vector2 coordinates = framesStage.screenToStageCoordinates(new Vector2(x, y));
-            Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
-            if (frame == null) {
-                wrongSound.stop(wrongId);
-                wrongId = wrongSound.play(1f);
+            camera.unproject(coordinates.set(x, y, 0));
+            if (bounds.contains(coordinates.x, coordinates.y)) {
+                Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
+                if (frame == null) {
+                    wrongSound.stop(wrongId);
+                    wrongId = wrongSound.play(1f);
+                }
             }
         }
         return false;
