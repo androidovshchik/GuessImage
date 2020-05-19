@@ -100,7 +100,9 @@ public class GuessImage extends BaseAdapter {
         } else if (mode == Mode.EDIT) {
             if (Utils.countFingers() == 1) {
                 Vector2 coordinates = framesStage.screenToStageCoordinates(new Vector2(x, y));
-                currentFrame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
+                Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
+                frame.setAction(coordinates.x, coordinates.y);
+                currentFrame = frame;
             }
         }
         return false;
@@ -113,7 +115,7 @@ public class GuessImage extends BaseAdapter {
         } else if (mode == Mode.EDIT) {
             Frame frame = currentFrame;
             if (frame != null) {
-                frame.setTranslation(deltaX * camera.zoom, -deltaY * camera.zoom);
+                frame.pan(deltaX * camera.zoom, -deltaY * camera.zoom);
             }
         }
         return false;
@@ -184,9 +186,9 @@ public class GuessImage extends BaseAdapter {
         framesStage.addActor(new Frame(bounds));
     }
 
-    public void addFrame(float xC, float yC, float width, float height) {
+    public void addFrame(float x0, float y0, float width, float height) {
         framesStage.clear();
-        framesStage.addActor(new Frame(bounds, xC, yC, width, height));
+        framesStage.addActor(new Frame(bounds, x0, y0, width, height));
     }
 
     public void playWin() {

@@ -58,7 +58,31 @@ public class Frame extends Actor implements Disposable {
         shapeRenderer.end();
     }
 
-    public void setTranslation(float dX, float dY) {
+    public void setAction(float x, float y) {
+        float size3 = Utils.dip(MIN_SIZE) / 3;
+        if (x > getX() + size3 && x < getX() + size3 * 2) {
+            if (y > getY() + size3 && y < getY() + size3 * 2) {
+                action = Action.MOVE;
+                return;
+            }
+        }
+        float size2 = Utils.dip(MIN_SIZE) / 2;
+        if (x < getX() + size2) {
+            if (y < getY() + size2) {
+                action = Action.SCALE_SW;
+            } else {
+                action = Action.SCALE_NW;
+            }
+        } else {
+            if (y < getY() + size2) {
+                action = Action.SCALE_SE;
+            } else {
+                action = Action.SCALE_NE;
+            }
+        }
+    }
+
+    public void pan(float dX, float dY) {
         if (bounds.perimeter() <= 0) {
             return;
         }
