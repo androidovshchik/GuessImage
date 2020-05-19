@@ -22,13 +22,12 @@ public class Background extends Image {
         setScale(ratio);
     }
 
-    public Rectangle getBounds() {
+    public void notifyBounds(Rectangle bounds) {
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
-        Rectangle bounds = new Rectangle(0, 0, getScaledWidth(), getScaledHeight());
+        bounds.setSize(getScaledWidth(), getScaledHeight());
         bounds.setX((width - bounds.getWidth()) / 2);
         bounds.setY((height - bounds.getHeight()) / 2);
-        return bounds;
     }
 
     public float getScaledWidth() {

@@ -9,11 +9,15 @@ public class BoundedCamera extends OrthographicCamera {
 
     private static final String TAG = BoundedCamera.class.getSimpleName();
 
-    public Rectangle bounds = new Rectangle();
+    private Rectangle bounds;
 
     public float startZoom = 1f;
 
     public boolean idle = false;
+
+    public BoundedCamera(Rectangle bounds) {
+        this.bounds = bounds;
+    }
 
     public void setTranslation(float dX, float dY) {
         translate(dX, dY);
