@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.mygdx.guessimage.BoundedCamera;
+import com.mygdx.guessimage.GdxLog;
 import com.mygdx.guessimage.Utils;
 
 public class Frame extends Actor implements Disposable {
@@ -21,6 +22,9 @@ public class Frame extends Actor implements Disposable {
     private Rectangle bounds;
 
     private Action action = Action.MOVE;
+
+    private float startWidth;
+    private float startHeight;
 
     public Frame(Rectangle bounds) {
         this.bounds = bounds;
@@ -59,24 +63,31 @@ public class Frame extends Actor implements Disposable {
         float size3 = Utils.dip(MIN_SIZE) / 3;
         if (x > getX() + size3 && x < getX() + size3 * 2) {
             if (y > getY() + size3 && y < getY() + size3 * 2) {
-                action = Action.MOVE;
+                applyAction(Action.MOVE, getWidth() / 2, getHeight() / 2);
                 return;
             }
         }
         float size2 = Utils.dip(MIN_SIZE) / 2;
         if (x < getX() + size2) {
             if (y < getY() + size2) {
-                action = Action.SCALE_SW;
+                applyAction(Action.SCALE_SW, getWidth(), getHeight());
             } else {
-                action = Action.SCALE_NW;
+                applyAction(Action.SCALE_NW, getWidth(), 0);
             }
         } else {
             if (y < getY() + size2) {
-                action = Action.SCALE_SE;
+                applyAction(Action.SCALE_SE, 0, getHeight());
             } else {
-                action = Action.SCALE_NE;
+                applyAction(Action.SCALE_NE, 0, 0);
             }
         }
+    }
+
+    private void applyAction(Action action, float originX, float originY) {
+        this.action = action;
+        setOrigin(originX, originY);
+        startWidth = getWidth();
+        startHeight = getHeight();
     }
 
     public void pan(float x, float y, float dX, float dY) {
@@ -114,6 +125,13 @@ public class Frame extends Actor implements Disposable {
             case SCALE_NE:
                 break;
             case SCALE_SW:
+                GdxLog.print(TAG, "--- SCALE_SW ");
+                if (x >= bounds.x) {
+                    setX(x);
+                }
+                if (y >= bounds.y) {
+                    setY(y);
+                }
                 break;
             case SCALE_SE:
                 break;
