@@ -9,18 +9,11 @@ public class BoundedCamera extends OrthographicCamera {
 
     private static final String TAG = BoundedCamera.class.getSimpleName();
 
-    private Rectangle bounds = new Rectangle();
-    private float topLimit, rightLimit;
+    public Rectangle bounds = new Rectangle();
 
-    float startZoom = 1f;
+    public float startZoom = 1f;
 
-    boolean idle = false;
-
-    public void setImageBounds(Rectangle backgroundBounds) {
-        bounds.set(backgroundBounds);
-        topLimit = bounds.y + bounds.height;
-        rightLimit = bounds.x + bounds.width;
-    }
+    public boolean idle = false;
 
     public void setTranslation(float dX, float dY) {
         translate(dX, dY);
@@ -44,7 +37,7 @@ public class BoundedCamera extends OrthographicCamera {
         float dx = 0, dy = 0, dz = 0;
         if (getWidth() < bounds.width) {
             float leftDiff = getVisualLeft() - bounds.x;
-            float rightDiff = getVisualRight() - rightLimit;
+            float rightDiff = getVisualRight() - Utils.getRight(bounds);
             if (leftDiff < 0) {
                 dx = -leftDiff;
             } else if (rightDiff > 0) {
@@ -54,7 +47,7 @@ public class BoundedCamera extends OrthographicCamera {
             dx = viewportWidth / 2 - position.x;
         }
         if (getHeight() < bounds.height) {
-            float topDiff = getVisualTop() - topLimit;
+            float topDiff = getVisualTop() - Utils.getTop(bounds);
             float bottomDiff = getVisualBottom() - bounds.y;
             if (topDiff > 0) {
                 dy = -topDiff;

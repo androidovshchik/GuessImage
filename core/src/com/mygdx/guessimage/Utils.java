@@ -2,6 +2,7 @@ package com.mygdx.guessimage;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Utils {
 
@@ -14,6 +15,14 @@ public class Utils {
 
     public static float dip(float value) {
         return value * Gdx.graphics.getDensity();
+    }
+
+    public static float getTop(Rectangle rectangle) {
+        return rectangle.y + rectangle.height;
+    }
+
+    public static float getRight(Rectangle rectangle) {
+        return rectangle.x + rectangle.width;
     }
 
     public static int countFingers() {

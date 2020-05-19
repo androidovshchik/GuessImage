@@ -2,6 +2,7 @@ package com.mygdx.guessimage.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class Background extends Image {
@@ -19,6 +20,15 @@ public class Background extends Image {
         float vRatio = height / getHeight();
         float ratio = Math.min(hRatio, vRatio);
         setScale(ratio);
+    }
+
+    public Rectangle getBounds() {
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+        Rectangle bounds = new Rectangle(0, 0, getScaledWidth(), getScaledHeight());
+        bounds.setX((width - bounds.getWidth()) / 2);
+        bounds.setY((height - bounds.getHeight()) / 2);
+        return bounds;
     }
 
     public float getScaledWidth() {
