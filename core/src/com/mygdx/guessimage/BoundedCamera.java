@@ -9,17 +9,17 @@ public class BoundedCamera extends OrthographicCamera {
 
     private static final String TAG = BoundedCamera.class.getSimpleName();
 
-    private Rectangle imageBounds = new Rectangle();
-    private float imageTop, imageRight;
+    private Rectangle bounds = new Rectangle();
+    private float topLimit, rightLimit;
 
     float startZoom = 1f;
 
     boolean idle = false;
 
-    public void setImageBounds(float width, float height) {
-        imageBounds.set((viewportWidth - width) / 2, (viewportHeight - height) / 2, width, height);
-        imageTop = imageBounds.y + imageBounds.height;
-        imageRight = imageBounds.x + imageBounds.width;
+    public void setImageBounds(Rectangle backgroundBounds) {
+        bounds.set(backgroundBounds);
+        topLimit = bounds.y + bounds.height;
+        rightLimit = bounds.x + bounds.width;
     }
 
     public void setTranslation(float dX, float dY) {
@@ -38,13 +38,13 @@ public class BoundedCamera extends OrthographicCamera {
     }
 
     public void normalize() {
-        if (imageBounds.perimeter() <= 0 || !idle) {
+        if (bounds.perimeter() <= 0 || !idle) {
             return;
         }
         float dx = 0, dy = 0, dz = 0;
-        if (getWidth() < imageBounds.width) {
-            float leftDiff = getVisualLeft() - imageBounds.x;
-            float rightDiff = getVisualRight() - imageRight;
+        if (getWidth() < bounds.width) {
+            float leftDiff = getVisualLeft() - bounds.x;
+            float rightDiff = getVisualRight() - rightLimit;
             if (leftDiff < 0) {
                 dx = -leftDiff;
             } else if (rightDiff > 0) {
@@ -53,9 +53,9 @@ public class BoundedCamera extends OrthographicCamera {
         } else {
             dx = viewportWidth / 2 - position.x;
         }
-        if (getHeight() < imageBounds.height) {
-            float topDiff = getVisualTop() - imageTop;
-            float bottomDiff = getVisualBottom() - imageBounds.y;
+        if (getHeight() < bounds.height) {
+            float topDiff = getVisualTop() - topLimit;
+            float bottomDiff = getVisualBottom() - bounds.y;
             if (topDiff > 0) {
                 dy = -topDiff;
             } else if (bottomDiff < 0) {

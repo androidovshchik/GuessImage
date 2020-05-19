@@ -17,10 +17,10 @@ public class Frame extends Actor implements Disposable {
 
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    private Rectangle imageBounds;
+    private Rectangle bounds;
 
     public Frame(Rectangle bounds) {
-        imageBounds = bounds;
+        this.bounds = bounds;
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
         setSize(Utils.dip(MIN_SIZE), Utils.dip(MIN_SIZE));
@@ -30,7 +30,7 @@ public class Frame extends Actor implements Disposable {
     }
 
     public Frame(Rectangle bounds, float xC, float yC, float w, float h) {
-        imageBounds = bounds;
+        this.bounds = bounds;
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
         float cX = width / 2f;
@@ -52,10 +52,10 @@ public class Frame extends Actor implements Disposable {
     }
 
     public void setTranslation(float dX, float dY) {
-        if (imageBounds.perimeter() <= 0) {
+        if (bounds.perimeter() <= 0) {
             return;
         }
-        if (imageBounds.contains(getX() + dX, getY() + dY)) {
+        if (bounds.contains(getX() + dX, getY() + dY)) {
             moveBy(dX, dY);
         }
     }
