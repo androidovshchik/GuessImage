@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
+import com.mygdx.guessimage.BoundedCamera;
 import com.mygdx.guessimage.Utils;
 
 public class Frame extends Actor implements Disposable {
@@ -45,12 +46,14 @@ public class Frame extends Actor implements Disposable {
     public void draw(Batch batch, float parentAlpha) {
         float w = getWidth();
         float h = getHeight();
-        float zoom = Utils.getApp().camera.zoom;
+        BoundedCamera camera = Utils.getApp().camera;
+        float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Utils.parseColor("#0000ff"));
-        shapeRenderer.line(getX(), getY(), getX() + w, getY());
+        shapeRenderer.setColor(Utils.parseColor("#00ff00"));
+        shapeRenderer.line(getX() - lW, getY(), getX() + w + lW, getY());
         shapeRenderer.line(getX() + w, getY(), getX() + w, getY() + h);
-        shapeRenderer.line(getX() + w, getY() + h, getX(), getY() + h);
+        shapeRenderer.line(getX() + w + lW, getY() + h, getX() - lW, getY() + h);
         shapeRenderer.line(getX(), getY() + h, getX(), getY());
         shapeRenderer.end();
     }
