@@ -20,7 +20,7 @@ public class Frame extends Actor implements Disposable {
 
     private Rectangle bounds;
 
-    public Action action = Action.MOVE;
+    private Action action = Action.MOVE;
 
     public Frame(Rectangle bounds) {
         this.bounds = bounds;
@@ -31,30 +31,27 @@ public class Frame extends Actor implements Disposable {
         setY((height - getHeight()) / 2);
     }
 
-    public Frame(Rectangle bounds, float xC, float yC, float w, float h) {
-        this.bounds = bounds;
-        int width = Gdx.graphics.getWidth();
-        int height = Gdx.graphics.getHeight();
-        float cX = width / 2f;
-        float cY = height / 2f;
-        setSize(w, h);
-        setX(cX + xC);
-        setY(cY + yC);
+    public Frame(Rectangle bounds, float x0, float y0, float width, float height) {
+        this(bounds);
+        if (bounds.perimeter() <= 0) {
+            return;
+        }
+        setSize(width, height);
+        setX(bounds.x + x0);
+        setY(bounds.y + y0);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        float w = getWidth();
-        float h = getHeight();
         BoundedCamera camera = Utils.getApp().camera;
-        float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
+        float w = Utils.dip(WIDTH) / 2 * camera.zoom;
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Utils.parseColor("#00ff00"));
-        shapeRenderer.line(getX() - lW, getY(), getX() + w + lW, getY());
-        shapeRenderer.line(getX() + w, getY(), getX() + w, getY() + h);
-        shapeRenderer.line(getX() + w + lW, getY() + h, getX() - lW, getY() + h);
-        shapeRenderer.line(getX(), getY() + h, getX(), getY());
+        shapeRenderer.line(getX() - w, getY(), getRight() + w, getY());
+        shapeRenderer.line(getRight(), getY(), getRight(), getTop());
+        shapeRenderer.line(getRight() + w, getTop(), getX() - w, getTop());
+        shapeRenderer.line(getX(), getTop(), getX(), getY());
         shapeRenderer.end();
     }
 
@@ -90,22 +87,22 @@ public class Frame extends Actor implements Disposable {
             case MOVE:
                 if (dX > 0) {
                     float right = Utils.getRight(bounds);
-                    if (getRight() + dX > right) {
-                        dX = Math.max(0, right - getRight());
+                    if (getVisualRight() + dX > right) {
+                        dX = Math.max(0, right - getVisualRight());
                     }
                 } else {
-                    if (getLeft() + dX < bounds.x) {
-                        dX = Math.min(0, bounds.x - getLeft());
+                    if (getVisualLeft() + dX < bounds.x) {
+                        dX = Math.min(0, bounds.x - getVisualLeft());
                     }
                 }
                 if (dY < 0) {
-                    if (getBottom() + dY < bounds.y) {
-                        dY = Math.min(0, bounds.y - getBottom());
+                    if (getVisualBottom() + dY < bounds.y) {
+                        dY = Math.min(0, bounds.y - getVisualBottom());
                     }
                 } else {
                     float top = Utils.getTop(bounds);
-                    if (getTop() + dY > top) {
-                        dY = Math.max(0, top - getTop());
+                    if (getVisualTop() + dY > top) {
+                        dY = Math.max(0, top - getVisualTop());
                     }
                 }
                 if (dX != 0 || dY != 0) {
@@ -124,18 +121,26 @@ public class Frame extends Actor implements Disposable {
     }
 
     public float getTop() {
-        return getY() + getHeight() + Utils.dip(WIDTH) / 2;
-    }
-
-    public float getLeft() {
-        return getX() - Utils.dip(WIDTH) / 2;
+        return getY() + getHeight();
     }
 
     public float getRight() {
+        return getX() + getWidth();
+    }
+
+    public float getVisualTop() {
+        return getY() + getHeight() + Utils.dip(WIDTH) / 2;
+    }
+
+    public float getVisualLeft() {
+        return getX() - Utils.dip(WIDTH) / 2;
+    }
+
+    public float getVisualRight() {
         return getX() + getWidth() + Utils.dip(WIDTH) / 2;
     }
 
-    public float getBottom() {
+    public float getVisualBottom() {
         return getY() - Utils.dip(WIDTH) / 2;
     }
 

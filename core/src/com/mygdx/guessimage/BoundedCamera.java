@@ -39,7 +39,7 @@ public class BoundedCamera extends OrthographicCamera {
             return;
         }
         float dX = 0, dY = 0, dZ = 0;
-        if (getWidth() < bounds.width) {
+        if (getVisualWidth() < bounds.width) {
             float leftDiff = getVisualLeft() - bounds.x;
             float rightDiff = getVisualRight() - Utils.getRight(bounds);
             if (leftDiff < 0) {
@@ -50,7 +50,7 @@ public class BoundedCamera extends OrthographicCamera {
         } else {
             dX = viewportWidth / 2 - position.x;
         }
-        if (getHeight() < bounds.height) {
+        if (getVisualHeight() < bounds.height) {
             float topDiff = getVisualTop() - Utils.getTop(bounds);
             float bottomDiff = getVisualBottom() - bounds.y;
             if (topDiff > 0) {
@@ -81,27 +81,27 @@ public class BoundedCamera extends OrthographicCamera {
         }
     }
 
-    public float getWidth() {
+    public float getVisualWidth() {
         return viewportWidth * zoom;
     }
 
-    public float getHeight() {
+    public float getVisualHeight() {
         return viewportHeight * zoom;
     }
 
     public float getVisualTop() {
-        return position.y + getHeight() / 2;
+        return position.y + getVisualHeight() / 2;
     }
 
     public float getVisualLeft() {
-        return position.x - getWidth() / 2;
+        return position.x - getVisualWidth() / 2;
     }
 
     public float getVisualRight() {
-        return position.x + getWidth() / 2;
+        return position.x + getVisualWidth() / 2;
     }
 
     public float getVisualBottom() {
-        return position.y - getHeight() / 2;
+        return position.y - getVisualHeight() / 2;
     }
 }
