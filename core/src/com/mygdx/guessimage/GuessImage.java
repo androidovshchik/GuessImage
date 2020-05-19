@@ -73,6 +73,7 @@ public class GuessImage extends BaseAdapter {
     public void render() {
         Gdx.gl.glClearColor(224f / 255, 224f / 255, 224f / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glLineWidth(Utils.dip(Frame.WIDTH));
 
         if (mode == Mode.PLAY) {
             camera.normalize();

@@ -13,7 +13,7 @@ public class Frame extends Actor implements Disposable {
     private static final String TAG = Frame.class.getSimpleName();
 
     public static final float MIN_SIZE = 3 * 16;
-    private static final float WIDTH = 2 * 2;
+    public static final float WIDTH = 2 * 2;
 
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
@@ -43,11 +43,15 @@ public class Frame extends Actor implements Disposable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        Gdx.gl.glLineWidth(Utils.dip(WIDTH));
+        float w = getWidth();
+        float h = getHeight();
         float zoom = Utils.getApp().camera.zoom;
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Utils.parseColor("#ff0000"));
-        shapeRenderer.rect(getX(), getY(), getWidth(), getHeight());
+        shapeRenderer.setColor(Utils.parseColor("#0000ff"));
+        shapeRenderer.line(getX(), getY(), getX() + w, getY());
+        shapeRenderer.line(getX() + w, getY(), getX() + w, getY() + h);
+        shapeRenderer.line(getX() + w, getY() + h, getX(), getY() + h);
+        shapeRenderer.line(getX(), getY() + h, getX(), getY());
         shapeRenderer.end();
     }
 
