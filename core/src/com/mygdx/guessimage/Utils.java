@@ -12,6 +12,16 @@ public class Utils {
         return value * Gdx.graphics.getDensity();
     }
 
+    public static int countFingers() {
+        int activeTouch = 0;
+        for (int i = 0; i < 20; i++) {
+            if (Gdx.input.isTouched(i)) {
+                activeTouch++;
+            }
+        }
+        return activeTouch;
+    }
+
     public static Color parseColor(String hex) {
         String s1 = hex.substring(1, 3);
         int v1 = Integer.parseInt(s1, 16);
