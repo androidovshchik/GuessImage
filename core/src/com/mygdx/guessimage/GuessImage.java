@@ -31,6 +31,7 @@ public class GuessImage extends BaseAdapter {
     private Listener listener;
 
     private Sound winSound, wrongSound;
+    private long winId, wrongId;
 
     private String initialPath;
     private int rendersCount = 0;
@@ -149,7 +150,8 @@ public class GuessImage extends BaseAdapter {
             if (frame != null) {
 
             } else {
-                wrongSound.play(1f);
+                wrongSound.stop(wrongId);
+                wrongId = wrongSound.play(1f);
             }
         }
         return false;
@@ -172,9 +174,14 @@ public class GuessImage extends BaseAdapter {
         framesStage.addActor(new Frame());
     }
 
-    public void addFrame(float x, float y, float width, float height) {
+    public void addFrame(float xC, float yC, float width, float height) {
         framesStage.clear();
-        framesStage.addActor(new Frame(x, y, width, height));
+        framesStage.addActor(new Frame(xC, yC, width, height));
+    }
+
+    public void playWin() {
+        winSound.stop(winId);
+        winSound.play(1f);
     }
 
     @Override
