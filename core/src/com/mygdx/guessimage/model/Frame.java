@@ -44,13 +44,13 @@ public class Frame extends Actor implements Disposable {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         BoundedCamera camera = Utils.getApp().camera;
-        float w = Utils.dip(WIDTH) / 2 * camera.zoom;
+        float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Utils.parseColor("#00ff00"));
-        shapeRenderer.line(getX() - w, getY(), getRight() + w, getY());
+        shapeRenderer.line(getX() - lW, getY(), getRight() + lW, getY());
         shapeRenderer.line(getRight(), getY(), getRight(), getTop());
-        shapeRenderer.line(getRight() + w, getTop(), getX() - w, getTop());
+        shapeRenderer.line(getRight() + lW, getTop(), getX() - lW, getTop());
         shapeRenderer.line(getX(), getTop(), getX(), getY());
         shapeRenderer.end();
     }
@@ -79,7 +79,7 @@ public class Frame extends Actor implements Disposable {
         }
     }
 
-    public void pan(float dX, float dY) {
+    public void pan(float x, float y, float dX, float dY) {
         if (bounds.perimeter() <= 0) {
             return;
         }

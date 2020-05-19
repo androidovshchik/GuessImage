@@ -37,6 +37,7 @@ public class GuessImage extends BaseAdapter {
     private long winId, wrongId;
 
     private Frame currentFrame;
+    private Vector2 editPan = new Vector2();
 
     private String initialPath;
     private int rendersCount = 0;
@@ -101,7 +102,9 @@ public class GuessImage extends BaseAdapter {
             if (Utils.countFingers() == 1) {
                 Vector2 coordinates = framesStage.screenToStageCoordinates(new Vector2(x, y));
                 Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
-                frame.setAction(coordinates.x, coordinates.y);
+                if (frame != null) {
+                    frame.setAction(coordinates.x, coordinates.y);
+                }
                 currentFrame = frame;
             }
         }
@@ -115,7 +118,9 @@ public class GuessImage extends BaseAdapter {
         } else if (mode == Mode.EDIT) {
             Frame frame = currentFrame;
             if (frame != null) {
-                frame.pan(deltaX * camera.zoom, -deltaY * camera.zoom);
+                editPan.set(x, y);
+                Vector2 coordinates = framesStage.screenToStageCoordinates(editPan);
+                frame.pan(coordinates.x, coordinates.y, deltaX * camera.zoom, -deltaY * camera.zoom);
             }
         }
         return false;
@@ -146,12 +151,12 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        int fingers = Utils.countFingers();
         if (mode == Mode.PLAY) {
-            int fingers = Utils.countFingers();
             camera.idle = fingers == 0;
-            if (fingers == 0) {
-                Gdx.graphics.requestRendering();
-            }
+        }
+        if (fingers == 0) {
+            Gdx.graphics.requestRendering();
         }
         return false;
     }
