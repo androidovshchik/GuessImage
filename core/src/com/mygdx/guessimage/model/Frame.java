@@ -44,6 +44,7 @@ public class Frame extends Actor implements Disposable {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         Gdx.gl.glLineWidth(Utils.dip(WIDTH));
+        float zoom = Utils.getApp().camera.zoom;
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Utils.parseColor("#ff0000"));
         shapeRenderer.rect(getX(), getY(), getWidth(), getHeight());

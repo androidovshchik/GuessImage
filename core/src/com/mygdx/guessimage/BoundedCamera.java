@@ -38,10 +38,7 @@ public class BoundedCamera extends OrthographicCamera {
     }
 
     public void normalize() {
-        if (imageBounds.perimeter() <= 0) {
-            return;
-        }
-        if (!idle) {
+        if (imageBounds.perimeter() <= 0 || !idle) {
             return;
         }
         float dx = 0, dy = 0, dz = 0;

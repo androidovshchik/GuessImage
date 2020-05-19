@@ -8,6 +8,10 @@ public class Utils {
     private Utils() {
     }
 
+    public static GuessImage getApp() {
+        return (GuessImage) Gdx.app.getApplicationListener();
+    }
+
     public static float dip(float value) {
         return value * Gdx.graphics.getDensity();
     }
