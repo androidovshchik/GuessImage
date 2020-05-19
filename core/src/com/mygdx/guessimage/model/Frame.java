@@ -12,8 +12,8 @@ public class Frame extends Actor implements Disposable {
 
     private static final String TAG = Frame.class.getSimpleName();
 
-    public static final float MIN_SIZE = 60;
-    private static final float WIDTH = 4;
+    public static final float MIN_SIZE = 3 * 20;
+    private static final float WIDTH = 2 * 2;
 
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
@@ -24,7 +24,6 @@ public class Frame extends Actor implements Disposable {
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
         setSize(Utils.dip(MIN_SIZE), Utils.dip(MIN_SIZE));
-        setOrigin(getWidth() / 2, getHeight() / 2);
         setX((width - getWidth()) / 2);
         setY((height - getHeight()) / 2);
     }
@@ -36,7 +35,6 @@ public class Frame extends Actor implements Disposable {
         float cX = width / 2f;
         float cY = height / 2f;
         setSize(w, h);
-        setOrigin(getWidth() / 2, getHeight() / 2);
         setX(cX + xC);
         setY(cY + yC);
     }
@@ -55,9 +53,45 @@ public class Frame extends Actor implements Disposable {
         if (bounds.perimeter() <= 0) {
             return;
         }
-        if (bounds.contains(getX() + dX, getY() + dY)) {
+        if (dX > 0) {
+            float right = Utils.getRight(bounds);
+            if (getRight() + dX > right) {
+                dX = Math.max(0, right - getRight());
+            }
+        } else {
+            if (getLeft() + dX < bounds.x) {
+                dX = Math.min(0, bounds.x - getLeft());
+            }
+        }
+        if (dY < 0) {
+            if (getBottom() + dY < bounds.y) {
+                dY = Math.min(0, bounds.y - getBottom());
+            }
+        } else {
+            float top = Utils.getTop(bounds);
+            if (getTop() + dY > top) {
+                dY = Math.max(0, top - getTop());
+            }
+        }
+        if (dX != 0 || dY != 0) {
             moveBy(dX, dY);
         }
+    }
+
+    public float getTop() {
+        return getY() + getHeight() + Utils.dip(WIDTH) / 2;
+    }
+
+    public float getLeft() {
+        return getX() - Utils.dip(WIDTH) / 2;
+    }
+
+    public float getRight() {
+        return getX() + getWidth() + Utils.dip(WIDTH) / 2;
+    }
+
+    public float getBottom() {
+        return getY() - Utils.dip(WIDTH) / 2;
     }
 
     @Override

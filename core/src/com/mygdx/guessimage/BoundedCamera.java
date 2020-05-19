@@ -38,42 +38,42 @@ public class BoundedCamera extends OrthographicCamera {
         if (bounds.perimeter() <= 0 || !idle) {
             return;
         }
-        float dx = 0, dy = 0, dz = 0;
+        float dX = 0, dY = 0, dZ = 0;
         if (getWidth() < bounds.width) {
             float leftDiff = getVisualLeft() - bounds.x;
             float rightDiff = getVisualRight() - Utils.getRight(bounds);
             if (leftDiff < 0) {
-                dx = -leftDiff;
+                dX = -leftDiff;
             } else if (rightDiff > 0) {
-                dx = -rightDiff;
+                dX = -rightDiff;
             }
         } else {
-            dx = viewportWidth / 2 - position.x;
+            dX = viewportWidth / 2 - position.x;
         }
         if (getHeight() < bounds.height) {
             float topDiff = getVisualTop() - Utils.getTop(bounds);
             float bottomDiff = getVisualBottom() - bounds.y;
             if (topDiff > 0) {
-                dy = -topDiff;
+                dY = -topDiff;
             } else if (bottomDiff < 0) {
-                dy = -bottomDiff;
+                dY = -bottomDiff;
             }
         } else {
-            dy = viewportHeight / 2 - position.y;
+            dY = viewportHeight / 2 - position.y;
         }
         if (zoom > 1) {
-            dz = zoom - 1;
+            dZ = zoom - 1;
         }
         float delta = Gdx.graphics.getDeltaTime();
-        if (dx != 0 || dy != 0) {
+        if (dX != 0 || dY != 0) {
             float min = Utils.dip(5);
-            dx = MathUtils.clamp(Math.signum(dx) * min + dx * delta * 5, -Math.abs(dx), Math.abs(dx));
-            dy = MathUtils.clamp(Math.signum(dy) * min + dy * delta * 5, -Math.abs(dy), Math.abs(dy));
-            setTranslation(dx, dy);
+            dX = MathUtils.clamp(Math.signum(dX) * min + dX * delta * 5, -Math.abs(dX), Math.abs(dX));
+            dY = MathUtils.clamp(Math.signum(dY) * min + dY * delta * 5, -Math.abs(dY), Math.abs(dY));
+            setTranslation(dX, dY);
             Gdx.graphics.requestRendering();
         }
-        if (dz > 0) {
-            float zoom = Math.max(this.zoom - 0.05f - dz * delta * 3, 1);
+        if (dZ > 0) {
+            float zoom = Math.max(this.zoom - 0.05f - dZ * delta * 3, 1);
             if (setZoom(zoom)) {
                 startZoom = zoom;
                 Gdx.graphics.requestRendering();
