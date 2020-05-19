@@ -1,0 +1,93 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "55d4365f4f860fc100116312a353d47b",
+    "entities": [
+      {
+        "tableName": "puzzles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`p_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `p_uri` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "p_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "p_uri",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "p_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "objects",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`o_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `o_uri` TEXT, `o_name` TEXT, FOREIGN KEY(`o_id`) REFERENCES `puzzles`(`p_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "o_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "o_uri",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "o_name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "o_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_objects_o_id",
+            "unique": false,
+            "columnNames": [
+              "o_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_objects_o_id` ON `${TABLE_NAME}` (`o_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "puzzles",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "o_id"
+            ],
+            "referencedColumns": [
+              "p_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '55d4365f4f860fc100116312a353d47b')"
+    ]
+  }
+}

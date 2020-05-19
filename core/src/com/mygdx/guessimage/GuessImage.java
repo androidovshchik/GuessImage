@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -21,7 +22,7 @@ public class GuessImage extends BaseAdapter {
 
     private static final String TAG = GuessImage.class.getSimpleName();
 
-    private BoundedCamera camera = new BoundedCamera();
+    public BoundedCamera camera = new BoundedCamera();
     private ScreenViewport viewport;
     private SpriteBatch spriteBatch;
     private Stage backgroundStage;
@@ -32,6 +33,9 @@ public class GuessImage extends BaseAdapter {
 
     private Sound winSound, wrongSound;
     private long winId, wrongId;
+
+    private Rectangle backgroundBounds = new Rectangle();
+    private Frame currentFrame;
 
     private String initialPath;
     private int rendersCount = 0;
@@ -52,6 +56,7 @@ public class GuessImage extends BaseAdapter {
         if (initialPath != null) {
             setBackground(initialPath);
         }
+        addFrame();
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -90,6 +95,11 @@ public class GuessImage extends BaseAdapter {
     public boolean touchDown(float x, float y, int pointer, int button) {
         if (mode == Mode.PLAY) {
             camera.idle = false;
+        } else if (mode == Mode.EDIT) {
+            if (Utils.countFingers() == 1) {
+                Vector2 coordinates = framesStage.screenToStageCoordinates(new Vector2(x, y));
+                currentFrame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
+            }
         }
         return false;
     }
@@ -98,6 +108,11 @@ public class GuessImage extends BaseAdapter {
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (mode == Mode.PLAY) {
             camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
+        } else if (mode == Mode.EDIT) {
+            Frame frame = currentFrame;
+            if (frame != null) {
+                frame.setTranslation(deltaX * camera.zoom, -deltaY * camera.zoom);
+            }
         }
         return false;
     }
@@ -128,14 +143,9 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (mode == Mode.PLAY) {
-            int activeTouch = 0;
-            for (int i = 0; i < 20; i++) {
-                if (Gdx.input.isTouched(i)) {
-                    activeTouch++;
-                }
-            }
-            camera.idle = activeTouch == 0;
-            if (camera.idle) {
+            int fingers = Utils.countFingers();
+            camera.idle = fingers == 0;
+            if (fingers == 0) {
                 Gdx.graphics.requestRendering();
             }
         }
@@ -147,9 +157,7 @@ public class GuessImage extends BaseAdapter {
         if (mode == Mode.PLAY) {
             Vector2 coordinates = framesStage.screenToStageCoordinates(new Vector2(x, y));
             Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
-            if (frame != null) {
-
-            } else {
+            if (frame == null) {
                 wrongSound.stop(wrongId);
                 wrongId = wrongSound.play(1f);
             }
@@ -165,18 +173,19 @@ public class GuessImage extends BaseAdapter {
     public void setBackground(String path) {
         backgroundStage.clear();
         Background background = new Background(new Texture(Gdx.files.absolute(path)));
+        imageBounds.set((viewportWidth - width) / 2, (viewportHeight - height) / 2, width, height);
         camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
         backgroundStage.addActor(background);
     }
 
     public void addFrame() {
         framesStage.clear();
-        framesStage.addActor(new Frame());
+        framesStage.addActor(new Frame(new Rectangle()));
     }
 
     public void addFrame(float xC, float yC, float width, float height) {
         framesStage.clear();
-        framesStage.addActor(new Frame(xC, yC, width, height));
+        framesStage.addActor(new Frame(new Rectangle(), xC, yC, width, height));
     }
 
     public void playWin() {
