@@ -22,7 +22,9 @@ public class GuessImage extends BaseAdapter {
 
     private static final String TAG = GuessImage.class.getSimpleName();
 
-    public BoundedCamera camera = new BoundedCamera();
+    private Rectangle bounds = new Rectangle();
+
+    public BoundedCamera camera = new BoundedCamera(bounds);
     private ScreenViewport viewport;
     private SpriteBatch spriteBatch;
     private Stage backgroundStage;
@@ -34,7 +36,6 @@ public class GuessImage extends BaseAdapter {
     private Sound winSound, wrongSound;
     private long winId, wrongId;
 
-    private Rectangle backgroundBounds = new Rectangle();
     private Frame currentFrame;
 
     private String initialPath;
@@ -173,19 +174,18 @@ public class GuessImage extends BaseAdapter {
     public void setBackground(String path) {
         backgroundStage.clear();
         Background background = new Background(new Texture(Gdx.files.absolute(path)));
-        imageBounds.set((viewportWidth - width) / 2, (viewportHeight - height) / 2, width, height);
-        camera.setImageBounds(background.getScaledWidth(), background.getScaledHeight());
+        background.notifyBounds(bounds);
         backgroundStage.addActor(background);
     }
 
     public void addFrame() {
         framesStage.clear();
-        framesStage.addActor(new Frame(new Rectangle()));
+        framesStage.addActor(new Frame(bounds));
     }
 
     public void addFrame(float xC, float yC, float width, float height) {
         framesStage.clear();
-        framesStage.addActor(new Frame(new Rectangle(), xC, yC, width, height));
+        framesStage.addActor(new Frame(bounds, xC, yC, width, height));
     }
 
     public void playWin() {

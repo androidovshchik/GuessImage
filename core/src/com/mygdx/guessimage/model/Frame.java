@@ -12,12 +12,14 @@ public class Frame extends Actor implements Disposable {
 
     private static final String TAG = Frame.class.getSimpleName();
 
-    public static final float MIN_SIZE = 3 * 20;
+    public static final float MIN_SIZE = 3 * 16;
     private static final float WIDTH = 2 * 2;
 
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     private Rectangle bounds;
+
+    public Action action = Action.MOVE;
 
     public Frame(Rectangle bounds) {
         this.bounds = bounds;
@@ -53,28 +55,40 @@ public class Frame extends Actor implements Disposable {
         if (bounds.perimeter() <= 0) {
             return;
         }
-        if (dX > 0) {
-            float right = Utils.getRight(bounds);
-            if (getRight() + dX > right) {
-                dX = Math.max(0, right - getRight());
-            }
-        } else {
-            if (getLeft() + dX < bounds.x) {
-                dX = Math.min(0, bounds.x - getLeft());
-            }
-        }
-        if (dY < 0) {
-            if (getBottom() + dY < bounds.y) {
-                dY = Math.min(0, bounds.y - getBottom());
-            }
-        } else {
-            float top = Utils.getTop(bounds);
-            if (getTop() + dY > top) {
-                dY = Math.max(0, top - getTop());
-            }
-        }
-        if (dX != 0 || dY != 0) {
-            moveBy(dX, dY);
+        switch (action) {
+            case MOVE:
+                if (dX > 0) {
+                    float right = Utils.getRight(bounds);
+                    if (getRight() + dX > right) {
+                        dX = Math.max(0, right - getRight());
+                    }
+                } else {
+                    if (getLeft() + dX < bounds.x) {
+                        dX = Math.min(0, bounds.x - getLeft());
+                    }
+                }
+                if (dY < 0) {
+                    if (getBottom() + dY < bounds.y) {
+                        dY = Math.min(0, bounds.y - getBottom());
+                    }
+                } else {
+                    float top = Utils.getTop(bounds);
+                    if (getTop() + dY > top) {
+                        dY = Math.max(0, top - getTop());
+                    }
+                }
+                if (dX != 0 || dY != 0) {
+                    moveBy(dX, dY);
+                }
+                break;
+            case SCALE_NW:
+                break;
+            case SCALE_NE:
+                break;
+            case SCALE_SW:
+                break;
+            case SCALE_SE:
+                break;
         }
     }
 
@@ -97,5 +111,9 @@ public class Frame extends Actor implements Disposable {
     @Override
     public void dispose() {
         shapeRenderer.dispose();
+    }
+
+    enum Action {
+        MOVE, SCALE_NW, SCALE_NE, SCALE_SW, SCALE_SE
     }
 }
