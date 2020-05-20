@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.mygdx.guessimage.BoundedCamera;
+import com.mygdx.guessimage.Mode;
 import com.mygdx.guessimage.Utils;
 
 public class Frame extends Actor implements Disposable {
@@ -19,12 +20,17 @@ public class Frame extends Actor implements Disposable {
 
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
+    private Mode mode;
+
     private Rectangle bounds;
 
     private Action action = Action.MOVE;
     private Rectangle startBounds = new Rectangle();
 
-    public Frame(Rectangle bounds) {
+    public boolean isDone = false;
+
+    public Frame(Mode mode, Rectangle bounds) {
+        this.mode = mode;
         this.bounds = bounds;
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
@@ -33,8 +39,8 @@ public class Frame extends Actor implements Disposable {
         setY((height - getHeight()) / 2);
     }
 
-    public Frame(Rectangle bounds, float x0, float y0, float width, float height) {
-        this(bounds);
+    public Frame(Mode mode, Rectangle bounds, float x0, float y0, float width, float height) {
+        this(mode, bounds);
         if (bounds.perimeter() <= 0) {
             return;
         }
@@ -45,16 +51,18 @@ public class Frame extends Actor implements Disposable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        BoundedCamera camera = Utils.getApp().camera;
-        float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Utils.parseColor("#ff0000"));
-        shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
-        shapeRenderer.line(getRight() - lW, getY(), getRight() - lW, getTop());
-        shapeRenderer.line(getRight(), getTop() - lW, getX(), getTop() - lW);
-        shapeRenderer.line(getX() + lW, getTop(), getX() + lW, getY());
-        shapeRenderer.end();
+        if (mode == Mode.EDIT || isDone) {
+            BoundedCamera camera = Utils.getApp().camera;
+            float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Utils.parseColor(isDone ? "#CDDC39" : "#2196F3"));
+            shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
+            shapeRenderer.line(getRight() - lW, getY(), getRight() - lW, getTop());
+            shapeRenderer.line(getRight(), getTop() - lW, getX(), getTop() - lW);
+            shapeRenderer.line(getX() + lW, getTop(), getX() + lW, getY());
+            shapeRenderer.end();
+        }
     }
 
     public void setAction(float x, float y) {

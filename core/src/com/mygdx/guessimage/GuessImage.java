@@ -167,7 +167,9 @@ public class GuessImage extends BaseAdapter {
             camera.unproject(coordinates.set(x, y, 0));
             if (bounds.contains(coordinates.x, coordinates.y)) {
                 Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
-                if (frame == null) {
+                if (frame != null) {
+                    frame.isDone = true;
+                } else {
                     wrongSound.stop(wrongId);
                     wrongId = wrongSound.play(1f);
                 }
@@ -190,12 +192,12 @@ public class GuessImage extends BaseAdapter {
 
     public void addFrame() {
         framesStage.clear();
-        framesStage.addActor(new Frame(bounds));
+        framesStage.addActor(new Frame(mode, bounds));
     }
 
     public void addFrame(float x0, float y0, float width, float height) {
         framesStage.clear();
-        framesStage.addActor(new Frame(bounds, x0, y0, width, height));
+        framesStage.addActor(new Frame(mode, bounds, x0, y0, width, height));
     }
 
     public void playWin() {
