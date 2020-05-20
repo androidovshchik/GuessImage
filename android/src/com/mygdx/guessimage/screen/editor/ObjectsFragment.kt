@@ -1,5 +1,6 @@
 package com.mygdx.guessimage.screen.editor
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -89,6 +90,13 @@ class ObjectsFragment : BaseFragment() {
                         withItem<ObjectEntity, ObjectViewHolder>(R.layout.item_object) {
                             onBind(::ObjectViewHolder) { _, item ->
                                 name.text = item.name
+                                itemView.setBackgroundColor(
+                                    if (item.isGuessed) {
+                                        Color.parseColor("#CDDC39")
+                                    } else {
+                                        Color.TRANSPARENT
+                                    }
+                                )
                             }
                             onClick { index ->
                                 puzzleModel.currentObj.value = dataSource[index]

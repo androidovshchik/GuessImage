@@ -15,12 +15,8 @@ import com.mygdx.guessimage.screen.base.BaseActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.UI
-import org.jetbrains.anko.frameLayout
-import org.jetbrains.anko.linearLayout
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 import org.kodein.di.generic.instance
-import java.io.File
 
 class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
 
@@ -54,6 +50,14 @@ class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
+    fun showWin() {
+        alert("Вы выиграли!") {
+            okButton {
+                finish()
+            }
+        }.show()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -68,7 +72,7 @@ class EditorActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
                         if (!filename.isNullOrBlank()) {
                             puzzleModel.apply {
                                 puzzle.filename = filename
-                                galleryPath.value = File(fileManager.imagesDir, filename).path
+                                galleryPath.value = fileManager.getImageFile(filename).path
                             }
                         }
                     }

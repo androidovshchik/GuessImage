@@ -206,12 +206,11 @@ public class GuessImage extends BaseAdapter {
         backgroundStage.addActor(background);
     }
 
-    public void addFrame(long id) {
-        framesStage.clear();
+    public void addFrame(Long id) {
         framesStage.addActor(new Frame(id, mode, bounds));
     }
 
-    public void addFrames(long[] ids, float[] args) {
+    public void addFrames(Long[] ids, Float[] args) {
         framesStage.clear();
         for (int i = 0; i < ids.length; i++) {
             int j = i * ids.length;

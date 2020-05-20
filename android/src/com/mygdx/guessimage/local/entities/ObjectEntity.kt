@@ -41,4 +41,7 @@ class ObjectEntity : Serializable {
 
     @ColumnInfo(name = "o_h")
     var height = 0f
+
+    @Ignore
+    var isGuessed = false
 }
