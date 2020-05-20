@@ -60,31 +60,32 @@ public class Frame extends Actor implements Disposable {
     public void setAction(float x, float y) {
         startBounds.set(getX(), getY(), getWidth(), getHeight());
         float min = Utils.dip(MIN_SIZE) / 3;
-        if (x > getX() + min && x < getRight() - min) {
-            if (y > getY() + min && y < getTop() - min) {
-                action = Action.MOVE;
-                return;
-            }
-        }
         if (x < getX() + min) {
             if (y < getY() + min) {
                 action = Action.SCALE_SW;
+                return;
             } else if (y > getTop() - min) {
                 action = Action.SCALE_NW;
+                return;
             }
         } else if (x > getRight() - min) {
             if (y < getY() + min) {
                 action = Action.SCALE_SE;
+                return;
             } else if (y > getTop() - min) {
                 action = Action.SCALE_NE;
+                return;
             }
         }
+        action = Action.MOVE;
     }
 
     public void pan(float x, float y, float dX, float dY) {
         if (bounds.perimeter() <= 0) {
             return;
         }
+        float width;
+        float height;
         float minSize = Utils.dip(MIN_SIZE);
         float top = startBounds.getY() + startBounds.getHeight();
         float right = startBounds.getX() + startBounds.getWidth();
@@ -117,12 +118,17 @@ public class Frame extends Actor implements Disposable {
             case SCALE_NW:
                 x = MathUtils.clamp(x, bounds.x, right - minSize);
                 y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds));
+                height = y - startBounds.getY();
+                if (getX() != x || getHeight() != height) {
+                    setHeight(height);
+                    setX(x);
+                }
                 break;
             case SCALE_NE:
                 x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds));
                 y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds));
-                float width = x - startBounds.getX();
-                float height = y - startBounds.getY();
+                width = x - startBounds.getX();
+                height = y - startBounds.getY();
                 if (getWidth() != width || getHeight() != height) {
                     setSize(width, height);
                 }
@@ -138,6 +144,11 @@ public class Frame extends Actor implements Disposable {
             case SCALE_SE:
                 x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds));
                 y = MathUtils.clamp(y, bounds.y, top - minSize);
+                width = x - startBounds.getX();
+                if (getWidth() != width || getY() != y) {
+                    setWidth(width);
+                    setY(y);
+                }
                 break;
         }
     }
