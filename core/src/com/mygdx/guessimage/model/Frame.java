@@ -85,10 +85,13 @@ public class Frame extends Actor implements Disposable {
         if (bounds.perimeter() <= 0) {
             return;
         }
+        float minSize = Utils.dip(MIN_SIZE);
+        float top = startBounds.getY() + startBounds.getHeight();
+        float right = startBounds.getX() + startBounds.getWidth();
         switch (action) {
             case MOVE:
                 if (dX > 0) {
-                    float right = Utils.getRight(bounds);
+                    right = Utils.getRight(bounds);
                     if (getRight() + dX > right) {
                         dX = Math.max(0, right - getRight());
                     }
@@ -102,7 +105,7 @@ public class Frame extends Actor implements Disposable {
                         dY = Math.min(0, bounds.y - getY());
                     }
                 } else {
-                    float top = Utils.getTop(bounds);
+                    top = Utils.getTop(bounds);
                     if (getTop() + dY > top) {
                         dY = Math.max(0, top - getTop());
                     }
@@ -112,20 +115,29 @@ public class Frame extends Actor implements Disposable {
                 }
                 break;
             case SCALE_NW:
+                x = MathUtils.clamp(x, bounds.x, right - minSize);
+                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds));
                 break;
             case SCALE_NE:
+                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds));
+                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds));
+                float width = x - startBounds.getX();
+                float height = y - startBounds.getY();
+                if (getWidth() != width || getHeight() != height) {
+                    setSize(width, height);
+                }
                 break;
             case SCALE_SW:
-                float top = startBounds.getY() + startBounds.getHeight();
-                float right = startBounds.getX() + startBounds.getWidth();
-                x = MathUtils.clamp(x, bounds.x, right - Utils.dip(MIN_SIZE));
-                y = MathUtils.clamp(y, bounds.y, top - Utils.dip(MIN_SIZE));
+                x = MathUtils.clamp(x, bounds.x, right - minSize);
+                y = MathUtils.clamp(y, bounds.y, top - minSize);
                 if (getX() != x || getY() != y) {
                     setSize(right - x, top - y);
                     setPosition(x, y);
                 }
                 break;
             case SCALE_SE:
+                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds));
+                y = MathUtils.clamp(y, bounds.y, top - minSize);
                 break;
         }
     }
