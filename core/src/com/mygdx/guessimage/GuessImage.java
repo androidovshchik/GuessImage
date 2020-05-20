@@ -59,7 +59,6 @@ public class GuessImage extends BaseAdapter {
         if (initialPath != null) {
             setBackground(initialPath);
         }
-        addFrame();
 
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.mp3"));
         wrongSound = Gdx.audio.newSound(Gdx.files.internal("wrong.mp3"));
@@ -154,6 +153,10 @@ public class GuessImage extends BaseAdapter {
         int fingers = Utils.countFingers();
         if (mode == Mode.PLAY) {
             camera.idle = fingers == 0;
+        } else if (mode == Mode.EDIT) {
+            if (fingers == 0) {
+                listener.onFrameChanged(currentFrame);
+            }
         }
         if (fingers == 0) {
             Gdx.graphics.requestRendering();
@@ -166,6 +169,7 @@ public class GuessImage extends BaseAdapter {
         if (mode == Mode.PLAY) {
             camera.unproject(coordinates.set(x, y, 0));
             if (bounds.contains(coordinates.x, coordinates.y)) {
+                // todo multiple
                 Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
                 if (frame != null) {
                     frame.isDone = true;
@@ -202,14 +206,17 @@ public class GuessImage extends BaseAdapter {
         backgroundStage.addActor(background);
     }
 
-    public void addFrame() {
+    public void addFrame(long id) {
         framesStage.clear();
-        framesStage.addActor(new Frame(0L, mode, bounds));
+        framesStage.addActor(new Frame(id, mode, bounds));
     }
 
-    public void addFrame(long id, float x0, float y0, float width, float height) {
+    public void addFrames(long[] ids, float[] args) {
         framesStage.clear();
-        framesStage.addActor(new Frame(id, mode, bounds, x0, y0, width, height));
+        for (int i = 0; i < ids.length; i++) {
+            int j = i * ids.length;
+            framesStage.addActor(new Frame(ids[i], mode, bounds, args[j], args[j + 1], args[j + 2], args[j + 3]));
+        }
     }
 
     @Override
