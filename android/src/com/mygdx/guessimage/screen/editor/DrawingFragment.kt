@@ -30,7 +30,8 @@ class DrawingFragment : AndroidFragmentApplication(), KodeinAware {
         if (!filename.isNullOrBlank()) {
             filename = fileManager.getImageFile(filename).path
         }
-        guessImage = GuessImage(puzzleModel.mode, filename, object : GuessImage.Listener {
+        guessImage = GuessImage(puzzleModel.mode, filename, GuessImage.Listener {
+
         })
     }
 

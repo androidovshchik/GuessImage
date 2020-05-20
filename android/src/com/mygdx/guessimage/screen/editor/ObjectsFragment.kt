@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
@@ -46,6 +48,9 @@ class ObjectsFragment : BaseFragment() {
 
     private lateinit var puzzleModel: PuzzleModel
 
+    private lateinit var buttonAdd: Button
+    private lateinit var buttonSave: Button
+
     private val dataSource = emptyDataSourceTyped<ObjectEntity>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,9 +68,10 @@ class ObjectsFragment : BaseFragment() {
                         activity?.finish()
                     }
                 }.lparams(matchParent, wrapContent)
-                button {
+                buttonAdd = button {
                     text = getString(R.string.btn_add)
                     isVisible = puzzleModel.mode == Mode.EDIT
+                    isEnabled = !puzzleModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         val obj = ObjectEntity()
                         dataSource.apply {
@@ -90,9 +96,10 @@ class ObjectsFragment : BaseFragment() {
                         }
                     }
                 }.lparams(matchParent, 0, 1f)
-                button {
+                buttonSave = button {
                     text = getString(R.string.btn_save)
                     isVisible = puzzleModel.mode == Mode.EDIT
+                    isEnabled = !puzzleModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         isTouchable = false
                         val puzzle = puzzleModel.puzzle
@@ -112,6 +119,12 @@ class ObjectsFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (puzzleModel.mode == Mode.EDIT) {
+            puzzleModel.galleryPath.observe(viewLifecycleOwner, Observer {
+                buttonAdd.isEnabled = true
+                buttonSave.isEnabled = true
+            })
+        }
         val puzzleId = puzzleModel.puzzle.id
         if (puzzleId > 0) {
             launch {
@@ -131,9 +144,11 @@ class ObjectsFragment : BaseFragment() {
         val puzzle = puzzleModel.puzzle
         if (puzzle.id == 0L && puzzle.filename != null) {
             val filename = puzzle.filename
+            val imageFile = fileManager.getImageFile(filename)
+            val iconFile = fileManager.getIconFile(filename)
             GlobalScope.launch(Dispatchers.IO) {
-                deleteFile(fileManager.getImageFile(filename))
-                deleteFile(fileManager.getIconFile(filename))
+                deleteFile(imageFile)
+                deleteFile(iconFile)
             }
         }
         super.onDestroy()
