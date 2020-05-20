@@ -18,6 +18,8 @@ public class Frame extends Actor implements Disposable {
     public static final float MIN_SIZE = 3 * 16;
     public static final float WIDTH = 2 * 2;
 
+    public long id;
+
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     private Mode mode;
@@ -29,7 +31,8 @@ public class Frame extends Actor implements Disposable {
 
     public boolean isDone = false;
 
-    public Frame(Mode mode, Rectangle bounds) {
+    public Frame(long id, Mode mode, Rectangle bounds) {
+        this.id = id;
         this.mode = mode;
         this.bounds = bounds;
         int width = Gdx.graphics.getWidth();
@@ -39,8 +42,8 @@ public class Frame extends Actor implements Disposable {
         setY((height - getHeight()) / 2);
     }
 
-    public Frame(Mode mode, Rectangle bounds, float x0, float y0, float width, float height) {
-        this(mode, bounds);
+    public Frame(long id, Mode mode, Rectangle bounds, float x0, float y0, float width, float height) {
+        this(id, mode, bounds);
         if (bounds.perimeter() <= 0) {
             return;
         }

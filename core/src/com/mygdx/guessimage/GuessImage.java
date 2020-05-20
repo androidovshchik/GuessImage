@@ -169,6 +169,18 @@ public class GuessImage extends BaseAdapter {
                 Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
                 if (frame != null) {
                     frame.isDone = true;
+                    listener.onFrameChanged(frame);
+                    Array<Actor> actors = framesStage.getActors();
+                    for (int i = 0; i < actors.size; i++) {
+                        Actor actor = actors.get(i);
+                        if (actor instanceof Frame) {
+                            if (!((Frame) actor).isDone) {
+                                return false;
+                            }
+                        }
+                    }
+                    winSound.stop(winId);
+                    winSound.play(1f);
                 } else {
                     wrongSound.stop(wrongId);
                     wrongId = wrongSound.play(1f);
@@ -192,17 +204,12 @@ public class GuessImage extends BaseAdapter {
 
     public void addFrame() {
         framesStage.clear();
-        framesStage.addActor(new Frame(mode, bounds));
+        framesStage.addActor(new Frame(0L, mode, bounds));
     }
 
-    public void addFrame(float x0, float y0, float width, float height) {
+    public void addFrame(long id, float x0, float y0, float width, float height) {
         framesStage.clear();
-        framesStage.addActor(new Frame(mode, bounds, x0, y0, width, height));
-    }
-
-    public void playWin() {
-        winSound.stop(winId);
-        winSound.play(1f);
+        framesStage.addActor(new Frame(id, mode, bounds, x0, y0, width, height));
     }
 
     @Override
@@ -229,5 +236,7 @@ public class GuessImage extends BaseAdapter {
     }
 
     public interface Listener {
+
+        void onFrameChanged(Frame frame);
     }
 }
