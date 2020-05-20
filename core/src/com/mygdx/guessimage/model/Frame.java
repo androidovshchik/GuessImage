@@ -120,7 +120,7 @@ public class Frame extends Actor implements Disposable {
                 y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds));
                 height = y - startBounds.getY();
                 if (getX() != x || getHeight() != height) {
-                    setHeight(height);
+                    setSize(right - x, height);
                     setX(x);
                 }
                 break;
@@ -146,7 +146,7 @@ public class Frame extends Actor implements Disposable {
                 y = MathUtils.clamp(y, bounds.y, top - minSize);
                 width = x - startBounds.getX();
                 if (getWidth() != width || getY() != y) {
-                    setWidth(width);
+                    setSize(width, top - y);
                     setY(y);
                 }
                 break;
