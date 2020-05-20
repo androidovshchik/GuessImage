@@ -49,7 +49,7 @@ public class Frame extends Actor implements Disposable {
         float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Utils.parseColor("#00ff00"));
+        shapeRenderer.setColor(Utils.parseColor("#0000ff"));
         shapeRenderer.line(getX() - lW, getY(), getRight() + lW, getY());
         shapeRenderer.line(getRight(), getY(), getRight(), getTop());
         shapeRenderer.line(getRight() + lW, getTop(), getX() - lW, getTop());
@@ -59,26 +59,23 @@ public class Frame extends Actor implements Disposable {
 
     public void setAction(float x, float y) {
         startBounds.set(getX(), getY(), getWidth(), getHeight());
-        float w3 = getWidth() / 3;
-        float h3 = getHeight() / 3;
-        if (x > getX() + w3 && x < getX() + w3 * 2) {
-            if (y > getY() + h3 && y < getY() + h3 * 2) {
+        float min = Utils.dip(MIN_SIZE) / 3;
+        if (x > getX() + min && x < getRight() - min) {
+            if (y > getY() + min && y < getTop() - min) {
                 action = Action.MOVE;
                 return;
             }
         }
-        float w2 = getWidth() / 2;
-        float h2 = getHeight() / 2;
-        if (x < getX() + w2) {
-            if (y < getY() + h2) {
+        if (x < getX() + min) {
+            if (y < getY() + min) {
                 action = Action.SCALE_SW;
-            } else {
+            } else if (y > getTop() - min) {
                 action = Action.SCALE_NW;
             }
-        } else {
-            if (y < getY() + h2) {
+        } else if (x > getRight() - min) {
+            if (y < getY() + min) {
                 action = Action.SCALE_SE;
-            } else {
+            } else if (y > getTop() - min) {
                 action = Action.SCALE_NE;
             }
         }
