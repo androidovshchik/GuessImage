@@ -49,11 +49,11 @@ public class Frame extends Actor implements Disposable {
         float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Utils.parseColor("#0000ff"));
-        shapeRenderer.line(getX() - lW, getY(), getRight() + lW, getY());
-        shapeRenderer.line(getRight(), getY(), getRight(), getTop());
-        shapeRenderer.line(getRight() + lW, getTop(), getX() - lW, getTop());
-        shapeRenderer.line(getX(), getTop(), getX(), getY());
+        shapeRenderer.setColor(Utils.parseColor("#ff0000"));
+        shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
+        shapeRenderer.line(getRight() - lW, getY(), getRight() - lW, getTop());
+        shapeRenderer.line(getRight(), getTop() - lW, getX(), getTop() - lW);
+        shapeRenderer.line(getX() + lW, getTop(), getX() + lW, getY());
         shapeRenderer.end();
     }
 
@@ -89,22 +89,22 @@ public class Frame extends Actor implements Disposable {
             case MOVE:
                 if (dX > 0) {
                     float right = Utils.getRight(bounds);
-                    if (getVisualRight() + dX > right) {
-                        dX = Math.max(0, right - getVisualRight());
+                    if (getRight() + dX > right) {
+                        dX = Math.max(0, right - getRight());
                     }
                 } else {
-                    if (getVisualLeft() + dX < bounds.x) {
-                        dX = Math.min(0, bounds.x - getVisualLeft());
+                    if (getX() + dX < bounds.x) {
+                        dX = Math.min(0, bounds.x - getX());
                     }
                 }
                 if (dY < 0) {
-                    if (getVisualBottom() + dY < bounds.y) {
-                        dY = Math.min(0, bounds.y - getVisualBottom());
+                    if (getY() + dY < bounds.y) {
+                        dY = Math.min(0, bounds.y - getY());
                     }
                 } else {
                     float top = Utils.getTop(bounds);
-                    if (getVisualTop() + dY > top) {
-                        dY = Math.max(0, top - getVisualTop());
+                    if (getTop() + dY > top) {
+                        dY = Math.max(0, top - getTop());
                     }
                 }
                 if (dX != 0 || dY != 0) {
@@ -136,22 +136,6 @@ public class Frame extends Actor implements Disposable {
 
     public float getRight() {
         return getX() + getWidth();
-    }
-
-    public float getVisualTop() {
-        return getY() + getHeight() + Utils.dip(WIDTH) / 2;
-    }
-
-    public float getVisualLeft() {
-        return getX() - Utils.dip(WIDTH) / 2;
-    }
-
-    public float getVisualRight() {
-        return getX() + getWidth() + Utils.dip(WIDTH) / 2;
-    }
-
-    public float getVisualBottom() {
-        return getY() - Utils.dip(WIDTH) / 2;
     }
 
     @Override
