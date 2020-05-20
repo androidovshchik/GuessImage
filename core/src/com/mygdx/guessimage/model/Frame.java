@@ -3,11 +3,11 @@ package com.mygdx.guessimage.model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
 import com.mygdx.guessimage.BoundedCamera;
-import com.mygdx.guessimage.GdxLog;
 import com.mygdx.guessimage.Utils;
 
 public class Frame extends Actor implements Disposable {
@@ -22,9 +22,7 @@ public class Frame extends Actor implements Disposable {
     private Rectangle bounds;
 
     private Action action = Action.MOVE;
-
-    private float startWidth;
-    private float startHeight;
+    private Rectangle startBounds = new Rectangle();
 
     public Frame(Rectangle bounds) {
         this.bounds = bounds;
@@ -60,13 +58,12 @@ public class Frame extends Actor implements Disposable {
     }
 
     public void setAction(float x, float y) {
+        startBounds.set(getX(), getY(), getWidth(), getHeight());
         float w3 = getWidth() / 3;
         float h3 = getHeight() / 3;
         if (x > getX() + w3 && x < getX() + w3 * 2) {
             if (y > getY() + h3 && y < getY() + h3 * 2) {
                 action = Action.MOVE;
-                startWidth = getWidth();
-                startHeight = getHeight();
                 return;
             }
         }
@@ -85,8 +82,6 @@ public class Frame extends Actor implements Disposable {
                 action = Action.SCALE_NE;
             }
         }
-        startWidth = getWidth();
-        startHeight = getHeight();
     }
 
     public void pan(float x, float y, float dX, float dY) {
@@ -95,44 +90,46 @@ public class Frame extends Actor implements Disposable {
         }
         switch (action) {
             case MOVE:
+                if (dX > 0) {
+                    float right = Utils.getRight(bounds);
+                    if (getVisualRight() + dX > right) {
+                        dX = Math.max(0, right - getVisualRight());
+                    }
+                } else {
+                    if (getVisualLeft() + dX < bounds.x) {
+                        dX = Math.min(0, bounds.x - getVisualLeft());
+                    }
+                }
+                if (dY < 0) {
+                    if (getVisualBottom() + dY < bounds.y) {
+                        dY = Math.min(0, bounds.y - getVisualBottom());
+                    }
+                } else {
+                    float top = Utils.getTop(bounds);
+                    if (getVisualTop() + dY > top) {
+                        dY = Math.max(0, top - getVisualTop());
+                    }
+                }
+                if (dX != 0 || dY != 0) {
+                    moveBy(dX, dY);
+                }
                 break;
             case SCALE_NW:
                 break;
             case SCALE_NE:
                 break;
             case SCALE_SW:
-                GdxLog.print(TAG, "--- SCALE_SW startWidth " + startWidth + " (getRight() - x) " + (getRight() - x));
-                dX = getX() - x;
-                dY = getY() - y;
-
-                //setScale((getRight() - x) / startWidth, (getTop() - y) / startHeight);
-                //Gdx.graphics.requestRendering();
+                float top = startBounds.getY() + startBounds.getHeight();
+                float right = startBounds.getX() + startBounds.getWidth();
+                x = MathUtils.clamp(x, bounds.x, right - Utils.dip(MIN_SIZE));
+                y = MathUtils.clamp(y, bounds.y, top - Utils.dip(MIN_SIZE));
+                if (getX() != x || getY() != y) {
+                    setSize(right - x, top - y);
+                    setPosition(x, y);
+                }
                 break;
             case SCALE_SE:
                 break;
-        }
-        if (dX > 0) {
-            float right = Utils.getRight(bounds);
-            if (getVisualRight() + dX > right) {
-                dX = Math.max(0, right - getVisualRight());
-            }
-        } else {
-            if (getVisualLeft() + dX < bounds.x) {
-                dX = Math.min(0, bounds.x - getVisualLeft());
-            }
-        }
-        if (dY < 0) {
-            if (getVisualBottom() + dY < bounds.y) {
-                dY = Math.min(0, bounds.y - getVisualBottom());
-            }
-        } else {
-            float top = Utils.getTop(bounds);
-            if (getVisualTop() + dY > top) {
-                dY = Math.max(0, top - getVisualTop());
-            }
-        }
-        if (dX != 0 || dY != 0) {
-            moveBy(dX, dY);
         }
     }
 
