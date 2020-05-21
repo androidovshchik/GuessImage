@@ -8,5 +8,5 @@ class PlayModel : ViewModel() {
 
     lateinit var puzzle: PuzzleEntity
 
-    val framesGuessed = MutableLiveData<LongArray>()
+    val framesGuessed = MutableLiveData<List<Long>>()
 }

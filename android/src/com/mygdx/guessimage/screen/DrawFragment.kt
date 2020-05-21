@@ -55,7 +55,7 @@ class DrawFragment : AndroidFragmentApplication(), KodeinAware, GuessImage.Liste
         }
     }
 
-    override fun onFramesGuessed(ids: LongArray) {
+    override fun onFramesGuessed(ids: List<Long>) {
         if (viewModel is PlayModel) {
             (viewModel as PlayModel).framesGuessed.postValue(ids)
         }

@@ -18,6 +18,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.guessimage.model.Background;
 import com.mygdx.guessimage.model.Frame;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SuppressWarnings("unused")
 public class GuessImage extends BaseAdapter {
 
@@ -155,7 +158,12 @@ public class GuessImage extends BaseAdapter {
             camera.idle = fingers == 0;
         } else if (mode == Mode.EDIT) {
             if (fingers == 0) {
-                listener.onFrameChanged(currentFrame);
+                Frame frame = currentFrame;
+                if (frame != null) {
+                    float x0 = Math.max(0, frame.getX() - bounds.x);
+                    float y0 = Math.max(0, frame.getY() - bounds.y);
+                    listener.onFrameChanged(frame.id, x0, y0, frame.getWidth(), frame.getHeight());
+                }
             }
         }
         if (fingers == 0) {
@@ -169,19 +177,22 @@ public class GuessImage extends BaseAdapter {
         if (mode == Mode.PLAY) {
             camera.unproject(coordinates.set(x, y, 0));
             if (bounds.contains(coordinates.x, coordinates.y)) {
-                // todo multiple
                 Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
                 if (frame != null) {
                     frame.isDone = true;
-                    listener.onFrameChanged(frame);
+                    List<Long> ids = new ArrayList<>();
                     Array<Actor> actors = framesStage.getActors();
                     for (int i = 0; i < actors.size; i++) {
                         Actor actor = actors.get(i);
                         if (actor instanceof Frame) {
-                            if (!((Frame) actor).isDone) {
-                                return false;
+                            if (((Frame) actor).isDone) {
+                                ids.add(((Frame) actor).id);
                             }
                         }
+                    }
+                    listener.onFramesGuessed(ids);
+                    if (ids.size() < actors.size) {
+                        return false;
                     }
                     winSound.stop(winId);
                     winSound.play(1f);
@@ -210,12 +221,8 @@ public class GuessImage extends BaseAdapter {
         framesStage.addActor(new Frame(id, mode, bounds));
     }
 
-    public void addFrames(Long[] ids, Float[] args) {
-        framesStage.clear();
-        for (int i = 0; i < ids.length; i++) {
-            int j = i * ids.length;
-            framesStage.addActor(new Frame(ids[i], mode, bounds, args[j], args[j + 1], args[j + 2], args[j + 3]));
-        }
+    public void addFrame(long id, float x0, float y0, float width, float height) {
+        framesStage.addActor(new Frame(id, mode, bounds, x0, y0, width, height));
     }
 
     @Override
@@ -246,6 +253,6 @@ public class GuessImage extends BaseAdapter {
 
         void onFrameChanged(long id, float x0, float y0, float width, float height);
 
-        void onFramesGuessed(long[] ids);
+        void onFramesGuessed(List<Long> ids);
     }
 }
