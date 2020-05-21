@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.extension.transact
-import com.mygdx.guessimage.screen.DrawingFragment
+import com.mygdx.guessimage.screen.DrawFragment
 import com.mygdx.guessimage.screen.base.BaseFragment
 import org.jetbrains.anko.frameLayout
 import org.jetbrains.anko.matchParent
@@ -19,12 +19,12 @@ class PlayFragment : BaseFragment() {
 
     private lateinit var playModel: PlayModel
 
-    private lateinit var drawingFragment: DrawingFragment
+    private lateinit var drawFragment: DrawFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         playModel = ViewModelProvider(requireActivity()).get(PlayModel::class.java)
-        drawingFragment = DrawingFragment.newInstance(Mode.PLAY, playModel.puzzle.filename)
+        drawFragment = DrawFragment.newInstance(Mode.PLAY, playModel.puzzle.filename)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -40,7 +40,7 @@ class PlayFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         childFragmentManager.transact {
-            add(idDrawing, drawingFragment, DrawingFragment.TAG)
+            add(idDrawing, drawFragment, DrawFragment.TAG)
         }
     }
 

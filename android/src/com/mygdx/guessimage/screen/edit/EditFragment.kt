@@ -17,7 +17,7 @@ import com.mygdx.guessimage.extension.isMarshmallowPlus
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.entities.ObjectEntity
-import com.mygdx.guessimage.screen.DrawingFragment
+import com.mygdx.guessimage.screen.DrawFragment
 import com.mygdx.guessimage.screen.base.BaseFragment
 import org.jetbrains.anko.button
 import org.jetbrains.anko.frameLayout
@@ -31,7 +31,7 @@ class EditFragment : BaseFragment() {
 
     private lateinit var editModel: EditModel
 
-    private lateinit var drawingFragment: DrawingFragment
+    private lateinit var drawFragment: DrawFragment
 
     private var buttonSelect: Button? = null
 
@@ -40,7 +40,7 @@ class EditFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editModel = ViewModelProvider(requireActivity()).get(EditModel::class.java)
-        drawingFragment = DrawingFragment.newInstance(Mode.EDIT, editModel.puzzle.filename)
+        drawFragment = DrawFragment.newInstance(Mode.EDIT, editModel.puzzle.filename)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -73,15 +73,15 @@ class EditFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         childFragmentManager.transact {
-            add(idDrawing, drawingFragment, DrawingFragment.TAG)
+            add(idDrawing, drawFragment, DrawFragment.TAG)
         }
-        editModel.currentObj.observe(viewLifecycleOwner, Observer {
+        editModel.currentObject.observe(viewLifecycleOwner, Observer {
             currentObj = it
-            drawingFragment.guessImage.postRunnable("addFrame", 0L)
+            drawFragment.guessImage.postRunnable("addFrame", 0L)
         })
         editModel.galleryPath.observe(viewLifecycleOwner, Observer {
             buttonSelect?.isVisible = false
-            drawingFragment.guessImage.postRunnable("setBackground", it)
+            drawFragment.guessImage.postRunnable("setBackground", it)
         })
     }
 

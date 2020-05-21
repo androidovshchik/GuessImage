@@ -76,7 +76,7 @@ class PanelFragment : BaseFragment() {
                             add(obj)
                             invalidateAt(size() - 1)
                         }
-                        editModel.currentObj.value = obj
+                        editModel.currentObject.value = obj
                     }
                 }.lparams(matchParent, wrapContent)
                 recyclerView {
@@ -89,7 +89,7 @@ class PanelFragment : BaseFragment() {
                                 name.text = item.name
                             }
                             onClick { index ->
-                                editModel.currentObj.value = dataSource[index]
+                                editModel.currentObject.value = dataSource[index]
                             }
                         }
                     }
@@ -100,11 +100,15 @@ class PanelFragment : BaseFragment() {
                     setOnClickListener {
                         isTouchable = false
                         val puzzle = editModel.puzzle
+                        val objects = dataSource.toList()
                         GlobalScope.launch(Dispatchers.Main) {
                             if (puzzle.id == 0L) {
                                 withContext(Dispatchers.IO) {
                                     puzzle.id = db.puzzleDao().insert(puzzle)
-                                    db.objectDao().insert(dataSource.toList())
+                                    objects.forEach {
+                                        it.puzzleId = puzzle.id
+                                    }
+                                    db.objectDao().insert(objects)
                                 }
                             }
                             activity?.finish()
