@@ -1,9 +1,10 @@
-package com.mygdx.guessimage.screen.draw
+package com.mygdx.guessimage.screen
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.mygdx.guessimage.GuessImage
@@ -15,14 +16,16 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
+class ObjectData(val id: Long, val x0: Float, val y0: Float, val width: Float, val height: Float)
+
 @Suppress("MemberVisibilityCanBePrivate")
-class DrawFragment : AndroidFragmentApplication(), KodeinAware {
+class DrawFragment : AndroidFragmentApplication(), KodeinAware, GuessImage.Listener {
 
     override val kodein by closestKodein()
 
     private val fileManager by instance<FileManager>()
 
-    private lateinit var drawModel: DrawModel
+    private lateinit var viewModel: ViewModel
 
     lateinit var guessImage: GuessImage
 
@@ -30,7 +33,7 @@ class DrawFragment : AndroidFragmentApplication(), KodeinAware {
         super.onCreate(savedInstanceState)
         val mode = Mode.valueOf(arguments!!.getString("mode")!!)
         val provider = ViewModelProvider(requireActivity())
-        drawModel = if (mode == Mode.EDIT) {
+        viewModel = if (mode == Mode.EDIT) {
             provider.get(EditModel::class.java)
         } else {
             provider.get(PlayModel::class.java)
@@ -39,13 +42,23 @@ class DrawFragment : AndroidFragmentApplication(), KodeinAware {
         if (!filename.isNullOrBlank()) {
             filename = fileManager.getImageFile(filename).path
         }
-        guessImage = GuessImage(mode, filename, GuessImage.Listener {
-            drawModel.frameChanged.postValue(it)
-        })
+        guessImage = GuessImage(mode, filename, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
         return initializeForView(guessImage)
+    }
+
+    override fun onFrameChanged(id: Long, x0: Float, y0: Float, width: Float, height: Float) {
+        if (viewModel is EditModel) {
+            (viewModel as EditModel).frameChanged.postValue(ObjectData(id, x0, y0, width, height))
+        }
+    }
+
+    override fun onFramesGuessed(ids: LongArray) {
+        if (viewModel is PlayModel) {
+            (viewModel as PlayModel).framesGuessed.postValue(ids)
+        }
     }
 
     companion object {

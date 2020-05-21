@@ -220,6 +220,7 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public void dispose() {
+        listener = null;
         spriteBatch.dispose();
         Array<Actor> actors = backgroundStage.getActors();
         for (int i = 0; i < actors.size; i++) {
@@ -243,6 +244,8 @@ public class GuessImage extends BaseAdapter {
 
     public interface Listener {
 
-        void onFrameChanged(Frame frame);
+        void onFrameChanged(long id, float x0, float y0, float width, float height);
+
+        void onFramesGuessed(long[] ids);
     }
 }
