@@ -1,6 +1,5 @@
-package com.mygdx.guessimage.screen.editor
+package com.mygdx.guessimage.screen.edit
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,9 +15,7 @@ import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.emptyDataSourceTyped
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
-import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.R
-import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.FileManager
@@ -41,22 +38,23 @@ class ObjectViewHolder(itemView: View) : ViewHolder(itemView) {
     val name: TextView = itemView.tv_name
 }
 
-class ObjectsFragment : BaseFragment() {
+class PanelFragment : BaseFragment() {
 
     private val db by instance<Database>()
 
     private val fileManager by instance<FileManager>()
 
-    private lateinit var puzzleModel: PuzzleModel
+    private lateinit var editModel: EditModel
 
-    private lateinit var buttonAdd: Button
-    private lateinit var buttonSave: Button
+    private var buttonAdd: Button? = null
+
+    private var buttonSave: Button? = null
 
     private val dataSource = emptyDataSourceTyped<ObjectEntity>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        puzzleModel = ViewModelProvider(requireActivity()).get(PuzzleModel::class.java)
+        editModel = ViewModelProvider(requireActivity()).get(EditModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -71,15 +69,14 @@ class ObjectsFragment : BaseFragment() {
                 }.lparams(matchParent, wrapContent)
                 buttonAdd = button {
                     text = getString(R.string.btn_add)
-                    isVisible = puzzleModel.mode == Mode.EDIT
-                    isEnabled = !puzzleModel.puzzle.filename.isNullOrBlank()
+                    isEnabled = !editModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         val obj = ObjectEntity()
                         dataSource.apply {
                             add(obj)
                             invalidateAt(size() - 1)
                         }
-                        puzzleModel.currentObj.value = obj
+                        editModel.currentObj.value = obj
                     }
                 }.lparams(matchParent, wrapContent)
                 recyclerView {
@@ -90,27 +87,19 @@ class ObjectsFragment : BaseFragment() {
                         withItem<ObjectEntity, ObjectViewHolder>(R.layout.item_object) {
                             onBind(::ObjectViewHolder) { _, item ->
                                 name.text = item.name
-                                itemView.setBackgroundColor(
-                                    if (item.isGuessed) {
-                                        Color.parseColor("#CDDC39")
-                                    } else {
-                                        Color.TRANSPARENT
-                                    }
-                                )
                             }
                             onClick { index ->
-                                puzzleModel.currentObj.value = dataSource[index]
+                                editModel.currentObj.value = dataSource[index]
                             }
                         }
                     }
                 }.lparams(matchParent, 0, 1f)
                 buttonSave = button {
                     text = getString(R.string.btn_save)
-                    isVisible = puzzleModel.mode == Mode.EDIT
-                    isEnabled = !puzzleModel.puzzle.filename.isNullOrBlank()
+                    isEnabled = !editModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         isTouchable = false
-                        val puzzle = puzzleModel.puzzle
+                        val puzzle = editModel.puzzle
                         GlobalScope.launch(Dispatchers.Main) {
                             if (puzzle.id == 0L) {
                                 withContext(Dispatchers.IO) {
@@ -127,29 +116,24 @@ class ObjectsFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (puzzleModel.mode == Mode.EDIT) {
-            puzzleModel.galleryPath.observe(viewLifecycleOwner, Observer {
-                buttonAdd.isEnabled = true
-                buttonSave.isEnabled = true
-            })
-        }
-        val puzzleId = puzzleModel.puzzle.id
-        if (puzzleId > 0) {
-            launch {
-                val items = withContext(Dispatchers.IO) {
-                    db.objectDao().getAllByPuzzle(puzzleId)
-                }
-                dataSource.apply {
-                    clear()
-                    addAll(items)
-                    invalidateAll()
-                }
+        editModel.galleryPath.observe(viewLifecycleOwner, Observer {
+            buttonAdd?.isEnabled = true
+            buttonSave?.isEnabled = true
+        })
+        launch {
+            val items = withContext(Dispatchers.IO) {
+                db.objectDao().getAllByPuzzle(editModel.puzzle.id)
+            }
+            dataSource.apply {
+                clear()
+                addAll(items)
+                invalidateAll()
             }
         }
     }
 
     override fun onDestroy() {
-        val puzzle = puzzleModel.puzzle
+        val puzzle = editModel.puzzle
         if (puzzle.id == 0L && puzzle.filename != null) {
             val filename = puzzle.filename
             val imageFile = fileManager.getImageFile(filename)
@@ -164,10 +148,10 @@ class ObjectsFragment : BaseFragment() {
 
     companion object {
 
-        val TAG = ObjectsFragment::class.java.simpleName
+        val TAG = PanelFragment::class.java.simpleName
 
-        fun newInstance(): ObjectsFragment {
-            return ObjectsFragment().apply {
+        fun newInstance(): PanelFragment {
+            return PanelFragment().apply {
                 arguments = Bundle().apply {
                 }
             }
