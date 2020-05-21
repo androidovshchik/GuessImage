@@ -4,6 +4,7 @@
     <string name="guess">Загадайте предметы</string>
     <string name="btn_close">Закрыть</string>
     <string name="btn_add">Добавить предмет</string>
+    <string name="btn_ready">Готово</string>
     <string name="btn_save">Сохранить</string>
     <string name="upload">Загрузите изображение</string>
     <string name="choose">Выберите приложение</string>

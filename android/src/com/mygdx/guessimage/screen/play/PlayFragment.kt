@@ -49,7 +49,7 @@ class PlayFragment : BaseFragment() {
     fun setObjects(items: List<ObjectEntity>) {
         Gdx.app.postRunnable {
             items.forEach {
-                drawFragment.guessImage.addFrame(it.id, it.x, it.y, it.width, it.height)
+                drawFragment.guessImage.addFrame(it.id, it.x0, it.y0, it.width, it.height)
             }
         }
     }

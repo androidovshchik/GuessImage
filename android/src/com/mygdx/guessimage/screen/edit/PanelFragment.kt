@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +17,7 @@ import com.afollestad.recyclical.datasource.emptyDataSourceTyped
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.R
+import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.FileManager
@@ -27,11 +29,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.button
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 import org.jetbrains.anko.support.v4.UI
-import org.jetbrains.anko.verticalLayout
-import org.jetbrains.anko.wrapContent
 import org.kodein.di.generic.instance
 
 class ObjectViewHolder(itemView: View) : ViewHolder(itemView) {
@@ -47,6 +46,10 @@ class PanelFragment : BaseFragment() {
     private lateinit var editModel: EditModel
 
     private var buttonAdd: Button? = null
+
+    private var buttonReady: Button? = null
+
+    private var editName: EditText? = null
 
     private var buttonSave: Button? = null
 
@@ -71,13 +74,23 @@ class PanelFragment : BaseFragment() {
                     text = getString(R.string.btn_add)
                     isEnabled = !editModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
-                        val obj = ObjectEntity()
+                        val objectEntity = ObjectEntity()
                         dataSource.apply {
-                            add(obj)
+                            add(objectEntity)
                             invalidateAt(size() - 1)
                         }
-                        editModel.currentObject.value = obj
+                        editModel.currentObject.value = objectEntity
                     }
+                }.lparams(matchParent, wrapContent)
+                buttonReady = button {
+                    text = getString(R.string.btn_ready)
+                    isVisible = false
+                    setOnClickListener {
+
+                    }
+                }.lparams(matchParent, wrapContent)
+                editName = editText {
+                    isVisible = false
                 }.lparams(matchParent, wrapContent)
                 recyclerView {
                     addItemDecoration(DividerItemDecoration(context, VERTICAL))
@@ -124,6 +137,17 @@ class PanelFragment : BaseFragment() {
             buttonAdd?.isEnabled = true
             buttonSave?.isEnabled = true
         })
+        editModel.frameChanged.observe(viewLifecycleOwner, Observer {
+            dataSource.toList().forEach { item ->
+                if (item.id == it.id) {
+                    item.x0 = it.x0
+                    item.y0 = it.y0
+                    item.width = it.width
+                    item.height = it.height
+                }
+                return@Observer
+            }
+        })
         launch {
             val items = withContext(Dispatchers.IO) {
                 db.objectDao().getAllByPuzzle(editModel.puzzle.id)
@@ -138,8 +162,8 @@ class PanelFragment : BaseFragment() {
 
     override fun onDestroy() {
         val puzzle = editModel.puzzle
-        if (puzzle.id == 0L && puzzle.filename != null) {
-            val filename = puzzle.filename
+        val filename = puzzle.filename
+        if (puzzle.id == 0L && filename != null) {
             val imageFile = fileManager.getImageFile(filename)
             val iconFile = fileManager.getIconFile(filename)
             GlobalScope.launch(Dispatchers.IO) {

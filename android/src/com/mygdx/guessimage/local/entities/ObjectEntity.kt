@@ -31,10 +31,10 @@ class ObjectEntity : Serializable {
     var name: String? = null
 
     @ColumnInfo(name = "o_x")
-    var x = 0f
+    var x0 = 0f
 
     @ColumnInfo(name = "o_y")
-    var y = 0f
+    var y0 = 0f
 
     @ColumnInfo(name = "o_w")
     var width = 0f
