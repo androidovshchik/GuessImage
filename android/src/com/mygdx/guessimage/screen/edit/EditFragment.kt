@@ -16,7 +16,6 @@ import com.mygdx.guessimage.extension.areGranted
 import com.mygdx.guessimage.extension.isMarshmallowPlus
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.transact
-import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.DrawFragment
 import com.mygdx.guessimage.screen.base.BaseFragment
 import org.jetbrains.anko.button
@@ -34,8 +33,6 @@ class EditFragment : BaseFragment() {
     private lateinit var drawFragment: DrawFragment
 
     private var buttonSelect: Button? = null
-
-    private var currentObj: ObjectEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,13 +72,12 @@ class EditFragment : BaseFragment() {
         childFragmentManager.transact {
             add(idDrawing, drawFragment, DrawFragment.TAG)
         }
-        editModel.currentObject.observe(viewLifecycleOwner, Observer {
-            currentObj = it
-            drawFragment.guessImage.postRunnable("addFrame", 0L)
-        })
         editModel.galleryPath.observe(viewLifecycleOwner, Observer {
             buttonSelect?.isVisible = false
             drawFragment.guessImage.postRunnable("setBackground", it)
+        })
+        editModel.currentObject.observe(viewLifecycleOwner, Observer {
+            drawFragment.guessImage.postRunnable("addFrame", it.id)
         })
     }
 
