@@ -45,6 +45,7 @@ public class GuessImage extends BaseAdapter {
 
     private String initialPath;
     private int rendersCount = 0;
+    private int guessedCount = 0;
 
     public GuessImage(Mode mode, String background, Listener listener) {
         this.mode = mode;
@@ -175,8 +176,12 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean tap(float x, float y, int count, int button) {
         if (mode == Mode.PLAY) {
+            if (guessedCount < 0) {
+                return false;
+            }
             camera.unproject(coordinates.set(x, y, 0));
             if (bounds.contains(coordinates.x, coordinates.y)) {
+                guessedCount = 0;
                 List<Long> ids = new ArrayList<>();
                 Array<Actor> actors = framesStage.getActors();
                 for (int i = 0; i < actors.size; i++) {
@@ -184,20 +189,25 @@ public class GuessImage extends BaseAdapter {
                         Frame frame = (Frame) actors.get(i);
                         if (frame.contains(coordinates.x, coordinates.y)) {
                             frame.isDone = true;
+                            ids.add(frame.id);
                         }
                         if (frame.isDone) {
-                            ids.add(frame.id);
+                            guessedCount++;
                         }
                     }
                 }
-                listener.onFramesGuessed(ids);
-                if (ids.size() < actors.size) {
+                if (ids.size() > 0) {
+                    listener.onFramesGuessed(ids);
+                } else {
+                    wrongSound.stop(wrongId);
+                    wrongId = wrongSound.play(1f);
                     return false;
                 }
-                winSound.stop(winId);
-                winSound.play(1f);
-                wrongSound.stop(wrongId);
-                wrongId = wrongSound.play(1f);
+                if (guessedCount >= actors.size) {
+                    guessedCount = -1;
+                    winSound.stop(winId);
+                    winSound.play(1f);
+                }
             }
         }
         return false;
