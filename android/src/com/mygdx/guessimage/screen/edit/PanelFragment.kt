@@ -85,6 +85,9 @@ class PanelFragment : BaseFragment() {
                                 invalidateAt(size() - 1)
                             }
                             editModel.currentObject.value = objectEntity
+                            it.isVisible = false
+                            editName.isVisible = true
+                            buttonReady.isVisible = true
                             isTouchable = true
                         }
                     }
@@ -98,6 +101,9 @@ class PanelFragment : BaseFragment() {
                             withContext(Dispatchers.IO) {
                                 db.objectDao().update(objectEntity)
                             }
+                            editName.isVisible = false
+                            it.isVisible = false
+                            buttonAdd.isVisible = true
                             isTouchable = true
                         }
                     }
@@ -106,7 +112,7 @@ class PanelFragment : BaseFragment() {
                     isVisible = false
                     textChangedListener {
                         afterTextChanged {
-
+                            editModel.currentObject.value?.name = it?.toString()
                         }
                     }
                 }.lparams(matchParent, wrapContent)
@@ -118,9 +124,6 @@ class PanelFragment : BaseFragment() {
                         withItem<ObjectEntity, ObjectViewHolder>(R.layout.item_object) {
                             onBind(::ObjectViewHolder) { _, item ->
                                 name.text = item.name
-                            }
-                            onClick { index ->
-                                editModel.currentObject.value = dataSource[index]
                             }
                         }
                     }
