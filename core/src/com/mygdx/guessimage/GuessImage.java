@@ -158,7 +158,7 @@ public class GuessImage extends BaseAdapter {
         if (mode == Mode.PLAY) {
             camera.idle = fingers == 0;
         } else if (mode == Mode.EDIT) {
-            if (fingers == 0) {
+            if (bounds.perimeter() > 0 && fingers == 0) {
                 Frame frame = currentFrame;
                 if (frame != null) {
                     float x0 = Math.max(0, frame.getX() - bounds.x);
@@ -176,7 +176,7 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean tap(float x, float y, int count, int button) {
         if (mode == Mode.PLAY) {
-            if (guessedCount < 0) {
+            if (bounds.perimeter() <= 0 || guessedCount < 0) {
                 return false;
             }
             camera.unproject(coordinates.set(x, y, 0));
