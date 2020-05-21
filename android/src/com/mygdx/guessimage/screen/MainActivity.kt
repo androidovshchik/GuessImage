@@ -19,7 +19,8 @@ import com.mygdx.guessimage.local.FileManager
 import com.mygdx.guessimage.local.entities.PuzzleCount
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 import com.mygdx.guessimage.screen.base.BaseActivity
-import com.mygdx.guessimage.screen.editor.EditorActivity
+import com.mygdx.guessimage.screen.edit.EditActivity
+import com.mygdx.guessimage.screen.play.PlayActivity
 import com.thekhaeng.recyclerviewmargin.LayoutMarginDecoration
 import kotlinx.android.synthetic.main.item_puzzle.view.*
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +63,7 @@ class MainActivity : BaseActivity() {
                             onBind(::DummyHolder) { _, _ ->
                             }
                             onClick {
-                                startActivity<EditorActivity>(
+                                startActivity<EditActivity>(
                                     "puzzle" to PuzzleEntity()
                                 )
                             }
@@ -78,7 +79,7 @@ class MainActivity : BaseActivity() {
                                 count.text = item.count.toString()
                             }
                             onClick { index ->
-                                startActivity<EditorActivity>(
+                                startActivity<PlayActivity>(
                                     "puzzle" to (dataSource[index] as PuzzleCount).puzzle
                                 )
                             }

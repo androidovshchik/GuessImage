@@ -1,12 +1,12 @@
-package com.mygdx.guessimage.screen.editor
+package com.mygdx.guessimage.screen
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.mygdx.guessimage.GuessImage
+import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.local.FileManager
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -19,18 +19,16 @@ class DrawingFragment : AndroidFragmentApplication(), KodeinAware {
 
     private val fileManager by instance<FileManager>()
 
-    private lateinit var puzzleModel: PuzzleModel
-
     lateinit var guessImage: GuessImage
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        puzzleModel = ViewModelProvider(requireActivity()).get(PuzzleModel::class.java)
-        var filename = puzzleModel.puzzle.filename
+        val mode = Mode.valueOf(arguments!!.getString("mode")!!)
+        var filename = arguments!!.getString("filename")
         if (!filename.isNullOrBlank()) {
             filename = fileManager.getImageFile(filename).path
         }
-        guessImage = GuessImage(puzzleModel.mode, filename, GuessImage.Listener {
+        guessImage = GuessImage(mode, filename, GuessImage.Listener {
 
         })
     }
@@ -41,11 +39,13 @@ class DrawingFragment : AndroidFragmentApplication(), KodeinAware {
 
     companion object {
 
-        val TAG = ObjectFragment::class.java.simpleName
+        val TAG = DrawingFragment::class.java.simpleName
 
-        fun newInstance(): DrawingFragment {
+        fun newInstance(mode: Mode, filename: String?): DrawingFragment {
             return DrawingFragment().apply {
                 arguments = Bundle().apply {
+                    putString("mode", mode.name)
+                    putString("filename", filename)
                 }
             }
         }

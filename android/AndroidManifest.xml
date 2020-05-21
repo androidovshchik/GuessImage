@@ -25,7 +25,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".screen.editor.EditorActivity"
+            android:name=".screen.edit.EditActivity"
+            android:screenOrientation="sensorLandscape"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".screen.play.PlayActivity"
             android:screenOrientation="sensorLandscape"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustPan"
