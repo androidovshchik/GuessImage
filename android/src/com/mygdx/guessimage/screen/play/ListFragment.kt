@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
@@ -14,23 +15,16 @@ import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.recyclerView
-import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
 import com.mygdx.guessimage.screen.edit.ObjectViewHolder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.button
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.verticalLayout
 import org.jetbrains.anko.wrapContent
-import org.kodein.di.generic.instance
 
 class ListFragment : BaseFragment() {
-
-    private val db by instance<Database>()
 
     private lateinit var playModel: PlayModel
 
@@ -75,15 +69,20 @@ class ListFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        launch {
-            val items = withContext(Dispatchers.IO) {
-                db.objectDao().getAllByPuzzle(playModel.puzzle.id)
+        playModel.framesGuessed.observe(viewLifecycleOwner, Observer {
+            dataSource.forEach { item ->
+                if (item.id in it) {
+                    item.isGuessed = true
+                }
             }
-            dataSource.apply {
-                clear()
-                addAll(items)
-                invalidateAll()
-            }
+        })
+    }
+
+    fun setObjects(items: List<ObjectEntity>) {
+        dataSource.apply {
+            clear()
+            addAll(items)
+            invalidateAll()
         }
     }
 
