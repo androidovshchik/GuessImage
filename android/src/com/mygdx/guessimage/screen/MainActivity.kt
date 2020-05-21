@@ -20,7 +20,6 @@ import com.mygdx.guessimage.local.entities.PuzzleCount
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 import com.mygdx.guessimage.screen.base.BaseActivity
 import com.mygdx.guessimage.screen.edit.EditActivity
-import com.mygdx.guessimage.screen.play.PlayActivity
 import com.thekhaeng.recyclerviewmargin.LayoutMarginDecoration
 import kotlinx.android.synthetic.main.item_puzzle.view.*
 import kotlinx.coroutines.Dispatchers
@@ -63,9 +62,15 @@ class MainActivity : BaseActivity() {
                             onBind(::DummyHolder) { _, _ ->
                             }
                             onClick {
-                                startActivity<EditActivity>(
-                                    "puzzle" to PuzzleEntity()
-                                )
+                                isTouchable = false
+                                launch {
+                                    val puzzle = PuzzleEntity()
+                                    withContext(Dispatchers.IO) {
+                                        puzzle.id = db.puzzleDao().insert(puzzle)
+                                    }
+                                    startActivity<EditActivity>("puzzle" to puzzle)
+                                    isTouchable = true
+                                }
                             }
                         }
                         withItem<PuzzleCount, PuzzleViewHolder>(R.layout.item_puzzle) {
@@ -79,9 +84,8 @@ class MainActivity : BaseActivity() {
                                 count.text = item.count.toString()
                             }
                             onClick { index ->
-                                startActivity<PlayActivity>(
-                                    "puzzle" to (dataSource[index] as PuzzleCount).puzzle
-                                )
+                                val puzzle = (dataSource[index] as PuzzleCount).puzzle
+                                startActivity<EditActivity>("puzzle" to puzzle)
                             }
                         }
                     }

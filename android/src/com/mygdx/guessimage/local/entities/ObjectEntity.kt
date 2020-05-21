@@ -1,15 +1,24 @@
 package com.mygdx.guessimage.local.entities
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 import java.io.Serializable
 
 class ObjectData(val id: Long, val x0: Float, val y0: Float, val width: Float, val height: Float)
 
 @Entity(
-    tableName = "objects"
+    tableName = "objects",
+    foreignKeys = [
+        ForeignKey(
+            entity = PuzzleEntity::class,
+            parentColumns = ["p_id"],
+            childColumns = ["o_p_id"],
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index(value = ["o_p_id"])
+    ]
 )
 class ObjectEntity : Serializable {
 

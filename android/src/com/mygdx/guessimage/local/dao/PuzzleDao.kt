@@ -3,6 +3,7 @@ package com.mygdx.guessimage.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.mygdx.guessimage.local.entities.PuzzleCount
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 
@@ -21,4 +22,7 @@ abstract class PuzzleDao {
 
     @Insert
     abstract fun insert(item: PuzzleEntity): Long
+
+    @Update
+    abstract fun update(item: PuzzleEntity)
 }
