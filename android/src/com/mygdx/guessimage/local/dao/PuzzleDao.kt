@@ -14,11 +14,12 @@ abstract class PuzzleDao {
         """
         SELECT puzzles.*, count(o_p_id) AS count FROM puzzles
         LEFT JOIN objects ON p_id = o_p_id
+        WHERE p_ready = 1
         GROUP BY p_id
         ORDER BY p_id ASC
     """
     )
-    abstract fun getAllCounted(): List<PuzzleCount>
+    abstract fun getReadyCounted(): List<PuzzleCount>
 
     @Insert
     abstract fun insert(item: PuzzleEntity): Long

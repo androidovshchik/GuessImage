@@ -12,7 +12,6 @@ import com.mygdx.guessimage.extension.use
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -23,9 +22,6 @@ private const val MAX_SIZE = 2048
 private const val THUMB_SIZE = 512
 
 private const val QUALITY = 80
-
-val File.randomName: String
-    get() = "${UUID.randomUUID()}.$extension"
 
 @Suppress("MemberVisibilityCanBePrivate")
 class FileManager(context: Context) {
@@ -45,16 +41,12 @@ class FileManager(context: Context) {
     fun getIconFile(name: String?) = File(iconsDir, name.orEmpty())
 
     @SuppressLint("DefaultLocale")
-    fun copyImage(path: String?): String? {
-        if (path.isNullOrBlank()) {
-            return null
-        }
-        val src = File(path)
+    fun copyImage(path: String?, filename: String) {
+        val src = File(path ?: return)
         if (!src.exists()) {
-            return null
+            return
         }
-        return createCopy(src)?.use {
-            val filename = src.randomName
+        createCopy(src)?.use {
             val format = when (src.extension.toLowerCase()) {
                 "png" -> Bitmap.CompressFormat.PNG
                 "webp" -> Bitmap.CompressFormat.WEBP
@@ -68,7 +60,6 @@ class FileManager(context: Context) {
                     compress(format, QUALITY, it)
                 }
             }
-            filename
         }
     }
 }

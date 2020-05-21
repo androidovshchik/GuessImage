@@ -16,5 +16,8 @@ class PuzzleEntity : Serializable {
     var id = 0L
 
     @ColumnInfo(name = "p_filename")
-    var filename: String? = null
+    lateinit var filename: String
+
+    @ColumnInfo(name = "p_ready")
+    var ready = false
 }
