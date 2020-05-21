@@ -177,29 +177,27 @@ public class GuessImage extends BaseAdapter {
         if (mode == Mode.PLAY) {
             camera.unproject(coordinates.set(x, y, 0));
             if (bounds.contains(coordinates.x, coordinates.y)) {
-                Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
-                if (frame != null) {
-                    frame.isDone = true;
-                    List<Long> ids = new ArrayList<>();
-                    Array<Actor> actors = framesStage.getActors();
-                    for (int i = 0; i < actors.size; i++) {
-                        Actor actor = actors.get(i);
-                        if (actor instanceof Frame) {
-                            if (((Frame) actor).isDone) {
-                                ids.add(((Frame) actor).id);
-                            }
+                List<Long> ids = new ArrayList<>();
+                Array<Actor> actors = framesStage.getActors();
+                for (int i = 0; i < actors.size; i++) {
+                    if (actors.get(i) instanceof Frame) {
+                        Frame frame = (Frame) actors.get(i);
+                        if (frame.contains(coordinates.x, coordinates.y)) {
+                            frame.isDone = true;
+                        }
+                        if (frame.isDone) {
+                            ids.add(frame.id);
                         }
                     }
-                    listener.onFramesGuessed(ids);
-                    if (ids.size() < actors.size) {
-                        return false;
-                    }
-                    winSound.stop(winId);
-                    winSound.play(1f);
-                } else {
-                    wrongSound.stop(wrongId);
-                    wrongId = wrongSound.play(1f);
                 }
+                listener.onFramesGuessed(ids);
+                if (ids.size() < actors.size) {
+                    return false;
+                }
+                winSound.stop(winId);
+                winSound.play(1f);
+                wrongSound.stop(wrongId);
+                wrongId = wrongSound.play(1f);
             }
         }
         return false;

@@ -164,6 +164,13 @@ public class Frame extends Actor implements Disposable {
         }
     }
 
+    public boolean contains(float x, float y) {
+        if (x >= getX() && x <= getRight()) {
+            return y >= getY() && y <= getTop();
+        }
+        return false;
+    }
+
     public float getTop() {
         return getY() + getHeight();
     }
