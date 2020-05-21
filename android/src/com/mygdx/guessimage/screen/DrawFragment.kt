@@ -37,11 +37,8 @@ class DrawFragment : AndroidFragmentApplication(), KodeinAware, GuessImage.Liste
         } else {
             provider.get(PlayModel::class.java)
         }
-        var filename = arguments!!.getString("filename")
-        if (!filename.isNullOrBlank()) {
-            filename = fileManager.getImageFile(filename).path
-        }
-        guessImage = GuessImage(mode, filename, this)
+        val filename = arguments!!.getString("filename")!!
+        guessImage = GuessImage(mode, fileManager.getImageFile(filename).path, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -64,7 +61,7 @@ class DrawFragment : AndroidFragmentApplication(), KodeinAware, GuessImage.Liste
 
         val TAG = DrawFragment::class.java.simpleName
 
-        fun newInstance(mode: Mode, filename: String?): DrawFragment {
+        fun newInstance(mode: Mode, filename: String): DrawFragment {
             return DrawFragment().apply {
                 arguments = Bundle().apply {
                     putString("mode", mode.name)

@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
 import org.kodein.di.generic.instance
+import java.util.*
 
 class DummyHolder(itemView: View) : ViewHolder(itemView)
 
@@ -65,6 +66,7 @@ class MainActivity : BaseActivity() {
                                 isTouchable = false
                                 launch {
                                     val puzzle = PuzzleEntity()
+                                    puzzle.filename = UUID.randomUUID().toString()
                                     withContext(Dispatchers.IO) {
                                         puzzle.id = db.puzzleDao().insert(puzzle)
                                     }
@@ -75,12 +77,7 @@ class MainActivity : BaseActivity() {
                         }
                         withItem<PuzzleCount, PuzzleViewHolder>(R.layout.item_puzzle) {
                             onBind(::PuzzleViewHolder) { _, item ->
-                                val filename = item.puzzle.filename
-                                if (!filename.isNullOrBlank()) {
-                                    icon.load(fileManager.getIconFile(filename))
-                                } else {
-                                    icon.load(0)
-                                }
+                                icon.load(fileManager.getIconFile(item.puzzle.filename))
                                 count.text = item.count.toString()
                             }
                             onClick { index ->
@@ -99,7 +96,7 @@ class MainActivity : BaseActivity() {
         job.cancelChildren()
         launch {
             val items = withContext(Dispatchers.IO) {
-                db.puzzleDao().getAllCounted()
+                db.puzzleDao().getReadyCounted()
             }
             dataSource.apply {
                 clear()

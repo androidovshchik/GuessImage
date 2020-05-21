@@ -36,9 +36,9 @@ class FileManager(context: Context) {
     val iconsDir: File
         get() = File(externalDir ?: internalDir, "icons").apply { mkdirs() }
 
-    fun getImageFile(name: String?) = File(imagesDir, name.orEmpty())
+    fun getImageFile(name: String) = File(imagesDir, name)
 
-    fun getIconFile(name: String?) = File(iconsDir, name.orEmpty())
+    fun getIconFile(name: String) = File(iconsDir, name)
 
     @SuppressLint("DefaultLocale")
     fun copyImage(path: String?, filename: String) {
