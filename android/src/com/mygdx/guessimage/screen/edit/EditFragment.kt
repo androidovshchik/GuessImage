@@ -1,4 +1,4 @@
-package com.mygdx.guessimage.screen.editor
+package com.mygdx.guessimage.screen.edit
 
 import android.Manifest
 import android.content.Intent
@@ -17,6 +17,7 @@ import com.mygdx.guessimage.extension.isMarshmallowPlus
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.entities.ObjectEntity
+import com.mygdx.guessimage.screen.DrawingFragment
 import com.mygdx.guessimage.screen.base.BaseFragment
 import org.jetbrains.anko.button
 import org.jetbrains.anko.frameLayout
@@ -24,21 +25,22 @@ import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.wrapContent
 
-class ObjectFragment : BaseFragment() {
+class EditFragment : BaseFragment() {
 
     private val idDrawing = View.generateViewId()
 
-    private val drawingFragment = DrawingFragment.newInstance()
+    private lateinit var editModel: EditModel
 
-    private lateinit var puzzleModel: PuzzleModel
+    private lateinit var drawingFragment: DrawingFragment
 
-    private lateinit var button: Button
+    private var buttonSelect: Button? = null
 
     private var currentObj: ObjectEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        puzzleModel = ViewModelProvider(requireActivity()).get(PuzzleModel::class.java)
+        editModel = ViewModelProvider(requireActivity()).get(EditModel::class.java)
+        drawingFragment = DrawingFragment.newInstance(Mode.EDIT, editModel.puzzle.filename)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -48,10 +50,9 @@ class ObjectFragment : BaseFragment() {
                 frameLayout {
                     id = idDrawing
                 }.lparams(matchParent, matchParent)
-                button = button {
+                buttonSelect = button {
                     text = getString(R.string.upload)
-                    isVisible =
-                        puzzleModel.mode == Mode.EDIT && puzzleModel.puzzle.filename.isNullOrBlank()
+                    isVisible = editModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         val activity = activity ?: return@setOnClickListener
                         if (activity.areGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -74,21 +75,20 @@ class ObjectFragment : BaseFragment() {
         childFragmentManager.transact {
             add(idDrawing, drawingFragment, DrawingFragment.TAG)
         }
-        puzzleModel.currentObj.observe(viewLifecycleOwner, Observer {
+        editModel.currentObj.observe(viewLifecycleOwner, Observer {
             currentObj = it
+            drawingFragment.guessImage.postRunnable("addFrame", 0L)
         })
-        if (puzzleModel.mode == Mode.EDIT) {
-            puzzleModel.galleryPath.observe(viewLifecycleOwner, Observer {
-                button.isVisible = false
-                drawingFragment.guessImage.postRunnable("setBackground", it)
-            })
-        }
+        editModel.galleryPath.observe(viewLifecycleOwner, Observer {
+            buttonSelect?.isVisible = false
+            drawingFragment.guessImage.postRunnable("setBackground", it)
+        })
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, p: Array<out String>, r: IntArray) {
         when (requestCode) {
             REQUEST_STORAGE -> {
-                button.performClick()
+                buttonSelect?.performClick()
             }
         }
     }
@@ -99,10 +99,10 @@ class ObjectFragment : BaseFragment() {
 
         const val REQUEST_IMAGE = 100
 
-        val TAG = ObjectFragment::class.java.simpleName
+        val TAG = EditFragment::class.java.simpleName
 
-        fun newInstance(): ObjectFragment {
-            return ObjectFragment().apply {
+        fun newInstance(): EditFragment {
+            return EditFragment().apply {
                 arguments = Bundle().apply {
                 }
             }
