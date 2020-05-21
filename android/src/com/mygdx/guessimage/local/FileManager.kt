@@ -41,10 +41,10 @@ class FileManager(context: Context) {
     fun getIconFile(name: String) = File(iconsDir, name)
 
     @SuppressLint("DefaultLocale")
-    fun copyImage(path: String?, filename: String) {
-        val src = File(path ?: return)
+    fun copyImage(path: String?, filename: String): Boolean {
+        val src = File(path ?: return false)
         if (!src.exists()) {
-            return
+            return false
         }
         createCopy(src)?.use {
             val format = when (src.extension.toLowerCase()) {
@@ -56,11 +56,12 @@ class FileManager(context: Context) {
                 compress(format, QUALITY, it)
             }
             createThumb()?.use {
-                writeFile(File(iconsDir, filename)) {
+                return writeFile(File(iconsDir, filename)) {
                     compress(format, QUALITY, it)
                 }
             }
         }
+        return false
     }
 }
 
