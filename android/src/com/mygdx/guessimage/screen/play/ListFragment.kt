@@ -17,6 +17,7 @@ import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.activityCallback
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.entities.ObjectEntity
+import com.mygdx.guessimage.model.Frame
 import com.mygdx.guessimage.screen.base.BaseFragment
 import com.mygdx.guessimage.screen.edit.ObjectViewHolder
 import org.jetbrains.anko.button
@@ -56,7 +57,7 @@ class ListFragment : BaseFragment() {
                                 name.text = item.name
                                 itemView.setBackgroundColor(
                                     if (item.isGuessed) {
-                                        Color.parseColor("#CDDC39")
+                                        Color.parseColor(Frame.GREEN)
                                     } else {
                                         Color.TRANSPARENT
                                     }
@@ -72,9 +73,10 @@ class ListFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         playModel.framesGuessed.observe(viewLifecycleOwner, Observer {
             var guessedCount = 0
-            dataSource.forEach { item ->
+            dataSource.toList().forEachIndexed { i, item ->
                 if (item.id in it) {
                     item.isGuessed = true
+                    dataSource.invalidateAt(i)
                 }
                 if (item.isGuessed) {
                     guessedCount++

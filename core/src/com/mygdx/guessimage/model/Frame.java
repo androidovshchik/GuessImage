@@ -17,6 +17,9 @@ public class Frame extends Actor implements Disposable {
 
     public static final float MIN_SIZE = 3 * 16;
     public static final float WIDTH = 2 * 2;
+    public static final String GREEN = "#4CAF50";
+    public static final String LIGHT_GREEN = "#CDDC39";
+    public static final String BLUE = "#2196F3";
 
     public long id;
 
@@ -59,7 +62,7 @@ public class Frame extends Actor implements Disposable {
             float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
             shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Utils.parseColor(isDone ? "#CDDC39" : "#2196F3"));
+            shapeRenderer.setColor(Utils.parseColor(isDone ? LIGHT_GREEN : BLUE));
             shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
             shapeRenderer.line(getRight() - lW, getY(), getRight() - lW, getTop());
             shapeRenderer.line(getRight(), getTop() - lW, getX(), getTop() - lW);

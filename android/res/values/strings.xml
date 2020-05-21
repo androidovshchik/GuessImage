@@ -7,4 +7,5 @@
     <string name="btn_save">Сохранить</string>
     <string name="upload">Загрузите изображение</string>
     <string name="choose">Выберите приложение</string>
+    <string name="win">Вы выиграли!</string>
 </resources>

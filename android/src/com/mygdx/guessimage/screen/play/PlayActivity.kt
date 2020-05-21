@@ -3,8 +3,10 @@ package com.mygdx.guessimage.screen.play
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
+import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.PuzzleEntity
@@ -12,7 +14,10 @@ import com.mygdx.guessimage.screen.base.BaseActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.*
+import org.jetbrains.anko.UI
+import org.jetbrains.anko.frameLayout
+import org.jetbrains.anko.linearLayout
+import org.jetbrains.anko.matchParent
 import org.kodein.di.generic.instance
 
 class PlayActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
@@ -55,12 +60,10 @@ class PlayActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
     }
 
     fun showWinAlert() {
-        alert("Вы выиграли!") {
-            isCancelable = false
-            okButton {
-                finish()
-            }
-        }.show()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.win)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     override fun exit() {}
