@@ -10,13 +10,12 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.mygdx.guessimage.GuessImage
 import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.local.FileManager
+import com.mygdx.guessimage.local.entities.ObjectData
 import com.mygdx.guessimage.screen.edit.EditModel
 import com.mygdx.guessimage.screen.play.PlayModel
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
-
-class ObjectData(val id: Long, val x0: Float, val y0: Float, val width: Float, val height: Float)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class DrawFragment : AndroidFragmentApplication(), KodeinAware, GuessImage.Listener {

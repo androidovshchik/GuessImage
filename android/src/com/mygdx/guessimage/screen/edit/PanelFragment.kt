@@ -139,13 +139,9 @@ class PanelFragment : BaseFragment() {
         })
         editModel.frameChanged.observe(viewLifecycleOwner, Observer {
             dataSource.toList().forEach { item ->
-                if (item.id == it.id) {
-                    item.x0 = it.x0
-                    item.y0 = it.y0
-                    item.width = it.width
-                    item.height = it.height
+                if (item.setFrom(it)) {
+                    return@Observer
                 }
-                return@Observer
             }
         })
         launch {

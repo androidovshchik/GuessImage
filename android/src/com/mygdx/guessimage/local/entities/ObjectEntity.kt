@@ -3,6 +3,8 @@ package com.mygdx.guessimage.local.entities
 import androidx.room.*
 import java.io.Serializable
 
+class ObjectData(val id: Long, val x0: Float, val y0: Float, val width: Float, val height: Float)
+
 @Entity(
     tableName = "objects",
     foreignKeys = [
@@ -44,4 +46,15 @@ class ObjectEntity : Serializable {
 
     @Ignore
     var isGuessed = false
+
+    fun setFrom(data: ObjectData): Boolean {
+        if (id == data.id) {
+            x0 = data.x0
+            y0 = data.y0
+            width = data.width
+            height = data.height
+            return true
+        }
+        return false
+    }
 }
