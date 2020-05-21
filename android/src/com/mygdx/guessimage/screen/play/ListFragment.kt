@@ -14,6 +14,7 @@ import com.afollestad.recyclical.datasource.emptyDataSourceTyped
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.R
+import com.mygdx.guessimage.extension.activityCallback
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
@@ -70,9 +71,18 @@ class ListFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         playModel.framesGuessed.observe(viewLifecycleOwner, Observer {
+            var guessedCount = 0
             dataSource.forEach { item ->
                 if (item.id in it) {
                     item.isGuessed = true
+                }
+                if (item.isGuessed) {
+                    guessedCount++
+                }
+            }
+            if (guessedCount >= dataSource.size()) {
+                context?.activityCallback<PlayActivity> {
+                    showWinAlert()
                 }
             }
         })

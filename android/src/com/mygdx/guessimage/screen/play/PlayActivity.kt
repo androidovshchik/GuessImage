@@ -54,8 +54,9 @@ class PlayActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
-    fun showWin() {
+    fun showWinAlert() {
         alert("Вы выиграли!") {
+            isCancelable = false
             okButton {
                 finish()
             }

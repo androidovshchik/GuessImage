@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import com.badlogic.gdx.Gdx
 import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.extension.transact
+import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.DrawFragment
 import com.mygdx.guessimage.screen.base.BaseFragment
 import org.jetbrains.anko.frameLayout
@@ -41,6 +43,14 @@ class PlayFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         childFragmentManager.transact {
             add(idDrawing, drawFragment, DrawFragment.TAG)
+        }
+    }
+
+    fun setObjects(items: List<ObjectEntity>) {
+        Gdx.app.postRunnable {
+            items.forEach {
+                drawFragment.guessImage.addFrame(it.id, it.x, it.y, it.width, it.height)
+            }
         }
     }
 
