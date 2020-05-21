@@ -19,7 +19,7 @@ abstract class ObjectDao {
     abstract fun getAllByPuzzle(id: Long): List<ObjectEntity>
 
     @Insert
-    abstract fun insert(item: ObjectEntity)
+    abstract fun insert(item: ObjectEntity): Long
 
     @Update
     abstract fun update(item: ObjectEntity)

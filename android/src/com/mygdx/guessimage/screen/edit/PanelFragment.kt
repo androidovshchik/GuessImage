@@ -1,5 +1,6 @@
 package com.mygdx.guessimage.screen.edit
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk21.listeners.textChangedListener
 import org.jetbrains.anko.support.v4.UI
 import org.kodein.di.generic.instance
 
@@ -45,13 +47,10 @@ class PanelFragment : BaseFragment() {
 
     private lateinit var editModel: EditModel
 
-    private var buttonAdd: Button? = null
-
-    private var buttonReady: Button? = null
-
-    private var editName: EditText? = null
-
-    private var buttonSave: Button? = null
+    private lateinit var buttonAdd: Button
+    private lateinit var buttonReady: Button
+    private lateinit var editName: EditText
+    private lateinit var buttonSave: Button
 
     private val dataSource = emptyDataSourceTyped<ObjectEntity>()
 
@@ -64,6 +63,7 @@ class PanelFragment : BaseFragment() {
         return UI {
             verticalLayout {
                 layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
+                layoutTransition = LayoutTransition()
                 button {
                     text = getString(R.string.btn_close)
                     setOnClickListener {
@@ -74,23 +74,41 @@ class PanelFragment : BaseFragment() {
                     text = getString(R.string.btn_add)
                     isEnabled = !editModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
-                        val objectEntity = ObjectEntity()
-                        dataSource.apply {
-                            add(objectEntity)
-                            invalidateAt(size() - 1)
+                        isTouchable = false
+                        launch {
+                            val objectEntity = ObjectEntity()
+                            withContext(Dispatchers.IO) {
+                                objectEntity.id = db.objectDao().insert(objectEntity)
+                            }
+                            dataSource.apply {
+                                add(objectEntity)
+                                invalidateAt(size() - 1)
+                            }
+                            editModel.currentObject.value = objectEntity
+                            isTouchable = true
                         }
-                        editModel.currentObject.value = objectEntity
                     }
                 }.lparams(matchParent, wrapContent)
                 buttonReady = button {
                     text = getString(R.string.btn_ready)
                     isVisible = false
                     setOnClickListener {
-
+                        isTouchable = false
+                        launch {
+                            withContext(Dispatchers.IO) {
+                                db.objectDao().update(objectEntity)
+                            }
+                            isTouchable = true
+                        }
                     }
                 }.lparams(matchParent, wrapContent)
                 editName = editText {
                     isVisible = false
+                    textChangedListener {
+                        afterTextChanged {
+
+                        }
+                    }
                 }.lparams(matchParent, wrapContent)
                 recyclerView {
                     addItemDecoration(DividerItemDecoration(context, VERTICAL))
@@ -112,17 +130,10 @@ class PanelFragment : BaseFragment() {
                     isEnabled = !editModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         isTouchable = false
-                        val puzzle = editModel.puzzle
-                        val objects = dataSource.toList()
                         GlobalScope.launch(Dispatchers.Main) {
-                            if (puzzle.id == 0L) {
-                                withContext(Dispatchers.IO) {
-                                    puzzle.id = db.puzzleDao().insert(puzzle)
-                                    objects.forEach {
-                                        it.puzzleId = puzzle.id
-                                    }
-                                    db.objectDao().insert(objects)
-                                }
+                            val puzzle = editModel.puzzle
+                            withContext(Dispatchers.IO) {
+                                puzzle.id = db.puzzleDao().insert(puzzle)
                             }
                             activity?.finish()
                         }
@@ -134,8 +145,8 @@ class PanelFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         editModel.galleryPath.observe(viewLifecycleOwner, Observer {
-            buttonAdd?.isEnabled = true
-            buttonSave?.isEnabled = true
+            buttonAdd.isEnabled = true
+            buttonSave.isEnabled = true
         })
         editModel.frameChanged.observe(viewLifecycleOwner, Observer {
             dataSource.toList().forEach { item ->
@@ -144,16 +155,6 @@ class PanelFragment : BaseFragment() {
                 }
             }
         })
-        launch {
-            val items = withContext(Dispatchers.IO) {
-                db.objectDao().getAllByPuzzle(editModel.puzzle.id)
-            }
-            dataSource.apply {
-                clear()
-                addAll(items)
-                invalidateAll()
-            }
-        }
     }
 
     override fun onDestroy() {
