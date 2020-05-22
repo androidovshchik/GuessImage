@@ -20,11 +20,17 @@ public class BoundedCamera extends OrthographicCamera {
     }
 
     public void setTranslation(float dX, float dY) {
+        if (bounds.perimeter() <= 0) {
+            return;
+        }
         translate(dX, dY);
         update();
     }
 
     public boolean setZoom(float zoom) {
+        if (bounds.perimeter() <= 0) {
+            return false;
+        }
         zoom = MathUtils.clamp(zoom, 0.2f, 2);
         if (this.zoom != zoom) {
             this.zoom = zoom;

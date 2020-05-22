@@ -159,11 +159,7 @@ class PanelFragment : BaseFragment() {
             buttonSave.isEnabled = true
         })
         editModel.frameChanged.observe(viewLifecycleOwner, Observer {
-            dataSource.toList().forEach { item ->
-                if (item.setFrom(it)) {
-                    return@Observer
-                }
-            }
+            lastObject?.setFrom(it)
         })
     }
 

@@ -69,6 +69,9 @@ public class Frame extends Actor {
     }
 
     public void setAction(float x, float y) {
+        if (bounds.perimeter() <= 0 || isDone) {
+            return;
+        }
         startBounds.set(getX(), getY(), getWidth(), getHeight());
         float min = Utils.dip(MIN_SIZE) / 3;
         if (x < getX() + min) {
@@ -92,7 +95,7 @@ public class Frame extends Actor {
     }
 
     public void pan(float x, float y, float dX, float dY) {
-        if (bounds.perimeter() <= 0) {
+        if (bounds.perimeter() <= 0 || isDone) {
             return;
         }
         float width;
