@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.badlogic.gdx.backends.android.AndroidFragmentApplication
+import com.badlogic.gdx.backends.android.AndroidXFragmentApplication
 import com.mygdx.guessimage.GuessImage
 import com.mygdx.guessimage.Mode
 import com.mygdx.guessimage.local.FileManager
@@ -18,7 +18,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 @Suppress("MemberVisibilityCanBePrivate")
-class DrawFragment : AndroidFragmentApplication(), KodeinAware, GuessImage.Listener {
+class DrawFragment : AndroidXFragmentApplication(), KodeinAware, GuessImage.Listener {
 
     override val kodein by closestKodein()
 

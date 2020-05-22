@@ -41,7 +41,7 @@ import java.lang.reflect.Method;
  *
  * @author Bartol Karuza (me@bartolkaruza.com)
  */
-public class AndroidFragmentApplication extends Fragment implements AndroidApplicationBase {
+public class AndroidXFragmentApplication extends Fragment implements AndroidApplicationBase {
 
     /**
      * Callbacks interface for letting the fragment interact with the Activitiy, parent fragment or target fragment.

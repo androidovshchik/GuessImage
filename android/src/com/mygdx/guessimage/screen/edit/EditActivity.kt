@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
-import com.badlogic.gdx.backends.android.AndroidFragmentApplication
+import com.badlogic.gdx.backends.android.AndroidXFragmentApplication
 import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.FileManager
 import com.mygdx.guessimage.local.PathCompat
@@ -20,7 +20,7 @@ import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
 import org.kodein.di.generic.instance
 
-class EditActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
+class EditActivity : BaseActivity(), AndroidXFragmentApplication.Callbacks {
 
     private val fileManager by instance<FileManager>()
 
