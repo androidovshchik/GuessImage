@@ -181,11 +181,11 @@ public class Frame extends Actor {
     }
 
     public float getX0() {
-        return Math.max(0, getX() - bounds.x);
+        return getX() - bounds.x;
     }
 
     public float getY0() {
-        return Math.max(0, getY() - bounds.y);
+        return getY() - bounds.y;
     }
 
     public float getTop() {
