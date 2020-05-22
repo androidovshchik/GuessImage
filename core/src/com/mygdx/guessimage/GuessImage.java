@@ -82,8 +82,10 @@ public class GuessImage extends BaseAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glLineWidth(Utils.dip(Frame.WIDTH));
 
-        if (mode == Mode.PLAY) {
-            camera.normalize();
+        if (bounds.perimeter() > 0) {
+            if (mode == Mode.PLAY) {
+                camera.normalize();
+            }
         }
 
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -104,16 +106,18 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
-        if (mode == Mode.PLAY) {
-            camera.idle = false;
-        } else if (mode == Mode.EDIT) {
-            if (Utils.countFingers() == 1) {
-                camera.unproject(coordinates.set(x, y, 0));
-                Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
-                if (frame != null) {
-                    frame.setAction(coordinates.x, coordinates.y);
+        if (bounds.perimeter() > 0) {
+            if (mode == Mode.PLAY) {
+                camera.idle = false;
+            } else if (mode == Mode.EDIT) {
+                if (Utils.countFingers() == 1) {
+                    camera.unproject(coordinates.set(x, y, 0));
+                    Frame frame = (Frame) framesStage.hit(coordinates.x, coordinates.y, false);
+                    if (frame != null && !frame.isDone) {
+                        frame.setAction(coordinates.x, coordinates.y);
+                        currentFrame = frame;
+                    }
                 }
-                currentFrame = frame;
             }
         }
         return false;
@@ -121,13 +125,15 @@ public class GuessImage extends BaseAdapter {
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
-        if (mode == Mode.PLAY) {
-            camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
-        } else if (mode == Mode.EDIT) {
-            Frame frame = currentFrame;
-            if (frame != null) {
-                camera.unproject(coordinates.set(x, y, 0));
-                frame.pan(coordinates.x, coordinates.y, deltaX * camera.zoom, -deltaY * camera.zoom);
+        if (bounds.perimeter() > 0) {
+            if (mode == Mode.PLAY) {
+                camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
+            } else if (mode == Mode.EDIT) {
+                Frame frame = currentFrame;
+                if (frame != null) {
+                    camera.unproject(coordinates.set(x, y, 0));
+                    frame.pan(coordinates.x, coordinates.y, deltaX * camera.zoom, -deltaY * camera.zoom);
+                }
             }
         }
         return false;
@@ -141,77 +147,85 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1,
                          Vector2 pointer2) {
-        if (mode == Mode.PLAY) {
-            Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
-            Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
-            camera.setZoom(camera.startZoom * startVector.len() / currentVector.len());
+        if (bounds.perimeter() > 0) {
+            if (mode == Mode.PLAY) {
+                Vector2 startVector = new Vector2(initialPointer1).sub(initialPointer2);
+                Vector2 currentVector = new Vector2(pointer1).sub(pointer2);
+                camera.setZoom(camera.startZoom * startVector.len() / currentVector.len());
+            }
         }
         return false;
     }
 
     @Override
     public void pinchStop() {
-        if (mode == Mode.PLAY) {
-            camera.startZoom = camera.zoom;
+        if (bounds.perimeter() > 0) {
+            if (mode == Mode.PLAY) {
+                camera.startZoom = camera.zoom;
+            }
         }
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        int fingers = Utils.countFingers();
-        if (mode == Mode.PLAY) {
-            camera.idle = fingers == 0;
-        } else if (mode == Mode.EDIT) {
-            if (bounds.perimeter() > 0 && fingers == 0) {
-                Frame frame = currentFrame;
-                if (frame != null) {
-                    float x0 = Math.max(0, frame.getX() - bounds.x);
-                    float y0 = Math.max(0, frame.getY() - bounds.y);
-                    listener.onFrameChanged(frame.id, x0, y0, frame.getWidth(), frame.getHeight());
+        if (bounds.perimeter() > 0) {
+            int fingers = Utils.countFingers();
+            if (mode == Mode.PLAY) {
+                camera.idle = fingers == 0;
+            } else if (mode == Mode.EDIT) {
+                if (fingers == 0) {
+                    Frame frame = currentFrame;
+                    if (frame != null) {
+                        listener.onFrameChanged(frame.id, frame.getX0(), frame.getY0(),
+                            frame.getWidth(), frame.getHeight());
+                    }
+                    currentFrame = null;
                 }
             }
-        }
-        if (fingers == 0) {
-            Gdx.graphics.requestRendering();
+            if (fingers == 0) {
+                Gdx.graphics.requestRendering();
+            }
         }
         return false;
     }
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-        if (mode == Mode.PLAY) {
-            if (bounds.perimeter() <= 0 || guessedCount < 0) {
-                return false;
-            }
-            camera.unproject(coordinates.set(x, y, 0));
-            if (bounds.contains(coordinates.x, coordinates.y)) {
-                guessedCount = 0;
-                List<Long> ids = new ArrayList<>();
-                Array<Actor> actors = framesStage.getActors();
-                for (int i = 0; i < actors.size; i++) {
-                    if (actors.get(i) instanceof Frame) {
-                        Frame frame = (Frame) actors.get(i);
-                        if (frame.contains(coordinates.x, coordinates.y)) {
-                            frame.isDone = true;
-                            ids.add(frame.id);
-                        }
-                        if (frame.isDone) {
-                            guessedCount++;
-                        }
-                    }
-                }
-                if (ids.size() > 0) {
-                    Gdx.graphics.requestRendering();
-                    listener.onFramesGuessed(ids);
-                } else {
-                    wrongSound.stop(wrongId);
-                    wrongId = wrongSound.play(1f);
+        if (bounds.perimeter() > 0) {
+            if (mode == Mode.PLAY) {
+                if (guessedCount < 0) {
                     return false;
                 }
-                if (guessedCount >= actors.size) {
-                    guessedCount = -1;
-                    winSound.stop(winId);
-                    winSound.play(1f);
+                camera.unproject(coordinates.set(x, y, 0));
+                if (bounds.contains(coordinates.x, coordinates.y)) {
+                    guessedCount = 0;
+                    List<Long> ids = new ArrayList<>();
+                    Array<Actor> actors = framesStage.getActors();
+                    for (int i = 0; i < actors.size; i++) {
+                        if (actors.get(i) instanceof Frame) {
+                            Frame frame = (Frame) actors.get(i);
+                            if (frame.contains(coordinates.x, coordinates.y)) {
+                                frame.isDone = true;
+                                ids.add(frame.id);
+                            }
+                            if (frame.isDone) {
+                                guessedCount++;
+                            }
+                        }
+                    }
+                    if (ids.size() > 0) {
+                        Gdx.graphics.requestRendering();
+                        listener.onFramesGuessed(ids);
+                    } else {
+                        wrongSound.stop(wrongId);
+                        wrongId = wrongSound.play(1f);
+                        return false;
+                    }
+                    if (guessedCount >= actors.size) {
+                        guessedCount = -1;
+                        winSound.stop(winId);
+                        winSound.play(1f);
+                    }
                 }
             }
         }
@@ -231,11 +245,17 @@ public class GuessImage extends BaseAdapter {
     }
 
     public void addFrame(Long id) {
-        framesStage.addActor(new Frame(shapeRenderer, id, mode, bounds));
+        Frame frame = new Frame(shapeRenderer, id, mode, bounds);
+        framesStage.addActor(frame);
+        listener.onFrameChanged(frame.id, frame.getX0(), frame.getY0(),
+            frame.getWidth(), frame.getHeight());
     }
 
     public void addFrame(long id, float x0, float y0, float width, float height) {
-        framesStage.addActor(new Frame(shapeRenderer, id, mode, bounds, x0, y0, width, height));
+        Frame frame = new Frame(shapeRenderer, id, mode, bounds, x0, y0, width, height);
+        framesStage.addActor(frame);
+        listener.onFrameChanged(frame.id, frame.getX0(), frame.getY0(),
+            frame.getWidth(), frame.getHeight());
     }
 
     public void markFrame(Long id) {

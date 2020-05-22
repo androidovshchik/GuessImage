@@ -26,7 +26,7 @@ public class Frame extends Actor {
     private Mode mode;
     private Rectangle bounds;
 
-    private Action action = Action.MOVE;
+    private Action action = Action.NONE;
     private Rectangle startBounds = new Rectangle();
 
     public boolean isDone = false;
@@ -69,7 +69,8 @@ public class Frame extends Actor {
     }
 
     public void setAction(float x, float y) {
-        if (bounds.perimeter() <= 0 || isDone) {
+        if (isDone) {
+            action = Action.NONE;
             return;
         }
         startBounds.set(getX(), getY(), getWidth(), getHeight());
@@ -95,7 +96,7 @@ public class Frame extends Actor {
     }
 
     public void pan(float x, float y, float dX, float dY) {
-        if (bounds.perimeter() <= 0 || isDone) {
+        if (isDone) {
             return;
         }
         float width;
@@ -174,6 +175,14 @@ public class Frame extends Actor {
         return false;
     }
 
+    public float getX0() {
+        return Math.max(0, getX() - bounds.x);
+    }
+
+    public float getY0() {
+        return Math.max(0, getY() - bounds.y);
+    }
+
     public float getTop() {
         return getY() + getHeight();
     }
@@ -183,6 +192,6 @@ public class Frame extends Actor {
     }
 
     enum Action {
-        MOVE, SCALE_NW, SCALE_NE, SCALE_SW, SCALE_SE
+        NONE, MOVE, SCALE_NW, SCALE_NE, SCALE_SW, SCALE_SE
     }
 }
