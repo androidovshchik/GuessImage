@@ -37,7 +37,7 @@ class EditFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editModel = ViewModelProvider(requireActivity()).get(EditModel::class.java)
-        drawFragment = DrawFragment.newInstance(Mode.EDIT, editModel.puzzle.filename)
+        drawFragment = DrawFragment.newInstance(Mode.EDIT, null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
@@ -49,7 +49,6 @@ class EditFragment : BaseFragment() {
                 }.lparams(matchParent, matchParent)
                 buttonSelect = button {
                     text = getString(R.string.upload)
-                    isVisible = editModel.puzzle.filename.isNullOrBlank()
                     setOnClickListener {
                         val activity = activity ?: return@setOnClickListener
                         if (activity.areGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -76,8 +75,11 @@ class EditFragment : BaseFragment() {
             buttonSelect?.isVisible = false
             drawFragment.guessImage.postRunnable("setBackground", it)
         })
-        editModel.currentObject.observe(viewLifecycleOwner, Observer {
+        editModel.newObject.observe(viewLifecycleOwner, Observer {
             drawFragment.guessImage.postRunnable("addFrame", it.id)
+        })
+        editModel.readyObject.observe(viewLifecycleOwner, Observer {
+            drawFragment.guessImage.postRunnable("markFrame", it.id)
         })
     }
 

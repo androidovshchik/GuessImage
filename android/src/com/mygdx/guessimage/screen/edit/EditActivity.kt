@@ -57,15 +57,13 @@ class EditActivity : BaseActivity(), AndroidFragmentApplication.Callbacks {
                 if (resultCode == RESULT_OK) {
                     val uri = data?.data ?: return
                     launch {
-                        val filename = withContext(Dispatchers.IO) {
+                        val filename = editModel.puzzle.filename
+                        val copied = withContext(Dispatchers.IO) {
                             val path = PathCompat.getFilePath(applicationContext, uri)
-                            fileManager.copyImage(path)
+                            fileManager.copyImage(path, filename)
                         }
-                        if (!filename.isNullOrBlank()) {
-                            editModel.apply {
-                                puzzle.filename = filename
-                                galleryPath.value = fileManager.getImageFile(filename).path
-                            }
+                        if (copied) {
+                            editModel.galleryPath.value = fileManager.getImageFile(filename).path
                         }
                     }
                 }
