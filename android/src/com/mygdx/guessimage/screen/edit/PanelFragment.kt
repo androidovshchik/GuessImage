@@ -2,6 +2,8 @@ package com.mygdx.guessimage.screen.edit
 
 import android.animation.LayoutTransition
 import android.os.Bundle
+import android.text.InputType
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -102,11 +104,12 @@ class PanelFragment : BaseFragment() {
                             withContext(Dispatchers.IO) {
                                 db.objectDao().update(objectEntity)
                             }
+                            lastObject = null
+                            editModel.readyObject.value = objectEntity
                             dataSource.apply {
                                 add(objectEntity)
                                 invalidateAt(size() - 1)
                             }
-                            editModel.readyObject.value = objectEntity
                             editName.isVisible = false
                             it.isVisible = false
                             buttonAdd.isVisible = true
@@ -115,6 +118,9 @@ class PanelFragment : BaseFragment() {
                     }
                 }.lparams(matchParent, wrapContent)
                 editName = editText {
+                    inputType = InputType.TYPE_CLASS_TEXT
+                    gravity = Gravity.CENTER
+                    maxLines = 1
                     isVisible = false
                     textChangedListener {
                         afterTextChanged {
