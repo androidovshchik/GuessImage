@@ -6,27 +6,24 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.utils.Disposable;
-import com.mygdx.guessimage.BoundedCamera;
 import com.mygdx.guessimage.Mode;
 import com.mygdx.guessimage.Utils;
 
-public class Frame extends Actor implements Disposable {
+public class Frame extends Actor {
 
     private static final String TAG = Frame.class.getSimpleName();
 
     public static final float MIN_SIZE = 3 * 16;
     public static final float WIDTH = 2 * 2;
+
     public static final String GREEN = "#4CAF50";
     public static final String LIGHT_GREEN = "#CDDC39";
     public static final String BLUE = "#2196F3";
 
+    private ShapeRenderer shapeRenderer;
+
     public long id;
-
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
-
     private Mode mode;
-
     private Rectangle bounds;
 
     private Action action = Action.MOVE;
@@ -34,7 +31,8 @@ public class Frame extends Actor implements Disposable {
 
     public boolean isDone = false;
 
-    public Frame(long id, Mode mode, Rectangle bounds) {
+    public Frame(ShapeRenderer renderer, long id, Mode mode, Rectangle bounds) {
+        shapeRenderer = renderer;
         this.id = id;
         this.mode = mode;
         this.bounds = bounds;
@@ -45,8 +43,9 @@ public class Frame extends Actor implements Disposable {
         setY((height - getHeight()) / 2);
     }
 
-    public Frame(long id, Mode mode, Rectangle bounds, float x0, float y0, float width, float height) {
-        this(id, mode, bounds);
+    public Frame(ShapeRenderer renderer, long id, Mode mode, Rectangle bounds, float x0, float y0,
+                 float width, float height) {
+        this(renderer, id, mode, bounds);
         if (bounds.perimeter() <= 0) {
             return;
         }
@@ -58,9 +57,7 @@ public class Frame extends Actor implements Disposable {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (mode == Mode.EDIT || isDone) {
-            BoundedCamera camera = Utils.getApp().camera;
-            float lW = Utils.dip(WIDTH) / 2 * camera.zoom;
-            shapeRenderer.setProjectionMatrix(camera.combined);
+            float lW = Utils.dip(WIDTH) / 2 * Utils.getApp().camera.zoom;
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             shapeRenderer.setColor(Utils.parseColor(isDone ? LIGHT_GREEN : BLUE));
             shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
@@ -180,11 +177,6 @@ public class Frame extends Actor implements Disposable {
 
     public float getRight() {
         return getX() + getWidth();
-    }
-
-    @Override
-    public void dispose() {
-        shapeRenderer.dispose();
     }
 
     enum Action {

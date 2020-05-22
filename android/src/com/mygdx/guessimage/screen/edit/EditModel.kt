@@ -10,7 +10,9 @@ class EditModel : ViewModel() {
 
     lateinit var puzzle: PuzzleEntity
 
-    val currentObject = MutableLiveData<ObjectEntity>()
+    val newObject = MutableLiveData<ObjectEntity>()
+
+    val readyObject = MutableLiveData<ObjectEntity>()
 
     val galleryPath = MutableLiveData<String>()
 

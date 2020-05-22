@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -13,7 +14,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.guessimage.model.Background;
 import com.mygdx.guessimage.model.Frame;
@@ -31,6 +31,7 @@ public class GuessImage extends BaseAdapter {
     public BoundedCamera camera = new BoundedCamera(bounds);
     private ScreenViewport viewport;
     private SpriteBatch spriteBatch;
+    private ShapeRenderer shapeRenderer = new ShapeRenderer();
     private Stage backgroundStage;
     private Stage framesStage;
 
@@ -83,6 +84,8 @@ public class GuessImage extends BaseAdapter {
         if (mode == Mode.PLAY) {
             camera.normalize();
         }
+
+        shapeRenderer.setProjectionMatrix(camera.combined);
 
         backgroundStage.act();
         backgroundStage.draw();
@@ -226,32 +229,31 @@ public class GuessImage extends BaseAdapter {
     }
 
     public void addFrame(Long id) {
-        framesStage.addActor(new Frame(id, mode, bounds));
+        framesStage.addActor(new Frame(shapeRenderer, id, mode, bounds));
     }
 
     public void addFrame(long id, float x0, float y0, float width, float height) {
-        framesStage.addActor(new Frame(id, mode, bounds, x0, y0, width, height));
+        framesStage.addActor(new Frame(shapeRenderer, id, mode, bounds, x0, y0, width, height));
+    }
+
+    public void markFrame(Long id) {
+        Array<Actor> actors = framesStage.getActors();
+        for (int i = 0; i < actors.size; i++) {
+            if (actors.get(i) instanceof Frame) {
+                Frame frame = (Frame) actors.get(i);
+                if (frame.id == id) {
+                    frame.isDone = true;
+                }
+            }
+        }
     }
 
     @Override
     public void dispose() {
         listener = null;
         spriteBatch.dispose();
-        Array<Actor> actors = backgroundStage.getActors();
-        for (int i = 0; i < actors.size; i++) {
-            Actor actor = actors.get(i);
-            if (actor instanceof Disposable) {
-                ((Disposable) actor).dispose();
-            }
-        }
+        shapeRenderer.dispose();
         backgroundStage.dispose();
-        actors = framesStage.getActors();
-        for (int i = 0; i < actors.size; i++) {
-            Actor actor = actors.get(i);
-            if (actor instanceof Disposable) {
-                ((Disposable) actor).dispose();
-            }
-        }
         framesStage.dispose();
         winSound.dispose();
         wrongSound.dispose();

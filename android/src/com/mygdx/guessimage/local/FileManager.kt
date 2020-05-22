@@ -9,13 +9,12 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import androidx.exifinterface.media.ExifInterface
 import com.mygdx.guessimage.extension.use
+import com.mygdx.guessimage.model.Frame
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.max
 import kotlin.math.min
-
-private const val MIN_SIZE = 256
 
 private const val MAX_SIZE = 2048
 
@@ -96,7 +95,8 @@ private fun createCopy(file: File): Bitmap? {
         val bitmap = BitmapFactory.Options().run {
             inJustDecodeBounds = true
             BitmapFactory.decodeFile(file.path, this)
-            if (outHeight < MIN_SIZE || outWidth < MIN_SIZE) {
+            val minSize = Frame.MIN_SIZE * 3
+            if (outHeight < minSize || outWidth < minSize) {
                 return null
             }
             // Calculate inSampleSize
