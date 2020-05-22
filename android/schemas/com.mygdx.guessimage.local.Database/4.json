@@ -1,0 +1,123 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "836cc780c597787694d6d207e2579fed",
+    "entities": [
+      {
+        "tableName": "puzzles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`p_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `p_filename` TEXT NOT NULL, `p_ready` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "p_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filename",
+            "columnName": "p_filename",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ready",
+            "columnName": "p_ready",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "p_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "objects",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`o_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `o_p_id` INTEGER NOT NULL, `o_name` TEXT, `o_x` REAL NOT NULL, `o_y` REAL NOT NULL, `o_w` REAL NOT NULL, `o_h` REAL NOT NULL, FOREIGN KEY(`o_p_id`) REFERENCES `puzzles`(`p_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "o_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "puzzleId",
+            "columnName": "o_p_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "o_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "x0",
+            "columnName": "o_x",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "y0",
+            "columnName": "o_y",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "o_w",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "o_h",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "o_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_objects_o_p_id",
+            "unique": false,
+            "columnNames": [
+              "o_p_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_objects_o_p_id` ON `${TABLE_NAME}` (`o_p_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "puzzles",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "o_p_id"
+            ],
+            "referencedColumns": [
+              "p_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '836cc780c597787694d6d207e2579fed')"
+    ]
+  }
+}

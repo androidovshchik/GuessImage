@@ -31,7 +31,7 @@ public class GuessImage extends BaseAdapter {
     public BoundedCamera camera = new BoundedCamera(bounds);
     private ScreenViewport viewport;
     private SpriteBatch spriteBatch;
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private ShapeRenderer shapeRenderer;
     private Stage backgroundStage;
     private Stage framesStage;
 
@@ -59,6 +59,7 @@ public class GuessImage extends BaseAdapter {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport = new ScreenViewport(camera);
         spriteBatch = new SpriteBatch();
+        shapeRenderer = new ShapeRenderer();
         backgroundStage = new Stage(viewport, spriteBatch);
         framesStage = new Stage(viewport, spriteBatch);
         if (initialPath != null) {
@@ -200,6 +201,7 @@ public class GuessImage extends BaseAdapter {
                     }
                 }
                 if (ids.size() > 0) {
+                    Gdx.graphics.requestRendering();
                     listener.onFramesGuessed(ids);
                 } else {
                     wrongSound.stop(wrongId);
@@ -243,6 +245,7 @@ public class GuessImage extends BaseAdapter {
                 Frame frame = (Frame) actors.get(i);
                 if (frame.id == id) {
                     frame.isDone = true;
+                    Gdx.graphics.requestRendering();
                 }
             }
         }
