@@ -2,10 +2,13 @@
 -renamesourcefileattribute SourceFile
 -repackageclasses
 
+-keepclassmembers class com.mygdx.guessimage.GuessImage { *; }
+
 -verbose
 
 -dontwarn android.support.**
 -dontwarn com.badlogic.gdx.backends.android.AndroidFragmentApplication
+-dontwarn com.badlogic.gdx.backends.android.AndroidXFragmentApplication
 -dontwarn com.badlogic.gdx.utils.GdxBuild
 -dontwarn com.badlogic.gdx.physics.box2d.utils.Box2DBuild
 -dontwarn com.badlogic.gdx.jnigen.BuildTarget*
