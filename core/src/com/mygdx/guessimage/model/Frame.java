@@ -13,7 +13,9 @@ public class Frame extends Actor {
 
     private static final String TAG = Frame.class.getSimpleName();
 
-    public static final float MIN_SIZE = 3 * 16;
+    public static final float UNIT = 20;
+    public static final float MIN_SIZE = 3 * UNIT;
+    public static final float MIN_VISUAL_SIZE = 2 * UNIT;
     public static final float WIDTH = 2 * 2;
 
     public static final String GREEN = "#4CAF50";
@@ -60,10 +62,10 @@ public class Frame extends Actor {
             float lW = Utils.dip(WIDTH) / 2 * Utils.getApp().camera.zoom;
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             shapeRenderer.setColor(Utils.parseColor(isDone ? LIGHT_GREEN : BLUE));
-            shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
-            shapeRenderer.line(getRight() - lW, getY(), getRight() - lW, getTop());
-            shapeRenderer.line(getRight(), getTop() - lW, getX(), getTop() - lW);
-            shapeRenderer.line(getX() + lW, getTop(), getX() + lW, getY());
+            shapeRenderer.line(getVisualLeft(), getVisualBottom() + lW, getVisualRight(), getVisualBottom() + lW);
+            shapeRenderer.line(getVisualRight() - lW, getVisualBottom(), getVisualRight() - lW, getVisualTop());
+            shapeRenderer.line(getVisualRight(), getVisualTop() - lW, getVisualLeft(), getVisualTop() - lW);
+            shapeRenderer.line(getVisualLeft() + lW, getVisualTop(), getVisualLeft() + lW, getVisualBottom());
             shapeRenderer.end();
         }
     }
@@ -107,23 +109,23 @@ public class Frame extends Actor {
         switch (action) {
             case MOVE:
                 if (dX > 0) {
-                    right = Utils.getRight(bounds);
-                    if (getRight() + dX > right) {
-                        dX = Math.max(0, right - getRight());
+                    float maxRight = Utils.getRight(bounds);
+                    if (getVisualRight() + dX > maxRight) {
+                        dX = Math.max(0, maxRight - getVisualRight());
                     }
                 } else {
-                    if (getX() + dX < bounds.x) {
-                        dX = Math.min(0, bounds.x - getX());
+                    if (getVisualLeft() + dX < bounds.x) {
+                        dX = Math.min(0, bounds.x - getVisualLeft());
                     }
                 }
                 if (dY < 0) {
-                    if (getY() + dY < bounds.y) {
-                        dY = Math.min(0, bounds.y - getY());
+                    if (getVisualBottom() + dY < bounds.y) {
+                        dY = Math.min(0, bounds.y - getVisualBottom());
                     }
                 } else {
-                    top = Utils.getTop(bounds);
-                    if (getTop() + dY > top) {
-                        dY = Math.max(0, top - getTop());
+                    float maxTop = Utils.getTop(bounds);
+                    if (getVisualTop() + dY > maxTop) {
+                        dY = Math.max(0, maxTop - getVisualTop());
                     }
                 }
                 if (dX != 0 || dY != 0) {
@@ -189,6 +191,30 @@ public class Frame extends Actor {
 
     public float getRight() {
         return getX() + getWidth();
+    }
+
+    public float getVisualWidth() {
+        return getWidth() - UNIT;
+    }
+
+    public float getVisualHeight() {
+        return getHeight() - UNIT;
+    }
+
+    public float getVisualTop() {
+        return getTop() - UNIT / 2;
+    }
+
+    public float getVisualLeft() {
+        return getX() + UNIT / 2;
+    }
+
+    public float getVisualRight() {
+        return getRight() - UNIT / 2;
+    }
+
+    public float getVisualBottom() {
+        return getY() + UNIT / 2;
     }
 
     enum Action {

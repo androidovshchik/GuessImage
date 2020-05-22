@@ -214,8 +214,8 @@ public class GuessImage extends BaseAdapter {
                         }
                     }
                     if (ids.size() > 0) {
-                        Gdx.graphics.requestRendering();
                         listener.onFramesGuessed(ids);
+                        Gdx.graphics.requestRendering();
                     } else {
                         wrongSound.stop(wrongId);
                         wrongId = wrongSound.play(1f);

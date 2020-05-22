@@ -95,7 +95,7 @@ private fun createCopy(file: File): Bitmap? {
         val bitmap = BitmapFactory.Options().run {
             inJustDecodeBounds = true
             BitmapFactory.decodeFile(file.path, this)
-            val minSize = Frame.MIN_SIZE * 3
+            val minSize = Frame.MIN_VISUAL_SIZE * 3
             if (outHeight < minSize || outWidth < minSize) {
                 return null
             }
