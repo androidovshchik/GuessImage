@@ -21,8 +21,6 @@ import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
-import com.mygdx.guessimage.local.FileManager
-import com.mygdx.guessimage.local.deleteFile
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
 import kotlinx.android.synthetic.main.item_object.view.*
@@ -43,8 +41,6 @@ class PanelFragment : BaseFragment() {
 
     private val db by instance<Database>()
 
-    private val fileManager by instance<FileManager>()
-
     private lateinit var editModel: EditModel
 
     private lateinit var buttonAdd: Button
@@ -53,6 +49,8 @@ class PanelFragment : BaseFragment() {
     private lateinit var buttonSave: Button
 
     private val dataSource = emptyDataSourceTyped<ObjectEntity>()
+
+    private var lastObject: ObjectEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +70,7 @@ class PanelFragment : BaseFragment() {
                 }.lparams(matchParent, wrapContent)
                 buttonAdd = button {
                     text = getString(R.string.btn_add)
-                    isEnabled = !editModel.puzzle.filename.isNullOrBlank()
+                    isEnabled = false
                     setOnClickListener {
                         isTouchable = false
                         launch {
@@ -80,12 +78,9 @@ class PanelFragment : BaseFragment() {
                             withContext(Dispatchers.IO) {
                                 objectEntity.id = db.objectDao().insert(objectEntity)
                             }
-                            dataSource.apply {
-                                add(objectEntity)
-                                invalidateAt(size() - 1)
-                            }
                             editModel.currentObject.value = objectEntity
                             it.isVisible = false
+                            editName.text = null
                             editName.isVisible = true
                             buttonReady.isVisible = true
                             isTouchable = true
@@ -96,10 +91,16 @@ class PanelFragment : BaseFragment() {
                     text = getString(R.string.btn_ready)
                     isVisible = false
                     setOnClickListener {
+                        val objectEntity =
+                            editModel.currentObject.value ?: return@setOnClickListener
                         isTouchable = false
                         launch {
                             withContext(Dispatchers.IO) {
                                 db.objectDao().update(objectEntity)
+                            }
+                            dataSource.apply {
+                                add(objectEntity)
+                                invalidateAt(size() - 1)
                             }
                             editName.isVisible = false
                             it.isVisible = false
@@ -112,7 +113,7 @@ class PanelFragment : BaseFragment() {
                     isVisible = false
                     textChangedListener {
                         afterTextChanged {
-                            editModel.currentObject.value?.name = it?.toString()
+                            lastObject?.name = it?.toString()
                         }
                     }
                 }.lparams(matchParent, wrapContent)
@@ -130,13 +131,14 @@ class PanelFragment : BaseFragment() {
                 }.lparams(matchParent, 0, 1f)
                 buttonSave = button {
                     text = getString(R.string.btn_save)
-                    isEnabled = !editModel.puzzle.filename.isNullOrBlank()
+                    isEnabled = false
                     setOnClickListener {
                         isTouchable = false
                         GlobalScope.launch(Dispatchers.Main) {
                             val puzzle = editModel.puzzle
+                            puzzle.ready = true
                             withContext(Dispatchers.IO) {
-                                puzzle.id = db.puzzleDao().insert(puzzle)
+                                db.puzzleDao().update(puzzle)
                             }
                             activity?.finish()
                         }
@@ -158,20 +160,6 @@ class PanelFragment : BaseFragment() {
                 }
             }
         })
-    }
-
-    override fun onDestroy() {
-        val puzzle = editModel.puzzle
-        val filename = puzzle.filename
-        if (puzzle.id == 0L && filename != null) {
-            val imageFile = fileManager.getImageFile(filename)
-            val iconFile = fileManager.getIconFile(filename)
-            GlobalScope.launch(Dispatchers.IO) {
-                deleteFile(imageFile)
-                deleteFile(iconFile)
-            }
-        }
-        super.onDestroy()
     }
 
     companion object {
