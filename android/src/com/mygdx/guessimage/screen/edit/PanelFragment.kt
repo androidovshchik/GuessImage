@@ -75,13 +75,18 @@ class PanelFragment : BaseFragment() {
                         isTouchable = false
                         launch {
                             val objectEntity = ObjectEntity()
+                            objectEntity.puzzleId = editModel.puzzle.id
                             withContext(Dispatchers.IO) {
                                 objectEntity.id = db.objectDao().insert(objectEntity)
                             }
-                            editModel.currentObject.value = objectEntity
+                            lastObject = objectEntity
+                            editModel.newObject.value = objectEntity
                             it.isVisible = false
-                            editName.text = null
-                            editName.isVisible = true
+                            editName.apply {
+                                text = null
+                                isVisible = true
+                                requestFocus()
+                            }
                             buttonReady.isVisible = true
                             isTouchable = true
                         }
@@ -91,8 +96,7 @@ class PanelFragment : BaseFragment() {
                     text = getString(R.string.btn_ready)
                     isVisible = false
                     setOnClickListener {
-                        val objectEntity =
-                            editModel.currentObject.value ?: return@setOnClickListener
+                        val objectEntity = lastObject ?: return@setOnClickListener
                         isTouchable = false
                         launch {
                             withContext(Dispatchers.IO) {
@@ -102,6 +106,7 @@ class PanelFragment : BaseFragment() {
                                 add(objectEntity)
                                 invalidateAt(size() - 1)
                             }
+                            editModel.readyObject.value = objectEntity
                             editName.isVisible = false
                             it.isVisible = false
                             buttonAdd.isVisible = true
