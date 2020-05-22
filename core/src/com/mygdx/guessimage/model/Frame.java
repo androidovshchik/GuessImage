@@ -67,11 +67,6 @@ public class Frame extends Actor {
             shapeRenderer.line(getVisualRight() - lW, getVisualBottom(), getVisualRight() - lW, getVisualTop());
             shapeRenderer.line(getVisualRight(), getVisualTop() - lW, getVisualLeft(), getVisualTop() - lW);
             shapeRenderer.line(getVisualLeft() + lW, getVisualTop(), getVisualLeft() + lW, getVisualBottom());
-            shapeRenderer.setColor(Utils.parseColor(isDone ? BLUE : LIGHT_GREEN));
-            shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
-            shapeRenderer.line(getRight() - lW, getY(), getRight() - lW, getTop());
-            shapeRenderer.line(getRight(), getTop() - lW, getX(), getTop() - lW);
-            shapeRenderer.line(getX() + lW, getTop(), getX() + lW, getY());
             shapeRenderer.end();
         }
     }
@@ -107,40 +102,42 @@ public class Frame extends Actor {
         if (isDone) {
             return;
         }
+        if (action == Action.MOVE) {
+            if (dX > 0) {
+                float maxRight = Utils.getRight(bounds);
+                if (getVisualRight() + dX > maxRight) {
+                    dX = Math.max(0, maxRight - getVisualRight());
+                }
+            } else {
+                if (getVisualLeft() + dX < bounds.x) {
+                    dX = Math.min(0, bounds.x - getVisualLeft());
+                }
+            }
+            if (dY < 0) {
+                if (getVisualBottom() + dY < bounds.y) {
+                    dY = Math.min(0, bounds.y - getVisualBottom());
+                }
+            } else {
+                float maxTop = Utils.getTop(bounds);
+                if (getVisualTop() + dY > maxTop) {
+                    dY = Math.max(0, maxTop - getVisualTop());
+                }
+            }
+            if (dX != 0 || dY != 0) {
+                moveBy(dX, dY);
+            }
+            return;
+        }
         float width;
         float height;
+        float unit = Utils.dip(UNIT);
         float minSize = Utils.dip(MIN_RECT_SIZE);
-        float top = startBounds.getY() + startBounds.getHeight();
-        float right = startBounds.getX() + startBounds.getWidth();
+        float top = Utils.getTop(startBounds);
+        float right = Utils.getRight(startBounds);
         switch (action) {
-            case MOVE:
-                if (dX > 0) {
-                    float maxRight = Utils.getRight(bounds);
-                    if (getVisualRight() + dX > maxRight) {
-                        dX = Math.max(0, maxRight - getVisualRight());
-                    }
-                } else {
-                    if (getVisualLeft() + dX < bounds.x) {
-                        dX = Math.min(0, bounds.x - getVisualLeft());
-                    }
-                }
-                if (dY < 0) {
-                    if (getVisualBottom() + dY < bounds.y) {
-                        dY = Math.min(0, bounds.y - getVisualBottom());
-                    }
-                } else {
-                    float maxTop = Utils.getTop(bounds);
-                    if (getVisualTop() + dY > maxTop) {
-                        dY = Math.max(0, maxTop - getVisualTop());
-                    }
-                }
-                if (dX != 0 || dY != 0) {
-                    moveBy(dX, dY);
-                }
-                break;
             case SCALE_NW:
-                x = MathUtils.clamp(x, bounds.x, right - minSize);
-                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds));
+                x = MathUtils.clamp(x, bounds.x - unit / 2, right - minSize);
+                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds) + unit / 2);
                 height = y - startBounds.getY();
                 if (getX() != x || getHeight() != height) {
                     setSize(right - x, height);
@@ -148,8 +145,8 @@ public class Frame extends Actor {
                 }
                 break;
             case SCALE_NE:
-                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds));
-                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds));
+                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds) + unit / 2);
+                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds) + unit / 2);
                 width = x - startBounds.getX();
                 height = y - startBounds.getY();
                 if (getWidth() != width || getHeight() != height) {
@@ -157,16 +154,16 @@ public class Frame extends Actor {
                 }
                 break;
             case SCALE_SW:
-                x = MathUtils.clamp(x, bounds.x, right - minSize);
-                y = MathUtils.clamp(y, bounds.y, top - minSize);
+                x = MathUtils.clamp(x, bounds.x - unit / 2, right - minSize);
+                y = MathUtils.clamp(y, bounds.y - unit / 2, top - minSize);
                 if (getX() != x || getY() != y) {
                     setSize(right - x, top - y);
                     setPosition(x, y);
                 }
                 break;
             case SCALE_SE:
-                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds));
-                y = MathUtils.clamp(y, bounds.y, top - minSize);
+                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds) + unit / 2);
+                y = MathUtils.clamp(y, bounds.y - unit / 2, top - minSize);
                 width = x - startBounds.getX();
                 if (getWidth() != width || getY() != y) {
                     setSize(width, top - y);
