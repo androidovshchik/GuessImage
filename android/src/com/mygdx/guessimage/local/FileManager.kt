@@ -146,11 +146,7 @@ private fun Bitmap.createThumb(): Bitmap? {
             val scale = THUMB_SIZE.toFloat() / maxSize
             matrix.preScale(scale, scale)
         }
-        val x = max(0, (width - THUMB_SIZE) / 2)
-        val y = max(0, (height - THUMB_SIZE) / 2)
-        val width = min(THUMB_SIZE, width)
-        val height = min(THUMB_SIZE, height)
-        Bitmap.createBitmap(this, x, y, width, height, matrix, true)
+        Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     } catch (e: Throwable) {
         Timber.e(e)
         null
