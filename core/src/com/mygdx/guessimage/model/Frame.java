@@ -13,9 +13,9 @@ public class Frame extends Actor {
 
     private static final String TAG = Frame.class.getSimpleName();
 
-    public static final float UNIT = 20;
-    public static final float MIN_SIZE = 3 * UNIT;
-    public static final float MIN_VISUAL_SIZE = 2 * UNIT;
+    private static final float UNIT = 20;
+    public static final float MIN_RECT_SIZE = 2 * UNIT;
+    public static final float MIN_VISUAL_SIZE = UNIT;
     public static final float WIDTH = 2 * 2;
 
     public static final String GREEN = "#4CAF50";
@@ -40,7 +40,8 @@ public class Frame extends Actor {
         this.bounds = bounds;
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
-        setSize(Utils.dip(MIN_SIZE), Utils.dip(MIN_SIZE));
+        float size = Utils.dip(MIN_RECT_SIZE);
+        setSize(size, size);
         setX((width - getWidth()) / 2);
         setY((height - getHeight()) / 2);
     }
@@ -66,6 +67,11 @@ public class Frame extends Actor {
             shapeRenderer.line(getVisualRight() - lW, getVisualBottom(), getVisualRight() - lW, getVisualTop());
             shapeRenderer.line(getVisualRight(), getVisualTop() - lW, getVisualLeft(), getVisualTop() - lW);
             shapeRenderer.line(getVisualLeft() + lW, getVisualTop(), getVisualLeft() + lW, getVisualBottom());
+            shapeRenderer.setColor(Utils.parseColor(isDone ? BLUE : LIGHT_GREEN));
+            shapeRenderer.line(getX(), getY() + lW, getRight(), getY() + lW);
+            shapeRenderer.line(getRight() - lW, getY(), getRight() - lW, getTop());
+            shapeRenderer.line(getRight(), getTop() - lW, getX(), getTop() - lW);
+            shapeRenderer.line(getX() + lW, getTop(), getX() + lW, getY());
             shapeRenderer.end();
         }
     }
@@ -76,20 +82,20 @@ public class Frame extends Actor {
             return;
         }
         startBounds.set(getX(), getY(), getWidth(), getHeight());
-        float min = Utils.dip(MIN_SIZE) / 3;
-        if (x < getX() + min) {
-            if (y < getY() + min) {
+        float unit = Utils.dip(UNIT);
+        if (x < getX() + unit) {
+            if (y < getY() + unit) {
                 action = Action.SCALE_SW;
                 return;
-            } else if (y > getTop() - min) {
+            } else if (y > getTop() - unit) {
                 action = Action.SCALE_NW;
                 return;
             }
-        } else if (x > getRight() - min) {
-            if (y < getY() + min) {
+        } else if (x > getRight() - unit) {
+            if (y < getY() + unit) {
                 action = Action.SCALE_SE;
                 return;
-            } else if (y > getTop() - min) {
+            } else if (y > getTop() - unit) {
                 action = Action.SCALE_NE;
                 return;
             }
@@ -103,7 +109,7 @@ public class Frame extends Actor {
         }
         float width;
         float height;
-        float minSize = Utils.dip(MIN_SIZE);
+        float minSize = Utils.dip(MIN_RECT_SIZE);
         float top = startBounds.getY() + startBounds.getHeight();
         float right = startBounds.getX() + startBounds.getWidth();
         switch (action) {
@@ -171,8 +177,8 @@ public class Frame extends Actor {
     }
 
     public boolean contains(float x, float y) {
-        if (x >= getX() && x <= getRight()) {
-            return y >= getY() && y <= getTop();
+        if (x >= getVisualLeft() && x <= getVisualRight()) {
+            return y >= getVisualBottom() && y <= getVisualTop();
         }
         return false;
     }
@@ -194,27 +200,27 @@ public class Frame extends Actor {
     }
 
     public float getVisualWidth() {
-        return getWidth() - UNIT;
+        return getWidth() - Utils.dip(UNIT);
     }
 
     public float getVisualHeight() {
-        return getHeight() - UNIT;
+        return getHeight() - Utils.dip(UNIT);
     }
 
     public float getVisualTop() {
-        return getTop() - UNIT / 2;
+        return getTop() - Utils.dip(UNIT) / 2;
     }
 
     public float getVisualLeft() {
-        return getX() + UNIT / 2;
+        return getX() + Utils.dip(UNIT) / 2;
     }
 
     public float getVisualRight() {
-        return getRight() - UNIT / 2;
+        return getRight() - Utils.dip(UNIT) / 2;
     }
 
     public float getVisualBottom() {
-        return getY() + UNIT / 2;
+        return getY() + Utils.dip(UNIT) / 2;
     }
 
     enum Action {
