@@ -205,14 +205,6 @@ public class Frame extends Actor {
         return getX() + getWidth();
     }
 
-    public float getVisualWidth() {
-        return getWidth() - Utils.dip(UNIT);
-    }
-
-    public float getVisualHeight() {
-        return getHeight() - Utils.dip(UNIT);
-    }
-
     public float getVisualTop() {
         return getTop() - Utils.dip(UNIT) / 2;
     }
