@@ -31,7 +31,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk21.listeners.onFocusChange
 import org.jetbrains.anko.sdk21.listeners.textChangedListener
 import org.jetbrains.anko.support.v4.UI
 import org.kodein.di.generic.instance
@@ -128,11 +127,6 @@ class PanelFragment : BaseFragment() {
                             lastObject?.name = it?.toString()
                         }
                     }
-                    onFocusChange { v, hasFocus ->
-                        if (!hasFocus) {
-                            v.requestFocus()
-                        }
-                    }
                 }.lparams(matchParent, wrapContent)
                 recyclerView {
                     addItemDecoration(DividerItemDecoration(context, VERTICAL))
@@ -173,6 +167,16 @@ class PanelFragment : BaseFragment() {
         editModel.frameChanged.observe(viewLifecycleOwner, Observer {
             lastObject?.setFrom(it)
         })
+    }
+
+    fun obtainFocus() {
+        if (view != null) {
+            editName.apply {
+                if (!hasFocus()) {
+                    requestFocus()
+                }
+            }
+        }
     }
 
     companion object {

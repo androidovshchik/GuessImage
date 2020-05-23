@@ -2,6 +2,7 @@ package com.mygdx.guessimage.screen.edit
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,8 @@ class EditActivity : BaseActivity(), AndroidXFragmentApplication.Callbacks {
 
     private lateinit var editModel: EditModel
 
+    private val panelFragment = PanelFragment.newInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         editModel = ViewModelProvider(this).get(EditModel::class.java).also {
@@ -46,8 +49,15 @@ class EditActivity : BaseActivity(), AndroidXFragmentApplication.Callbacks {
         }.view)
         supportFragmentManager.transact {
             add(idEdit, EditFragment.newInstance(), EditFragment.TAG)
-            add(idPanel, PanelFragment.newInstance(), PanelFragment.TAG)
+            add(idPanel, panelFragment, PanelFragment.TAG)
         }
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            panelFragment.obtainFocus()
+        }
+        return super.dispatchTouchEvent(event)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
