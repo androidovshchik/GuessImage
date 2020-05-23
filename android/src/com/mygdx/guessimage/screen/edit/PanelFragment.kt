@@ -166,17 +166,8 @@ class PanelFragment : BaseFragment() {
         })
         editModel.frameChanged.observe(viewLifecycleOwner, Observer {
             lastObject?.setFrom(it)
+            editName.requestFocus()
         })
-    }
-
-    fun obtainFocus() {
-        if (view != null) {
-            editName.apply {
-                if (!hasFocus()) {
-                    requestFocus()
-                }
-            }
-        }
     }
 
     companion object {
