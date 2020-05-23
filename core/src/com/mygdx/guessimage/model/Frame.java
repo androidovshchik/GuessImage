@@ -30,6 +30,7 @@ public class Frame extends Actor {
 
     private Action action = Action.NONE;
     private Rectangle startBounds = new Rectangle();
+    private float startX, startY;
 
     public boolean isDone = false;
 
@@ -40,7 +41,7 @@ public class Frame extends Actor {
         this.bounds = bounds;
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
-        float size = Utils.dip(MIN_RECT_SIZE);
+        float size = Utils.dip(MIN_RECT_SIZE) * 3;
         setSize(size, size);
         setX((width - getWidth()) / 2);
         setY((height - getHeight()) / 2);
@@ -81,17 +82,25 @@ public class Frame extends Actor {
         if (x < getX() + unit) {
             if (y < getY() + unit) {
                 action = Action.SCALE_SW;
+                startX = x - getX();
+                startY = y - getY();
                 return;
             } else if (y > getTop() - unit) {
                 action = Action.SCALE_NW;
+                startX = x - getX();
+                startY = y - getTop();
                 return;
             }
         } else if (x > getRight() - unit) {
             if (y < getY() + unit) {
                 action = Action.SCALE_SE;
+                startX = x - getRight();
+                startY = y - getY();
                 return;
             } else if (y > getTop() - unit) {
                 action = Action.SCALE_NE;
+                startX = x - getRight();
+                startY = y - getTop();
                 return;
             }
         }
@@ -136,8 +145,8 @@ public class Frame extends Actor {
         float right = Utils.getRight(startBounds);
         switch (action) {
             case SCALE_NW:
-                x = MathUtils.clamp(x, bounds.x - unit / 2, right - minSize);
-                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds) + unit / 2);
+                x = MathUtils.clamp(x - startX, bounds.x - unit / 2, right - minSize);
+                y = MathUtils.clamp(y - startY, startBounds.getY() + minSize, Utils.getTop(bounds) + unit / 2);
                 height = y - startBounds.getY();
                 if (getX() != x || getHeight() != height) {
                     setSize(right - x, height);
@@ -145,8 +154,8 @@ public class Frame extends Actor {
                 }
                 break;
             case SCALE_NE:
-                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds) + unit / 2);
-                y = MathUtils.clamp(y, startBounds.getY() + minSize, Utils.getTop(bounds) + unit / 2);
+                x = MathUtils.clamp(x - startX, startBounds.getX() + minSize, Utils.getRight(bounds) + unit / 2);
+                y = MathUtils.clamp(y - startY, startBounds.getY() + minSize, Utils.getTop(bounds) + unit / 2);
                 width = x - startBounds.getX();
                 height = y - startBounds.getY();
                 if (getWidth() != width || getHeight() != height) {
@@ -154,16 +163,16 @@ public class Frame extends Actor {
                 }
                 break;
             case SCALE_SW:
-                x = MathUtils.clamp(x, bounds.x - unit / 2, right - minSize);
-                y = MathUtils.clamp(y, bounds.y - unit / 2, top - minSize);
+                x = MathUtils.clamp(x - startX, bounds.x - unit / 2, right - minSize);
+                y = MathUtils.clamp(y - startY, bounds.y - unit / 2, top - minSize);
                 if (getX() != x || getY() != y) {
                     setSize(right - x, top - y);
                     setPosition(x, y);
                 }
                 break;
             case SCALE_SE:
-                x = MathUtils.clamp(x, startBounds.getX() + minSize, Utils.getRight(bounds) + unit / 2);
-                y = MathUtils.clamp(y, bounds.y - unit / 2, top - minSize);
+                x = MathUtils.clamp(x - startX, startBounds.getX() + minSize, Utils.getRight(bounds) + unit / 2);
+                y = MathUtils.clamp(y - startY, bounds.y - unit / 2, top - minSize);
                 width = x - startBounds.getX();
                 if (getWidth() != width || getY() != y) {
                     setSize(width, top - y);
