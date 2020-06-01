@@ -11,13 +11,12 @@ import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.DrawFragment
 import com.mygdx.guessimage.screen.base.BaseFragment
-import org.jetbrains.anko.frameLayout
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.support.v4.UI
+import com.mygdx.guessimage.screen.play.ui.PlayFragmentUI
+import org.jetbrains.anko.AnkoContext
 
 class PlayFragment : BaseFragment() {
 
-    private val idDrawing = View.generateViewId()
+    val idDrawing = View.generateViewId()
 
     private lateinit var playModel: PlayModel
 
@@ -30,14 +29,7 @@ class PlayFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
-        return UI {
-            frameLayout {
-                layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-                frameLayout {
-                    id = idDrawing
-                }.lparams(matchParent, matchParent)
-            }
-        }.view
+        return PlayFragmentUI().createView(AnkoContext.create(requireActivity(), this))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
