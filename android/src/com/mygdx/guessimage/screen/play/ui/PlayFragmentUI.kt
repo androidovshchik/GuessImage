@@ -14,8 +14,13 @@ class PlayFragmentUI : AnkoComponent<PlayFragment> {
         frameLayout {
             layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
             frameLayout {
-                id = owner.idDrawing
+                id = idDrawing
             }.lparams(matchParent, matchParent)
         }
+    }
+
+    companion object {
+
+        val idDrawing = View.generateViewId()
     }
 }

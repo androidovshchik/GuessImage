@@ -16,8 +16,6 @@ import org.jetbrains.anko.AnkoContext
 
 class PlayFragment : BaseFragment() {
 
-    val idDrawing = View.generateViewId()
-
     private lateinit var playModel: PlayModel
 
     private lateinit var drawFragment: DrawFragment
@@ -34,7 +32,7 @@ class PlayFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         childFragmentManager.transact {
-            add(idDrawing, drawFragment, DrawFragment.TAG)
+            add(PlayFragmentUI.idDrawing, drawFragment, DrawFragment.TAG)
         }
     }
 

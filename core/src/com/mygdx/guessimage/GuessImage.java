@@ -126,15 +126,15 @@ public class GuessImage extends BaseAdapter {
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (bounds.perimeter() > 0) {
-            if (mode == Mode.PLAY) {
-                camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
-            } else if (mode == Mode.EDIT) {
+            if (mode == Mode.EDIT) {
                 Frame frame = currentFrame;
                 if (frame != null) {
                     camera.unproject(coordinates.set(x, y, 0));
                     frame.pan(coordinates.x, coordinates.y, deltaX * camera.zoom, -deltaY * camera.zoom);
+                    return false;
                 }
             }
+            camera.setTranslation(-deltaX * camera.zoom, deltaY * camera.zoom);
         }
         return false;
     }
