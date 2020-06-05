@@ -1,10 +1,8 @@
 package com.mygdx.guessimage.screen.play
 
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.badlogic.gdx.backends.android.AndroidXFragmentApplication
-import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.transact
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.PuzzleEntity
@@ -41,13 +39,6 @@ class PlayActivity : BaseActivity(), AndroidXFragmentApplication.Callbacks {
             playFragment.setObjects(items)
             listFragment.setObjects(items)
         }
-    }
-
-    fun showWinAlert() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.win)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
     }
 
     override fun exit() {}

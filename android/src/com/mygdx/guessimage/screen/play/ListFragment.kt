@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.afollestad.recyclical.datasource.emptyDataSourceTyped
-import com.mygdx.guessimage.extension.activityCallback
+import com.mygdx.guessimage.R
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
 import com.mygdx.guessimage.screen.play.ui.ListFragmentUI
@@ -41,9 +42,7 @@ class ListFragment : BaseFragment() {
             }
             dataSource.invalidateAll()
             if (guessedCount >= dataSource.size()) {
-                context?.activityCallback<PlayActivity> {
-                    showWinAlert()
-                }
+                showWinAlert()
             }
         })
     }
@@ -54,6 +53,14 @@ class ListFragment : BaseFragment() {
             addAll(items)
             invalidateAll()
         }
+    }
+
+    private fun showWinAlert() {
+        val activity = activity ?: return
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.win)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     companion object {
