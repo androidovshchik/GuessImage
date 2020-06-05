@@ -1,5 +1,6 @@
 package com.mygdx.guessimage.screen.main
 
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -11,6 +12,7 @@ import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.recyclerView
+import com.mygdx.guessimage.local.FileManager
 import com.mygdx.guessimage.local.entities.PuzzleCount
 import com.thekhaeng.recyclerviewmargin.LayoutMarginDecoration
 import kotlinx.android.synthetic.main.item_puzzle.view.*
@@ -23,7 +25,9 @@ class PuzzleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val count: TextView = itemView.tv_count
 }
 
-class MainActivityUI : AnkoComponent<MainActivity> {
+class MainActivityUI(context: Context) : AnkoComponent<MainActivity> {
+
+    private val fileManager = FileManager(context)
 
     override fun createView(ui: AnkoContext<MainActivity>): View = with(ui) {
         frameLayout {
@@ -45,7 +49,7 @@ class MainActivityUI : AnkoComponent<MainActivity> {
                     }
                     withItem<PuzzleCount, PuzzleViewHolder>(R.layout.item_puzzle) {
                         onBind(::PuzzleViewHolder) { _, item ->
-                            icon.load(owner.fileManager.getIconFile(item.puzzle.filename))
+                            icon.load(fileManager.getIconFile(item.puzzle.filename))
                             count.text = item.count.toString()
                         }
                         onClick {

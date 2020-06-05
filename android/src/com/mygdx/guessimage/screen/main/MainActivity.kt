@@ -3,7 +3,6 @@ package com.mygdx.guessimage.screen.main
 import android.os.Bundle
 import com.afollestad.recyclical.datasource.dataSourceOf
 import com.mygdx.guessimage.local.Database
-import com.mygdx.guessimage.local.FileManager
 import com.mygdx.guessimage.local.entities.PuzzleEntity
 import com.mygdx.guessimage.screen.base.BaseActivity
 import com.mygdx.guessimage.screen.edit.EditActivity
@@ -20,13 +19,11 @@ class MainActivity : BaseActivity() {
 
     private val db by instance<Database>()
 
-    val fileManager by instance<FileManager>()
-
     val dataSource = dataSourceOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MainActivityUI().setContentView(this)
+        MainActivityUI(applicationContext).setContentView(this)
     }
 
     fun createGame() {
