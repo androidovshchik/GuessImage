@@ -26,7 +26,7 @@ class MainActivity : BaseActivity() {
         MainActivityUI(applicationContext).setContentView(this)
     }
 
-    fun createGame() {
+    fun createPuzzle() {
         isTouchable = false
         launch {
             val puzzle = PuzzleEntity()
@@ -34,12 +34,12 @@ class MainActivity : BaseActivity() {
             withContext(Dispatchers.IO) {
                 puzzle.id = db.puzzleDao().insert(puzzle)
             }
-            startGame(puzzle)
+            startPuzzle(puzzle)
             isTouchable = true
         }
     }
 
-    fun startGame(puzzle: PuzzleEntity) {
+    fun startPuzzle(puzzle: PuzzleEntity) {
         startActivity<EditActivity>("puzzle" to puzzle)
     }
 

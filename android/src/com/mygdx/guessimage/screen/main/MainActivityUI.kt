@@ -44,7 +44,7 @@ class MainActivityUI(context: Context) : AnkoComponent<MainActivity> {
                         onBind(::DummyHolder) { _, _ ->
                         }
                         onClick {
-                            owner.createGame()
+                            owner.createPuzzle()
                         }
                     }
                     withItem<PuzzleCount, PuzzleViewHolder>(R.layout.item_puzzle) {
@@ -53,7 +53,7 @@ class MainActivityUI(context: Context) : AnkoComponent<MainActivity> {
                             count.text = item.count.toString()
                         }
                         onClick {
-                            owner.startGame(item.puzzle)
+                            owner.startPuzzle(item.puzzle)
                         }
                     }
                 }
