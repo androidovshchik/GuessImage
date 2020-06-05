@@ -42,7 +42,10 @@ class ListFragment : BaseFragment() {
             }
             dataSource.invalidateAll()
             if (guessedCount >= dataSource.size()) {
-                showWinAlert()
+                AlertDialog.Builder(activity ?: return@Observer)
+                    .setTitle(R.string.win)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
             }
         })
     }
@@ -53,14 +56,6 @@ class ListFragment : BaseFragment() {
             addAll(items)
             invalidateAll()
         }
-    }
-
-    private fun showWinAlert() {
-        val activity = activity ?: return
-        AlertDialog.Builder(activity)
-            .setTitle(R.string.win)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
     }
 
     companion object {

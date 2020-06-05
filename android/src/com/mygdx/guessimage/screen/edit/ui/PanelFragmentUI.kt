@@ -2,7 +2,6 @@ package com.mygdx.guessimage.screen.edit.ui
 
 import android.animation.LayoutTransition
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.text.InputType
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.withItem
 import com.mygdx.guessimage.R
-import com.mygdx.guessimage.extension.activityCallback
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.entities.ObjectEntity
@@ -27,7 +25,7 @@ import org.jetbrains.anko.sdk21.listeners.textChangedListener
 class PanelFragmentUI : AnkoComponent<PanelFragment> {
 
     override fun createView(ui: AnkoContext<PanelFragment>): View = with(ui) {
-        owner.colorAnimation = ValueAnimator.ofInt(0, greyToPink.lastIndex).apply {
+        owner.addAnimation = ValueAnimator.ofInt(0, greyToPink.lastIndex).apply {
             duration = 500L
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.REVERSE
@@ -42,9 +40,7 @@ class PanelFragmentUI : AnkoComponent<PanelFragment> {
             button {
                 text = context.getString(R.string.btn_close)
                 setOnClickListener {
-                    ctx.activityCallback<Activity> {
-                        finish()
-                    }
+                    owner.closePuzzle()
                 }
             }.lparams(matchParent, wrapContent)
             owner.buttonAdd = tintedButton {

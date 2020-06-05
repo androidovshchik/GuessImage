@@ -44,7 +44,7 @@ class PanelFragment : BaseFragment() {
 
     val dataSource = emptyDataSourceTyped<ObjectEntity>()
 
-    lateinit var colorAnimation: ValueAnimator
+    lateinit var addAnimation: ValueAnimator
 
     var lastObject: ObjectEntity? = null
 
@@ -61,7 +61,7 @@ class PanelFragment : BaseFragment() {
         editModel.galleryPath.observe(viewLifecycleOwner, Observer {
             buttonAdd.isEnabled = true
             buttonSave.isEnabled = true
-            colorAnimation.start()
+            addAnimation.start()
         })
         editModel.frameChanged.observe(viewLifecycleOwner, Observer {
             lastObject?.setFrom(it)
@@ -69,9 +69,26 @@ class PanelFragment : BaseFragment() {
         })
     }
 
+    fun closePuzzle() {
+        if (dataSource.size() > 0) {
+            AlertDialog.Builder(activity ?: return)
+                .setTitle(R.string.prompt)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    activity?.finish()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        } else {
+            activity?.finish()
+        }
+    }
+
     fun addObject() {
         isTouchable = false
-        colorAnimation.cancel()
+        if (addAnimation.isRunning) {
+            addAnimation.reverse()
+            addAnimation.end()
+        }
         launch {
             val objectEntity = ObjectEntity()
             objectEntity.puzzleId = editModel.puzzle.id
@@ -123,12 +140,9 @@ class PanelFragment : BaseFragment() {
         }
     }
 
-    private fun showPromptAlert() {
-        val activity = activity ?: return
-        AlertDialog.Builder(activity)
-            .setTitle(R.string.prompt)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
+    override fun onDestroyView() {
+        addAnimation.removeAllUpdateListeners()
+        super.onDestroyView()
     }
 
     companion object {
