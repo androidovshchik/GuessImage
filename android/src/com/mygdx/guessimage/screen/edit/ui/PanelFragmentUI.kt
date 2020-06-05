@@ -1,7 +1,10 @@
 package com.mygdx.guessimage.screen.edit.ui
 
 import android.animation.LayoutTransition
+import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
@@ -18,11 +21,21 @@ import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.edit.ObjectViewHolder
 import com.mygdx.guessimage.screen.edit.PanelFragment
 import org.jetbrains.anko.*
+import org.jetbrains.anko.appcompat.v7.tintedButton
 import org.jetbrains.anko.sdk21.listeners.textChangedListener
 
 class PanelFragmentUI : AnkoComponent<PanelFragment> {
 
     override fun createView(ui: AnkoContext<PanelFragment>): View = with(ui) {
+        owner.colorAnimation = ValueAnimator.ofInt(0, greyToPink.lastIndex).apply {
+            duration = 500L
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            addUpdateListener {
+                owner.buttonAdd.backgroundTintList =
+                    ColorStateList.valueOf(greyToPink[it.animatedValue as Int])
+            }
+        }
         verticalLayout {
             layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
             layoutTransition = LayoutTransition()
@@ -34,7 +47,7 @@ class PanelFragmentUI : AnkoComponent<PanelFragment> {
                     }
                 }
             }.lparams(matchParent, wrapContent)
-            owner.buttonAdd = button {
+            owner.buttonAdd = tintedButton {
                 text = context.getString(R.string.btn_add)
                 isEnabled = false
                 setOnClickListener {
@@ -79,5 +92,27 @@ class PanelFragmentUI : AnkoComponent<PanelFragment> {
                 }
             }.lparams(matchParent, wrapContent)
         }
+    }
+
+    companion object {
+
+        // https://colordesigner.io/gradient-generator
+        private val greyToPink = intArrayOf(
+            Color.parseColor("#d6d8d7"),
+            Color.parseColor("#ced6d0"),
+            Color.parseColor("#c9d4c7"),
+            Color.parseColor("#c6d1bc"),
+            Color.parseColor("#c7cdb0"),
+            Color.parseColor("#cbc8a4"),
+            Color.parseColor("#d1c399"),
+            Color.parseColor("#d9bc8f"),
+            Color.parseColor("#e1b488"),
+            Color.parseColor("#eaac85"),
+            Color.parseColor("#f2a385"),
+            Color.parseColor("#f99989"),
+            Color.parseColor("#fe9091"),
+            Color.parseColor("#ff879c"),
+            Color.parseColor("#ff80ab")
+        )
     }
 }
