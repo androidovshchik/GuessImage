@@ -1,5 +1,6 @@
 package com.mygdx.guessimage.screen.edit
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,10 +8,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.emptyDataSourceTyped
+import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.isVisible
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.ObjectEntity
@@ -41,6 +44,8 @@ class PanelFragment : BaseFragment() {
 
     val dataSource = emptyDataSourceTyped<ObjectEntity>()
 
+    lateinit var colorAnimation: ValueAnimator
+
     var lastObject: ObjectEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +61,7 @@ class PanelFragment : BaseFragment() {
         editModel.galleryPath.observe(viewLifecycleOwner, Observer {
             buttonAdd.isEnabled = true
             buttonSave.isEnabled = true
+            colorAnimation.start()
         })
         editModel.frameChanged.observe(viewLifecycleOwner, Observer {
             lastObject?.setFrom(it)
@@ -65,6 +71,7 @@ class PanelFragment : BaseFragment() {
 
     fun addObject() {
         isTouchable = false
+        colorAnimation.cancel()
         launch {
             val objectEntity = ObjectEntity()
             objectEntity.puzzleId = editModel.puzzle.id
@@ -114,6 +121,14 @@ class PanelFragment : BaseFragment() {
             }
             activity?.finish()
         }
+    }
+
+    private fun showPromptAlert() {
+        val activity = activity ?: return
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.prompt)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     companion object {

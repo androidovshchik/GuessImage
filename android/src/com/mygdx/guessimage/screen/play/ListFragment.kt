@@ -30,13 +30,13 @@ class ListFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        playModel.framesGuessed.observe(viewLifecycleOwner, Observer {
+        playModel.framesGuessed.observe(viewLifecycleOwner, Observer { ids ->
             var guessedCount = 0
-            dataSource.toList().forEachIndexed { i, item ->
-                if (item.id in it) {
-                    item.isGuessed = true
+            dataSource.toList().forEach {
+                if (it.id in ids) {
+                    it.isGuessed = true
                 }
-                if (item.isGuessed) {
+                if (it.isGuessed) {
                     guessedCount++
                 }
             }
