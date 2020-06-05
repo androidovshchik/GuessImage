@@ -1,9 +1,6 @@
 package com.mygdx.guessimage.screen.edit
 
-import android.animation.LayoutTransition
 import android.os.Bundle
-import android.text.InputType
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,27 +9,19 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.recyclical.ViewHolder
 import com.afollestad.recyclical.datasource.emptyDataSourceTyped
-import com.afollestad.recyclical.setup
-import com.afollestad.recyclical.withItem
-import com.mygdx.guessimage.R
 import com.mygdx.guessimage.extension.isVisible
-import com.mygdx.guessimage.extension.recyclerView
 import com.mygdx.guessimage.local.Database
 import com.mygdx.guessimage.local.entities.ObjectEntity
 import com.mygdx.guessimage.screen.base.BaseFragment
+import com.mygdx.guessimage.screen.edit.ui.PanelFragmentUI
 import kotlinx.android.synthetic.main.item_object.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk21.listeners.textChangedListener
-import org.jetbrains.anko.support.v4.UI
+import org.jetbrains.anko.AnkoContext
 import org.kodein.di.generic.instance
 
 class ObjectViewHolder(itemView: View) : ViewHolder(itemView) {
@@ -45,14 +34,14 @@ class PanelFragment : BaseFragment() {
 
     private lateinit var editModel: EditModel
 
-    private lateinit var buttonAdd: Button
-    private lateinit var buttonReady: Button
-    private lateinit var editName: EditText
-    private lateinit var buttonSave: Button
+    lateinit var buttonAdd: Button
+    lateinit var buttonReady: Button
+    lateinit var editName: EditText
+    lateinit var buttonSave: Button
 
-    private val dataSource = emptyDataSourceTyped<ObjectEntity>()
+    val dataSource = emptyDataSourceTyped<ObjectEntity>()
 
-    private var lastObject: ObjectEntity? = null
+    var lastObject: ObjectEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,103 +49,7 @@ class PanelFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, root: ViewGroup?, bundle: Bundle?): View {
-        return UI {
-            verticalLayout {
-                layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-                layoutTransition = LayoutTransition()
-                button {
-                    text = getString(R.string.btn_close)
-                    setOnClickListener {
-                        activity?.finish()
-                    }
-                }.lparams(matchParent, wrapContent)
-                buttonAdd = button {
-                    text = getString(R.string.btn_add)
-                    isEnabled = false
-                    setOnClickListener {
-                        isTouchable = false
-                        launch {
-                            val objectEntity = ObjectEntity()
-                            objectEntity.puzzleId = editModel.puzzle.id
-                            withContext(Dispatchers.IO) {
-                                objectEntity.id = db.objectDao().insert(objectEntity)
-                            }
-                            lastObject = objectEntity
-                            editModel.newObject.value = objectEntity
-                            it.isVisible = false
-                            editName.apply {
-                                text = null
-                                isVisible = true
-                                requestFocus()
-                            }
-                            buttonReady.isVisible = true
-                            isTouchable = true
-                        }
-                    }
-                }.lparams(matchParent, wrapContent)
-                buttonReady = button {
-                    text = getString(R.string.btn_ready)
-                    isVisible = false
-                    setOnClickListener {
-                        val objectEntity = lastObject ?: return@setOnClickListener
-                        isTouchable = false
-                        launch {
-                            withContext(Dispatchers.IO) {
-                                db.objectDao().update(objectEntity)
-                            }
-                            lastObject = null
-                            editModel.readyObject.value = objectEntity
-                            dataSource.apply {
-                                add(objectEntity)
-                                invalidateAt(size() - 1)
-                            }
-                            editName.isVisible = false
-                            it.isVisible = false
-                            buttonAdd.isVisible = true
-                            isTouchable = true
-                        }
-                    }
-                }.lparams(matchParent, wrapContent)
-                editName = editText {
-                    inputType = InputType.TYPE_CLASS_TEXT
-                    gravity = Gravity.CENTER
-                    maxLines = 1
-                    isVisible = false
-                    textChangedListener {
-                        afterTextChanged {
-                            lastObject?.name = it?.toString()
-                        }
-                    }
-                }.lparams(matchParent, wrapContent)
-                recyclerView {
-                    addItemDecoration(DividerItemDecoration(context, VERTICAL))
-                    setup {
-                        withLayoutManager(LinearLayoutManager(context))
-                        withDataSource(dataSource)
-                        withItem<ObjectEntity, ObjectViewHolder>(R.layout.item_object) {
-                            onBind(::ObjectViewHolder) { _, item ->
-                                name.text = item.name
-                            }
-                        }
-                    }
-                }.lparams(matchParent, 0, 1f)
-                buttonSave = button {
-                    text = getString(R.string.btn_save)
-                    isEnabled = false
-                    setOnClickListener {
-                        isTouchable = false
-                        GlobalScope.launch(Dispatchers.Main) {
-                            val puzzle = editModel.puzzle
-                            puzzle.ready = true
-                            withContext(Dispatchers.IO) {
-                                db.puzzleDao().update(puzzle)
-                            }
-                            activity?.finish()
-                        }
-                    }
-                }.lparams(matchParent, wrapContent)
-            }
-        }.view
+        return PanelFragmentUI().createView(AnkoContext.create(requireActivity(), this))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -168,6 +61,59 @@ class PanelFragment : BaseFragment() {
             lastObject?.setFrom(it)
             editName.requestFocus()
         })
+    }
+
+    fun addObject() {
+        isTouchable = false
+        launch {
+            val objectEntity = ObjectEntity()
+            objectEntity.puzzleId = editModel.puzzle.id
+            withContext(Dispatchers.IO) {
+                objectEntity.id = db.objectDao().insert(objectEntity)
+            }
+            lastObject = objectEntity
+            editModel.newObject.value = objectEntity
+            buttonAdd.isVisible = false
+            editName.apply {
+                text = null
+                isVisible = true
+                requestFocus()
+            }
+            buttonReady.isVisible = true
+            isTouchable = true
+        }
+    }
+
+    fun saveObject() {
+        val objectEntity = lastObject ?: return
+        isTouchable = false
+        launch {
+            withContext(Dispatchers.IO) {
+                db.objectDao().update(objectEntity)
+            }
+            editModel.readyObject.value = objectEntity
+            dataSource.apply {
+                add(objectEntity)
+                invalidateAt(size() - 1)
+            }
+            lastObject = null
+            editName.isVisible = false
+            buttonReady.isVisible = false
+            buttonAdd.isVisible = true
+            isTouchable = true
+        }
+    }
+
+    fun savePuzzle() {
+        isTouchable = false
+        val puzzle = editModel.puzzle
+        puzzle.ready = true
+        GlobalScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.IO) {
+                db.puzzleDao().update(puzzle)
+            }
+            activity?.finish()
+        }
     }
 
     companion object {

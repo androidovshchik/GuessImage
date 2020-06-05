@@ -34,12 +34,12 @@ class ListFragment : BaseFragment() {
             dataSource.toList().forEachIndexed { i, item ->
                 if (item.id in it) {
                     item.isGuessed = true
-                    dataSource.invalidateAt(i)
                 }
                 if (item.isGuessed) {
                     guessedCount++
                 }
             }
+            dataSource.invalidateAll()
             if (guessedCount >= dataSource.size()) {
                 context?.activityCallback<PlayActivity> {
                     showWinAlert()
